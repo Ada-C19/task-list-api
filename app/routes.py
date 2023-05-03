@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from app.models.task import Task
 from app import db
 
@@ -29,3 +29,16 @@ def create_a_task():
             "is_complete": new_task.is_complete
         }
     }, 201
+    
+@tasks_bp.route("", method=["GET"])
+def get_saved_tasks():
+    tasks = Task.query.all()
+    task_response = []
+    # Question: Isn't query.all() return result as a list already? why append again?
+    if not tasks:
+        for task in tasks:
+    # Question: will this work without to_dict()?
+            task_response.append(task)
+        return jsonify(task_response), 200
+    else:
+        return task_response, 200
