@@ -189,7 +189,7 @@ Consider using the keyword argument `data`, `json`, and/or `headers`
 
 Test and verify that your API sends an API call to the Slack web API by using Postman!
 
-Send `PATCH` requests to `localhost:5000/tasks/<book_id>/mark_complete` (use the ID of any existing task), and check if Slack messages were sent.
+Send `PATCH` requests to `localhost:5000/tasks/<task_id>/mark_complete` (use the ID of any existing task), and check if Slack messages were sent.
 
 ![](assets/postman_patch.png)
 
