@@ -42,13 +42,14 @@ def create_task():
 
 def read_all_tasks():
 
-    title_query = request.args.get("title")
-
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-        
-    else: 
-    
+    sorting_query = request.args.get("sort")
+    if sorting_query == "asc":
+        print("ASCENDED")
+        tasks=Task.query.order_by(Task.title.asc())
+    elif sorting_query=="desc":
+        print("DESCENDED")
+        tasks=Task.query.order_by(Task.title.desc())
+    else:
         tasks = Task.query.all()
     
     tasks_response = []
@@ -89,3 +90,21 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'},200)
+
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PUT"])
+def finished_task(task_id):
+    
+    updated_task=handle_id_request(Task, task_id)
+
+    #updated_task.completed_at = (2012, 9, 1)
+    updated_task.title= "WASHUUU"
+
+    
+
+    db.session.commit()
+
+    task_response = updated_task.to_dict()
+    print (task_response)
+
+    return make_response(jsonify ({"task":task_response}), 200)

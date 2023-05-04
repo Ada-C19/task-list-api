@@ -22,7 +22,6 @@ def test_get_tasks_one_saved_tasks(client, one_task):
     # Assert
     assert response.status_code == 200
     assert len(response_body) == 1
-    print (response_body)
     assert response_body == [
         {
             "id": 1,
