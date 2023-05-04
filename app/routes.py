@@ -23,14 +23,14 @@ def get_one_task(task_id):
     return {"task": task.to_dict()}, 200
 
 
-# @task_bp.route("", methods=["POST"])
-# def create_new_task():
-#     request_body = request.get_json()
-#     new_task = Task(
-#         "title": request.title,
-#         "description": request.description
-#     )
+@task_bp.route("", methods=["POST"])
+def create_new_task():
+    request_body = request.get_json()
+    new_task = Task(
+        title=request_body["title"],
+        description=request_body["description"]
+    )
+    db.session.add(new_task)
+    db.session.commit()
 
-
-
-#     return {"task": None}, 201
+    return {"task": new_task.to_dict()}, 201
