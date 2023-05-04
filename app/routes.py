@@ -5,6 +5,18 @@ from app import db
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+# helper function: validate task
+def validate_task(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({"message": f"{type(task_id)} is not a valid type"}, 400))
+
+    task = Task.query.get(task_id)
+    if not task:
+        abort(make_response({"message": f"task #{task_id} not found"}, 404))
+
+
 
 @tasks_bp.route("", methods=["POST"])
 def make_tast():
