@@ -16,7 +16,7 @@ def create_a_task():
     
     request_body = request.get_json()
     
-    new_task = Task(title=request_body["title"], description=request_body["description"], completed_at=request_body["completed_at"])
+    new_task = Task(title=request_body["title"], description=request_body["description"])
     
     db.session.add(new_task)
     db.session.commit()
@@ -30,15 +30,28 @@ def create_a_task():
         }
     }, 201
     
-@tasks_bp.route("", method=["GET"])
+@tasks_bp.route("", methods=["GET"])
 def get_saved_tasks():
     tasks = Task.query.all()
     task_response = []
     # Question: Isn't query.all() return result as a list already? why append again?
-    if not tasks:
+    if tasks is not None:
         for task in tasks:
     # Question: will this work without to_dict()?
-            task_response.append(task)
+            task_response.append(task.to_dict())
         return jsonify(task_response), 200
     else:
-        return task_response, 200
+        return tasks, 200
+    
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task_id = int(task_id)
+    task = Task.query.get(task_id)
+    return {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
+        }
+    }, 200
