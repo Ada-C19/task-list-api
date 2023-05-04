@@ -4,7 +4,7 @@ from app.models.task import Task
 
 tasks_bp = Blueprint ("tasks", __name__, url_prefix="/tasks")
 
-def handle_id_reguest(cls,id):
+def handle_id_request(cls,id):
     try:
         id = int(id)
     except:
@@ -31,7 +31,7 @@ def create_task():
 
     task_response = new_task.to_dict()
 
-    return make_response(jsonify (task_response), 200)
+    return make_response(jsonify ({"task":task_response}), 201)
 
 
 @tasks_bp.route("", methods=[ "GET"])
@@ -54,9 +54,34 @@ def read_all_tasks():
     return make_response(jsonify (tasks_response), 200)
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
+
 def read_one_task(task_id):
-    task=handle_id_reguest(task_id)
+    task=handle_id_request(Task, task_id)
     #task = Task.query.get(task_id)
+
     task_response = task.to_dict()
     return make_response({"task": task_response},200)
 
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):
+    
+    updated_task=handle_id_request(Task, task_id)
+    request_body = request.get_json()
+
+    updated_task.title = request_body["title"]
+    updated_task.description = request_body["description"]
+
+    db.session.commit()
+
+    task_response = updated_task.to_dict()
+
+    return make_response(jsonify ({"task":task_response}), 200)
+
+@tasks_bp.route("/<task_id>", methods = ["DELETE"])
+def delete_task(task_id):
+    task= handle_id_request(Task, task_id)
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'},200)
