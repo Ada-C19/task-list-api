@@ -4,6 +4,10 @@ from app import db
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
+    #tasks = db.relationship('Task', back_populates = 'Goal', 
+#lazy = True)
+    tasks = db.relationship('task', backref='goal', lazy=True)
+
 
     def to_dict(self):
         goal_as_dict={}
