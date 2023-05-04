@@ -1,6 +1,9 @@
 from flask import Blueprint,jsonify, abort, make_response,request
 from app import db
 from app.models.task import Task
+import datetime
+
+
 
 tasks_bp = Blueprint ("tasks", __name__, url_prefix="/tasks")
 
@@ -44,10 +47,8 @@ def read_all_tasks():
 
     sorting_query = request.args.get("sort")
     if sorting_query == "asc":
-        print("ASCENDED")
         tasks=Task.query.order_by(Task.title.asc())
     elif sorting_query=="desc":
-        print("DESCENDED")
         tasks=Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
@@ -93,15 +94,26 @@ def delete_task(task_id):
 
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PUT"])
+
 def finished_task(task_id):
     
     updated_task=handle_id_request(Task, task_id)
 
-    #updated_task.completed_at = (2012, 9, 1)
-    updated_task.title= "WASHUUU"
+    updated_task.completed_at = datetime.datetime.utcnow()
+    db.session.commit()
 
+    task_response = updated_task.to_dict()
+    print (task_response)
+
+    return make_response(jsonify ({"task":task_response}), 200)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PUT"])
+
+def unfinished_task(task_id):
     
+    updated_task=handle_id_request(Task, task_id)
 
+    updated_task.completed_at = None
     db.session.commit()
 
     task_response = updated_task.to_dict()
