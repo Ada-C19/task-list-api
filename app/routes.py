@@ -22,7 +22,7 @@ def validate_task(task_id):
 
 
 @tasks_bp.route("", methods=["POST"])
-def make_task():
+def create_task():
     try:
         request_body = request.get_json()
 
@@ -43,6 +43,7 @@ def make_task():
     "is_complete": bool(new_task.completed_at)
 }
 }, 201)
+
     except KeyError as error:
         abort(make_response({"details": "Invalid data"}, 400))
         # abort(make_response(f"{error.__str__()} is missing", 400))
@@ -67,16 +68,16 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_task(task_id)
-    return {
+    return { "task":{
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": bool(task.completed_at)
+                "is_complete": bool(task.completed_at)}
             }
 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
-def fix_one_task(task_id):
+def update_task(task_id):
     task = validate_task(task_id)
 
     request_body = request.get_json()
@@ -89,9 +90,19 @@ def fix_one_task(task_id):
     # if request_body["completed_at"] else task.completed_at
 
     db.session.commit()
-    return {
+    return {"task": {
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": bool(task.completed_at)
+                "is_complete": bool(task.completed_at)}
             }
+
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task = validate_task(task_id)
+    db.session.delete(task)
+    db.session.commit()
+    return make_response({
+        "details": f"Task {task.task_id} \"{task.title}\" successfully deleted"
+})
