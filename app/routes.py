@@ -54,5 +54,17 @@ def update_one_task(task_id):
         task.title = request_body["title"]
     if "description" in request_body:
         task.description = request_body["description"]
+    #TODO:Update the completed_at attribute
     db.session.commit()
     return {"task": task.to_dict()}, 200
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task_to_delete = Task.query.get(task_id)
+    
+    db.session.delete(task_to_delete)
+    db.session.commit()
+    
+    return {
+        "details": f'Task {task_to_delete.task_id} "{task_to_delete.title}" successfully deleted'
+    }, 200
