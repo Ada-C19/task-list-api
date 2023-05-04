@@ -35,7 +35,12 @@ def get_task(task_id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task.from_dict(request_body)
+    try:
+        new_task = Task.from_dict(request_body)
+    except KeyError:
+        return {
+        "details": "Invalid data"
+        }, 400
 
     db.session.add(new_task)
     db.session.commit()
@@ -49,13 +54,13 @@ def update_task(task_id):
     task_to_update = validate_model(Task, task_id)
 
     request_body = request.get_json()
-    for key, item in request_body.items():
+    for key, value in request_body.items():
         if key == "title":
-            task_to_update.title = item
+            task_to_update.title = value
         elif key == "description":
-            task_to_update.description = item
+            task_to_update.description = value
         elif key == "is_complete":
-            task_to_update.is_complete = item
+            task_to_update.is_complete = value
     
     db.session.commit()
 
