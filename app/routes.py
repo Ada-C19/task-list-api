@@ -2,15 +2,19 @@ from flask import Blueprint, make_response, request, jsonify, abort
 from app import db
 from app.models.task import Task
 from datetime import datetime
+import os
+import requests
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
     if "title" not in request_body or "description" not in request_body:
         return {"details": "Invalid data"}, 400
-    # should I have to do the next if check?
+
     if "completed_at" in request_body:
         new_task = Task(
             title = request_body["title"],
@@ -88,9 +92,13 @@ def mark_complete(task_id):
     task = validate_task(task_id)
 
     task.completed_at = datetime.utcnow()
-
-    
     db.session.commit()
+
+    api_url = "https://hooks.slack.com/services/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"
+    payload = {"text": f"Someone just completed the task {task.title}"}
+    head = {"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"}
+
+    response = requests.post(url=api_url, json=payload, headers=head)
     
     return {"task": task.to_dict()}, 200
 
