@@ -57,3 +57,25 @@ def get_one_task(task_id):
                 "description": task.description,
                 "is_complete": bool(task.completed_at)
             }
+
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def fix_one_task(task_id):
+    task = Task.query.get(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    # if request_body["title"] else task.title
+    task.description = request_body["description"] 
+    # if request_body["description"] else task.description
+    # task.completed_at = request_body["completed_at"] 
+    # if request_body["completed_at"] else task.completed_at
+
+    db.session.commit()
+    return {
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            }
