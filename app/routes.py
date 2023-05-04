@@ -95,7 +95,7 @@ def delete_task(task_id):
     return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'},200)
 
 
-@tasks_bp.route("/<task_id>/mark_complete", methods=["PUT"])
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 
 def finished_task(task_id):
     
@@ -109,7 +109,7 @@ def finished_task(task_id):
 
     return make_response(jsonify ({"task":task_response}), 200)
 
-@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PUT"])
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 
 def unfinished_task(task_id):
     
@@ -139,4 +139,47 @@ def create_goal():
 
     goal_response = new_goal.to_dict()
 
-    return make_response(jsonify ({"task":goal_response}), 201)
+    return make_response(jsonify ({"goal":goal_response}), 201)
+
+@goals_bp.route("", methods=[ "GET"])
+
+def read_all_goals():
+
+    sorting_query = request.args.get("sort")
+    if sorting_query == "asc":
+        goals=Goal.query.order_by(Goal.title.asc())
+    elif sorting_query=="desc":
+        goals=Goal.query.order_by(Goal.title.desc())
+    else:
+        goals = Goal.query.all()
+    
+    goals_response = []
+    for goal in goals: 
+        goals_response.append(goal.to_dict())
+    
+    return make_response(jsonify (goals_response), 200)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+
+def read_one_goal(goal_id):
+    goal=handle_id_request(Goal, goal_id)
+    #task = Task.query.get(task_id)
+
+    goal_response = goal.to_dict()
+    return make_response({"goal": goal_response},200)
+
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_one_goal(goal_id):
+    
+    updated_goal=handle_id_request(Goal, goal_id)
+    request_body = request.get_json()
+
+    updated_goal.title = request_body["title"]
+    #updated_goal.description = request_body["description"]
+
+    db.session.commit()
+
+    goal_response = updated_goal.to_dict()
+
+    return make_response(jsonify ({"goal":goal_response}), 200)
