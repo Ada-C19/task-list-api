@@ -4,6 +4,16 @@ from app import db
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+# Helper Function
+def validate_task(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({'message': f'Invalid Task id {task_id}'}, 400))
+    task = Task.query.get(task_id)
+    if not task:
+        abort(make_response({'message': f'Task id {task_id} not found'}, 404))
+    return task
 
 # route for posting a task to db
 @task_bp.route("", methods=['POST'])
@@ -42,7 +52,7 @@ def get_all_tasks():
 # get one saved task
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = Task.query.get(task_id)
+    task = validate_task(task_id)
     response_body = {
         "task": {
             "id": task.task_id,
@@ -58,13 +68,26 @@ def get_one_task(task_id):
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_route_by_id(task_id):
     request_body = request.get_json()
-    task = Task.query.get(task_id)
+    task = validate_task(task_id)
+    task.title = request_body['title']
+    task.description = request_body['description']
+    db.session.commit()
+
     task_response = {
         "task": {
             "title": request_body['title'],
             "description": request_body['description'],
             'id': task.task_id,
             'completed_at': bool(task.completed_at)
-            }
         }
+    }
     return jsonify(task_response), 200
+
+@task_bp.route("/<task_id>", methods=['DELETE'])
+def delete_one_task(task_id):
+    task = validate_task(task_id)
+    response_body = {"details": f'Task {task_id} "{task.title}" successfully deleted'}
+    db.session.delete(task)
+    db.session.commit()
+
+    return jsonify(response_body), 200
