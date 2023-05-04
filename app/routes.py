@@ -22,12 +22,7 @@ def create_a_task():
     db.session.commit()
     
     return {
-        "task": {
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": new_task.is_complete
-        }
+        "task": new_task.to_dict()
     }, 201
     
 @tasks_bp.route("", methods=["GET"])
@@ -50,3 +45,14 @@ def get_one_task(task_id):
     return {
         "task": task.to_dict()
     }, 200
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):
+    request_body = request.get_json()
+    task = Task.query.get(task_id)
+    if "title" in request_body:
+        task.title = request_body["title"]
+    if "description" in request_body:
+        task.description = request_body["description"]
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
