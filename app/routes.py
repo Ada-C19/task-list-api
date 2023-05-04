@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify, abort, make_response,request
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 import datetime
 
 
@@ -121,3 +122,21 @@ def unfinished_task(task_id):
     print (task_response)
 
     return make_response(jsonify ({"task":task_response}), 200)
+
+@goals_bp.route("", methods=["POST"])
+
+def create_goal():
+
+    request_body = request.get_json()
+
+    if "title" not in request_body:
+        return make_response({"details": "Invalid data"},400)
+    
+    new_goal = Goal.from_dict(request_body)
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    goal_response = new_goal.to_dict()
+
+    return make_response(jsonify ({"task":goal_response}), 201)
