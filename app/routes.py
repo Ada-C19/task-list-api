@@ -3,7 +3,7 @@ from app import db
 from app.models.task import Task
 
 
-task_bp = Blueprint("tasks", __name__, url_prefix="/planet")
+task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 def validate_task(task_id):
     try:
@@ -30,5 +30,5 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response({"msg": f"Task {new_task.title} successfully created"}), 201
+    return {"msg": f"Task {new_task.title} successfully created"}, 201
 
