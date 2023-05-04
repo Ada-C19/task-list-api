@@ -12,4 +12,4 @@ class Task(db.Model):
         return {"id":self.id,
                 "title": self.title,
                 "description": self.description,
-                "completed_at":self.completed_at}
+                "is_complete":(self.completed_at != None)}
