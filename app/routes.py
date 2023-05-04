@@ -183,3 +183,11 @@ def update_one_goal(goal_id):
     goal_response = updated_goal.to_dict()
 
     return make_response(jsonify ({"goal":goal_response}), 200)
+
+@goals_bp.route("/<goal_id>", methods = ["DELETE"])
+def delete_goal(goal_id):
+    goal= handle_id_request(Goal, goal_id)
+    db.session.delete(goal)
+    db.session.commit()
+
+    return make_response({"details":f'Goal {goal.goal_id} "{goal.title}" successfully deleted'},200)

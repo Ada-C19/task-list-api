@@ -11,6 +11,8 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at= db.Column(db.DateTime, nullable=True)
+    #goal_id = db.Column(db.Integer, ForeignKey('countries.id'))
+    #goal = relationship('Country', back_populates = 'cities')
 
     def to_dict(self):
         task_as_dict={}
