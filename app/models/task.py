@@ -7,3 +7,14 @@ class Task(db.Model):
     description = db.Column(db.Text)
     completed_at = db.Column(db.DateTime, nullable=True, default=None)
 
+    def to_dict(self):
+        task = {
+        "id": self.task_id,
+        "title": self.title,
+        "description": self.description,
+        "is_complete": False
+    }
+        if self.completed_at is not None:
+            task["is_complete"] = True
+
+        return task
