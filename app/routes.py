@@ -43,3 +43,22 @@ def create_task():
     return {
         "task": new_task.to_dict()
     }, 201
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task_to_update = validate_model(Task, task_id)
+
+    request_body = request.get_json()
+    for key, item in request_body.items():
+        if key == "title":
+            task_to_update.title = item
+        elif key == "description":
+            task_to_update.description = item
+        elif key == "is_complete":
+            task_to_update.is_complete = item
+    
+    db.session.commit()
+
+    return {
+        "task": task_to_update.to_dict()
+    }, 200
