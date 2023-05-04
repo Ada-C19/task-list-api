@@ -33,7 +33,7 @@ def make_tast():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    
+
     tasks = Task.query.all()
     tasks_response = []
 
@@ -47,3 +47,13 @@ def get_all_tasks():
             }
         )
     return jsonify(tasks_response)
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = Task.query.get(task_id)
+    return {
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            }
