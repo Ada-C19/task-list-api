@@ -7,3 +7,11 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, default=None, nullable = True)
     
+
+    def task_display_dict(self):
+        return{
+            "task_id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "completed_at": self.completed_at
+        }
