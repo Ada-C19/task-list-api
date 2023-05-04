@@ -18,5 +18,4 @@ def create_task():
     return {"id":new_task.id,
             "title": new_task.title,
             "description": new_task.description,
-            "completed_at":new_task.completed_at, 
-            "msg": "successfully created"}, 201
+            "is_complete": (new_task.completed_at != None)}, 201
