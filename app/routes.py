@@ -47,3 +47,14 @@ def update_one_task(task_id):
     db.session.commit()
 
     return {"task": task.to_dict()}, 200
+
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task = Task.query.get_or_404(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return {"details": (f'Task {task.task_id} "{task.title}" '
+                        'successfully deleted')}, 200
