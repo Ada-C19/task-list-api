@@ -26,10 +26,14 @@ def get_one_task(task_id):
 @task_bp.route("", methods=["POST"])
 def create_new_task():
     request_body = request.get_json()
-    new_task = Task(
-        title=request_body["title"],
-        description=request_body["description"]
-    )
+    try:
+        new_task = Task(
+            title=request_body["title"],
+            description=request_body["description"]
+        )
+    except KeyError:
+        return {"details": "Invalid data"}, 400
+    
     db.session.add(new_task)
     db.session.commit()
 
