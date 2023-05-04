@@ -6,6 +6,7 @@ import datetime
 
 
 tasks_bp = Blueprint ("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint ("goals", __name__, url_prefix="/goals")
 
 def handle_id_request(cls,id):
     try:
