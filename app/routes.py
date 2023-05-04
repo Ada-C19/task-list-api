@@ -94,7 +94,7 @@ def mark_complete(task_id):
     task.completed_at = datetime.utcnow()
     db.session.commit()
 
-    api_url = "https://hooks.slack.com/services/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"
+    api_url = os.environ.get("API_URL")
     payload = {"text": f"Someone just completed the task {task.title}"}
     head = {"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"}
 
