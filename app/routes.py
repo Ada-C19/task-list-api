@@ -9,11 +9,18 @@ def create_task():
     request_body = request.get_json()
     if "title" not in request_body or "description" not in request_body:
         return {"details": "Invalid data"}, 400
-
-    new_task = Task(
-        title = request_body["title"],
-        description = request_body["description"]
-    )
+    # should I have to do the next if check?
+    if "completed_at" in request_body:
+        new_task = Task(
+            title = request_body["title"],
+            description = request_body["description"],
+            completed_at = request_body["completed_at"]
+        )
+    else:
+        new_task = Task(
+            title = request_body["title"],
+            description = request_body["description"]
+        )
 
     db.session.add(new_task)
     db.session.commit()
