@@ -48,10 +48,5 @@ def get_one_task(task_id):
     task_id = int(task_id)
     task = Task.query.get(task_id)
     return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.is_complete
-        }
+        "task": task.to_dict()
     }, 200
