@@ -20,10 +20,16 @@ def validate_task(task_id):
 
     return task
 
+
 #POST request
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+    if not request_body.get("description") or not request_body.get("title"):
+            abort(make_response({
+                    "details": "Invalid data"
+                }, 400))
+
     new_task = Task(title=request_body["title"],
                     description=request_body["description"],
                     completed_at=request_body.get("completed_at"))
@@ -68,7 +74,7 @@ def get_task_by_id(task_id):
         }
     }
 
-#update task by id
+#Update task by id
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task_by_id(task_id):
     task = validate_task(task_id)
@@ -87,3 +93,15 @@ def update_task_by_id(task_id):
             "is_complete": not task.completed_at is None
         }
     }, 200
+
+#Delete task 
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_task(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return {
+        "details": f'Task {task_id} "{task.title}" successfully deleted'
+    }
