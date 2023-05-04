@@ -38,3 +38,33 @@ def get_all_tasks():
             "completed_at": bool(task.completed_at)
         })
     return jsonify(tasks_response), 200
+
+# get one saved task
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = Task.query.get(task_id)
+    response_body = {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "completed_at": task.completed_at
+        }
+    }
+    return jsonify(response_body), 200
+
+
+# update task route
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_route_by_id(task_id):
+    request_body = request.get_json()
+    task = Task.query.get(task_id)
+    task_response = {
+        "task": {
+            "title": request_body['title'],
+            "description": request_body['description'],
+            'id': task.task_id,
+            'completed_at': bool(task.completed_at)
+            }
+        }
+    return jsonify(task_response), 200
