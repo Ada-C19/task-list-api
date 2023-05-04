@@ -13,13 +13,16 @@ def validate_task(task_id):
         abort(make_response({"message": f"{type(task_id)} is not a valid type"}, 400))
 
     task = Task.query.get(task_id)
+
     if not task:
         abort(make_response({"message": f"task #{task_id} not found"}, 404))
+    
+    return task
 
 
 
 @tasks_bp.route("", methods=["POST"])
-def make_tast():
+def make_task():
     try:
         request_body = request.get_json()
 
@@ -41,7 +44,8 @@ def make_tast():
 }
 }, 201)
     except KeyError as error:
-        abort(make_response(f"{error.__str__()} is missing", 400))
+        abort(make_response({"details": "Invalid data"}, 400))
+        # abort(make_response(f"{error.__str__()} is missing", 400))
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -62,7 +66,7 @@ def get_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = Task.query.get(task_id)
+    task = validate_task(task_id)
     return {
                 "id": task.task_id,
                 "title": task.title,
@@ -73,7 +77,7 @@ def get_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def fix_one_task(task_id):
-    task = Task.query.get(task_id)
+    task = validate_task(task_id)
 
     request_body = request.get_json()
 
