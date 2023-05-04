@@ -12,6 +12,7 @@ def get_tasks():
         response.append(task.to_dict())
     return jsonify(response), 200
 
+
 @task_bp.route("", methods = ["POST"])
 def create_new_task():
     request_body = request.get_json()
@@ -25,10 +26,32 @@ def create_new_task():
     result = new_task.to_dict()
     return {"task": new_task.to_dict()}, 201
 
+
 @task_bp.route("/<task_id>", methods = ["GET"])
 def get_task_by_id(task_id):
     task = validate_task(task_id)
     return {"task": task.to_dict()}, 200
+
+
+@task_bp.route("/<task_id>", methods = ["PUT"])
+def update_one_task(task_id):
+    updated_task = validate_task(task_id)
+
+    request_body = request.get_json()
+    updated_task.title = request_body["title"],
+    updated_task.description = request_body["description"]
+
+    db.session.commit()
+    return {"task": updated_task.to_dict()}, 200
+
+@task_bp.route("/<task_id>", methods = ["DELETE"])
+def delete_one_task(task_id):
+    task = validate_task(task_id)
+    
+    db.session.delete(task)
+    db.session.commit()
+
+    return {"details": f'Task {task_id} "{task.title}" successfully deleted'}, 200
 
 def validate_task(task_id):
     try:
