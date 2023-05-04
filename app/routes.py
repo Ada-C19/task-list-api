@@ -24,7 +24,13 @@ def create_tasks():
 # GET TASKS ENDPOINT
 @tasks_bp.route("", methods=["GET"])
 def read_tasks():
-    tasks = Task.query.all()
+    sort_query = request.args.get("sort")
+
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title).all()
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    
     tasks_response = []
 
     for task in tasks:
