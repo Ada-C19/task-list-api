@@ -10,8 +10,9 @@ class Task(db.Model):
 
     def task_display_dict(self):
         return{
-            "task_id": self.id,
+            "task_id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "completed_at": self.completed_at
+            "completed_at": self.completed_at,
+            "is_complete": self.completed_at is not None
         }

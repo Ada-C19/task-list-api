@@ -9,17 +9,22 @@ task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 def create_task():
     request_body = request.get_json()
 
-    if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
+    if "title" not in request_body or "description" not in request_body:
         return jsonify({"details": "Invalid data"}), 400
 
     #create a new instance of Task
     new_task = Task(
         title = request_body["title"],
         description = request_body["description"],
-        completed_at = request_body["completed_at"]
+        completed_at = request_body.get("completed_at", None)
     )
     db.session.add(new_task)
     db.session.commit()
 
-
-    return jsonify({"task": new_task.task_display_dict()}), 201
+    return jsonify({"task":{
+        "id": new_task.task_id,
+        "title": new_task.title,
+        "description": new_task.description,
+        "is_complete": new_task.completed_at is not None
+        
+    }}), 201
