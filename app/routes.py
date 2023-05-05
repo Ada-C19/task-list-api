@@ -125,9 +125,9 @@ def mark_off_complete(task_id):
     time_now = datetime.now()
     todays_date = date.today()
 
-    task.title = request_body["title"]
+    # task.title = request_body["title"]
     # if request_body["title"] else task.title
-    task.description = request_body["description"] 
+    # task.description = request_body["description"] 
     # if request_body["description"] else task.description
     task.completed_at = todays_date
     # if request_body["completed_at"] else task.completed_at
@@ -139,3 +139,6 @@ def mark_off_complete(task_id):
                 "description": task.description,
                 "is_complete": bool(task.completed_at)}
             }
+
+
+# @tasks_bp.route()
