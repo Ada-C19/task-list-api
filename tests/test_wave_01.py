@@ -65,6 +65,8 @@ def test_get_task_not_found(client):
     # # **Complete test with assertion about response body***************
     # # *****************************************************************
 
+    assert response_body == {"error": "task not found"}
+
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task(client):
