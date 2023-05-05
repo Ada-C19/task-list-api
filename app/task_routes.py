@@ -25,7 +25,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(jsonify({"task": response_body(new_task)}), 201)
+    return make_response(jsonify({"task": new_task.to_dict()}), 201)
 
 # GET TASKS ENDPOINT
 @tasks_bp.route("", methods=["GET"])
@@ -42,7 +42,7 @@ def read_tasks():
     tasks_response = []
 
     for task in tasks:
-        tasks_response.append(response_body(task))
+        tasks_response.append(task.to_dict())
 
     return jsonify(tasks_response)
 
@@ -51,7 +51,7 @@ def read_tasks():
 def read_one_task(task_id):
     task = validate_task(task_id)
 
-    return {"task": response_body(task)}
+    return {"task": task.to_dict()}
 
 # UPDATE TASK ENDPOINT
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -65,7 +65,7 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {"task": response_body(task)}
+    return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
@@ -87,7 +87,7 @@ def mark_complete(task_id):
 
     requests.post(path, data=args)
 
-    return {"task": response_body_complete(task)}
+    return {"task": task.to_dict_complete()}
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
@@ -97,7 +97,7 @@ def mark_incomplete(task_id):
     
     db.session.commit()
 
-    return {"task": response_body(task)}
+    return {"task": task.to_dict()}
 
 # DELETE TASK ENDPOINT
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
@@ -111,22 +111,6 @@ def delete_task(task_id):
 
 
 # HELPER FUNCTIONS
-def response_body(task):
-    return {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        }
-
-def response_body_complete(task):
-    return {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True
-        }
-
 def validate_task(task_id):
     try:
         task_id = int(task_id)
