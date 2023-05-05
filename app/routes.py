@@ -48,3 +48,17 @@ def handle_tasks():
 def handle_task(task_id):
     task = validate_task(task_id)
     return {"task": task.to_dict()}, 200
+
+
+@tasks_bp.route("/<task_id>", methods=['PUT'])
+def update_one_task(task_id):
+    request_body = request.get_json()
+
+    task_to_update = validate_task(task_id)
+
+    task_to_update.title = request_body["title"]
+    task_to_update.description = request_body["description"]
+
+    db.session.commit()
+
+    return {"task": task_to_update.to_dict()}, 200
