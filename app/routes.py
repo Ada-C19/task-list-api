@@ -26,3 +26,17 @@ def get_task(task_id):
         message = f"Task #{task_id} not found"
         return make_response({"error": message}, 404)
     return make_response({"task": task.to_dict()}, 200)
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = Task.query.get(task_id)
+    if task is None:
+        message = f"Task #{task_id} not found"
+        return make_response({"error": message}, 404)
+    
+    task_data = request.get_json()
+    task.title = task_data["title"]
+    task.description = task_data["description"]
+    db.session.commit()
+    
+    return make_response({"task": task.to_dict()}, 200)
