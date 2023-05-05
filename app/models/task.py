@@ -4,8 +4,8 @@ from datetime import datetime
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String)
-    description = db.Column(db.String)
+    title = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self):
@@ -13,7 +13,7 @@ class Task(db.Model):
         self_dict["id"] = self.task_id
         self_dict["title"] = self.title
         self_dict["description"] = self.description
-        self_dict["is_complete"] = False
+        self_dict["is_complete"] = self.completed_at is not None
 
         return self_dict
         # return {

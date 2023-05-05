@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, abort
+from sqlalchemy import asc, desc
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
@@ -26,13 +27,15 @@ def add_tasks():
     
     if "title" not in request_body or "description" not in request_body:
         return {f"details": "Invalid data"}, 400
-
+    
+    if "completed_at" in request_body:
+        Task(completed_at = request_body["completed at"])
+    else:
+        Task(completed_at = None)
 
     new_task = Task(
         title = request_body["title"],
         description = request_body["description"],
-        completed_at = None
-        # completed_at = request_body["completed_at"] 
     )
 
     db.session.add(new_task)
@@ -42,14 +45,17 @@ def add_tasks():
 
 
 @task_bp.route("", methods=["GET"])
-def get_tasks():
+def get_all_tasks():
     response = []
-    
-    title_query = request.args.get("title")
-    if title_query is None:
-        all_tasks = Task.query.all()
+
+    sort_query = request.args.get("sort")
+
+    if sort_query == "desc":
+        all_tasks = Task.query.order_by(Task.title.desc()).all()
+    elif sort_query == "asc":
+        all_tasks = Task.query.order_by(Task.title.asc()).all()
     else:
-        all_tasks = Task.query.filter_by(title=title_query)
+        all_tasks = Task.query.all()
     
     for task in all_tasks:
         response.append(task.to_dict())
@@ -60,7 +66,6 @@ def get_tasks():
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_task(task_id)
-
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
 
@@ -70,12 +75,12 @@ def update_task(task_id):
 
     request_body = request.get_json()
 
-    # if not task.title or not task.description or not task.completed:
-    #     return {f"details": "Invalid data"}, 404
-
     task.title = request_body["title"]
     task.description = request_body["description"]
-    task.completed_at = None
+    if "completed_at" in request_body:
+        task.completed_at = datetime.utcnow()
+    else:
+        task.completed_at = None
     
     # datetime.utcnow()
 
@@ -92,3 +97,30 @@ def delete_task(task_id):
     db.session.commit()
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_task(task_id)
+
+    # request_body = request.get_json()
+
+    task.completed_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+
+    # request_body = request.get_json()
+
+    task.completed_at = None
+
+    db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
+
+
+
