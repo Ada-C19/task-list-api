@@ -1,11 +1,10 @@
 from app import db
 from app.models.task import Task 
 from flask import Blueprint, make_response, abort, request, jsonify
-from sqlalchemy.exc import DataError
 
 
 
-bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 #helper function
 def validate_model(cls, model_id):
@@ -25,37 +24,69 @@ def validate_model(cls, model_id):
 
 #routes
 
-@bp.route("", methods=["POST"])
+@task_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    missing_fields = []
 
-    if "title" not in request_body:
-        missing_fields.append("title")
-    if "description" not in request_body:
-        missing_fields.append("description")
+    if "title" not in request_body or "description" not in request_body:
+        abort(make_response({"details": "Invalid data"}, 400))
 
-    if missing_fields:
-        error_dict = {
-            "details": "Invalid data"
+    new_task = Task.from_dict(request_body)
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return make_response(jsonify({
+        "task": {
+            "id" : new_task.task_id,
+            "title" : new_task.title,
+            "description" : new_task.description,
+            "is_complete" : False
         }
-        abort(make_response(jsonify(error_dict), 400))
+    }), 201)
 
-    try:
-        new_task = Task.from_dict(request_body)
-        db.session.add(new_task)
-        db.session.commit()
 
-        task_dict = new_task.to_dict()
-        task_dict["is_complete"] = False
+@task_bp.route("", methods=["GET"])
+def read_all_tasks():
+    tasks = Task.query.all()
+    task_response = [task.to_dict() for task in tasks]
 
-        response_body = {"task": task_dict}
+    return jsonify(task_response)
 
-        return make_response(jsonify(response_body)), 201
-    
-    except DataError as e:
-        db.session.rollback()
 
-        message = "Invalid request body: DataError"
-        error_dict = {"message": message, "error": str(e)}
-        abort(make_response(jsonify(error_dict), 400))
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_model(Task, task_id)
+
+    return jsonify({"task": task.to_dict()}), 200
+
+
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_model(Task, task_id)
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    task.is_complete = False
+
+    db.session.commit()
+
+    return make_response(jsonify({
+        "task": {
+            "id" : task.task_id,
+            "title" : task.title,
+            "description" : task.description,
+            "is_complete" : False
+        }
+    }), 200)
+
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response(jsonify({"details": f"Task 1 \"{task.title}\" successfully deleted"})), 200
