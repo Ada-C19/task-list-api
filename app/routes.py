@@ -61,7 +61,7 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return {"details": f'Task {goal_id} "{title}" successfully deleted'}, 200
+    return {"details": f'Goal {goal_id} "{title}" successfully deleted'}, 200
 
 
 @tasks_bp.route("", methods=["POST"])
