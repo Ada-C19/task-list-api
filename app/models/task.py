@@ -17,10 +17,15 @@ class Task(db.Model):
             "is_complete": self.completed_at is not None
         }
     
-    # def task_json(self):
-    #     return{
-    #         "id": self.task_id,
-    #         "title": self.title,
-    #         "description": self.description,
-    #         "is_complete": False
-    #     }
+
+    @classmethod
+    def from_dict(cls, task_data):
+        return cls(
+            title = task_data["title"],
+            description = task_data["description"],
+            completed_at = task_data.get("completed_at", None)
+        )
+
+    
+    
+   
