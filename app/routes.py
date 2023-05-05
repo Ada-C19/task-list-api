@@ -24,13 +24,21 @@ def create_task():
     except KeyError:
         return {
             "details": "Invalid data"
-        }, 400
+            }, 400
 
     db.session.add(new_task)
     db.session.commit()
 
-    return new_task.to_dict(), 201
+    return {"task": new_task.to_dict()}, 201
 
 
-
-
+@tasks_bp.route("", methods=['GET'])
+def handle_tasks():
+    title_query = request.args.get("title")
+    if title_query:
+        tasks = Task.query.filter_by(title=title_query)
+    else:
+        tasks = Task.query.all()
+    
+    tasks_response = [task.to_dict() for task in tasks]
+    return jsonify(tasks_response), 200
