@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
 
 db = SQLAlchemy()
@@ -21,6 +23,13 @@ def create_app(test_config=None):
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_TEST_DATABASE_URI")
+        
+    
+    
+    
+        
+    SLACK_SIGNING_SECRET = os.environ['SLACK_SIGNING_SECRET']
+
 
     # Import models here for Alembic setup
     from app.models.task import Task
@@ -33,9 +42,7 @@ def create_app(test_config=None):
 
     from .routes import tasks_bp, goals_bp
     app.register_blueprint(tasks_bp)
-    app.register_blueprint(goals_bp)
-
-
-   
+    app.register_blueprint(goals_bp)   
 
     return app
+

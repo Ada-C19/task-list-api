@@ -3,6 +3,12 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 import datetime
+import os
+from dotenv import load_dotenv
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+
 
 
 
@@ -104,9 +110,22 @@ def finished_task(task_id):
     updated_task.completed_at = datetime.datetime.utcnow()
     db.session.commit()
 
+
+    slack_token = os.environ["SLACK_BOT_TOKEN"]
+
+    client = WebClient(token=slack_token)
+
+    result = client.chat_postMessage(
+        channel="task-notifications", 
+        text=f"Someone just completed the task {updated_task.title}"
+    )
+
+
     task_response = updated_task.to_dict()
 
     return make_response(jsonify ({"task":task_response}), 200)
+
+
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 
@@ -121,6 +140,8 @@ def unfinished_task(task_id):
     print (task_response)
 
     return make_response(jsonify ({"task":task_response}), 200)
+
+
 
 @goals_bp.route("", methods=["POST"])
 
