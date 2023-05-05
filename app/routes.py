@@ -24,7 +24,7 @@ def get_task():
             "id": new_task.task_id,
             "title": new_task.title,
             "description": new_task.description,
-            "is_complete": new_task.completed_at is not None
+            "is_complete": False
     }
     }), 201
 
@@ -34,7 +34,13 @@ def get_all_tasks():
     response = []
     tasks = Task.query.all()
     for task in tasks:
-        response.append(task.to_dict())
+        response.append({
+            "id": task.task_id,
+            "title":task.title,
+            "description": task.description,
+            "is_complete": False
+    })
+        # response.append(task.to_dict())
     return jsonify(response), 200
 
 
@@ -43,7 +49,23 @@ def get_all_tasks():
 def get_one_task(task_id):
     tasks = validate_task(task_id)
 
-    return tasks.to_dict(),200
+    return jsonify({"task":{
+            "id": tasks.task_id,
+            "title": tasks.title,
+            "description": tasks.description,
+            "is_complete": False}
+            }), 200
+
+
+# get update
+@task_bp.route("/<id>", methods=["PUT"])
+def update_task(task_id):
+    tasks = validate_task(task_id)
+    request_data = request.get_json()
+    
+    tasks.title = request_data["title"]
+
+
 
 
 
@@ -59,7 +81,6 @@ def validate_task(task_id):
     task = Task.query.get(task_id_num)
     if task is None:
         abort(make_response({"msg": "Task not found"}, 404))
-    
     return task
 
     
