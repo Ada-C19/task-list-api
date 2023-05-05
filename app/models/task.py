@@ -24,4 +24,4 @@ class Task(db.Model):
             title = data["title"],
             description = data["description"],
             completed_at = data["completed_at"]
-        ) 
+        )
