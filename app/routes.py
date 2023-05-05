@@ -12,7 +12,7 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 # CREATE TASK ENDPOINT
 @tasks_bp.route("", methods=["POST"])
-def create_tasks():
+def create_task():
     request_body = request.get_json()
 
     if not request_body.get("title") or not request_body.get("description"):
