@@ -81,3 +81,12 @@ def mark_complete(task_id):
     db.session.commit()
 
     return make_response({"task": task.to_dict()}, 200)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = None
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()}, 200)
