@@ -42,3 +42,9 @@ def handle_tasks():
     
     tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response), 200
+
+
+@tasks_bp.route("/<task_id>", methods=['GET'])
+def handle_task(task_id):
+    task = validate_task(task_id)
+    return {"task": task.to_dict()}, 200
