@@ -1,4 +1,5 @@
 from app import db
+from flask import abort, make_response
 
 
 class Task(db.Model):
@@ -10,14 +11,14 @@ class Task(db.Model):
     @classmethod
     def from_dict(cls, data_dict):
         return cls(
-            id=cls.id,
             title=data_dict["title"],
-            description=data_dict["description"]
+            description=data_dict["description"],
         )
 
     def to_dict(self):
         return dict(
             id=self.id,
             title=self.title,
-            description=self.description
+            description=self.description,
+            is_complete=bool(self.completed_at)
         )
