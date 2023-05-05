@@ -1,6 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
 from app import db
+from datetime import date
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -30,6 +31,8 @@ def read_tasks():
         tasks = Task.query.order_by(Task.title).all()
     elif sort_query == "desc":
         tasks = Task.query.order_by(Task.title.desc()).all()
+    elif not sort_query:
+        tasks = Task.query.all()
     
     tasks_response = []
 
@@ -59,6 +62,26 @@ def update_task(task_id):
 
     return {"task": response_body(task)}
 
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_task(task_id)
+
+    task.completed_at = date.today()
+
+    db.session.commit()
+
+    return {"task": response_body_complete(task)}
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+
+    task.completed_at = None
+    
+    db.session.commit()
+
+    return {"task": response_body(task)}
+
 # DELETE TASK ENDPOINT
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -77,6 +100,14 @@ def response_body(task):
             "title": task.title,
             "description": task.description,
             "is_complete": False
+        }
+
+def response_body_complete(task):
+    return {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True
         }
 
 def validate_task(task_id):
