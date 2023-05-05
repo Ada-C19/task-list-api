@@ -1,5 +1,6 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, request, make_response, jsonify, abort
 from datetime import datetime
 import os
@@ -8,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 
 def validate_model(cls, model_id):
@@ -38,17 +40,20 @@ def send_slack_message(task_title):
     response = requests.post(slack_url, headers=headers, data=data)
     return response
 
-@tasks_bp.route("", methods=["POST"])
-def create_task():
+def create_item(cls):
     request_body = request.get_json()
 
     try: 
-        new_task = Task.from_dict(request_body)
-        db.session.add(new_task)
+        new_item = cls.from_dict(request_body)
+        db.session.add(new_item)
         db.session.commit()
-        return make_response({"task": new_task.to_dict()}, 201)
+        return make_response({cls.__name__.lower(): new_item.to_dict()}, 201)
     except:
         return make_response({"details": "Invalid data"}, 400)
+
+@tasks_bp.route("", methods=["POST"])
+def create_task():
+    return create_item(Task)
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -110,3 +115,7 @@ def mark_incomplete(task_id):
     db.session.commit()
 
     return make_response({"task": task.to_dict()}, 200)
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    return create_item(Goal)
