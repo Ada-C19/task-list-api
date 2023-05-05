@@ -8,18 +8,18 @@ from datetime import datetime
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-def validate_task(task_id):
+def validate_item(model, task_id):
     try:
         task_id = int(task_id)
     except ValueError:
         return abort(make_response({"details": "Invalid data"}, 400))
     
-    task = Task.query.get(task_id)
+    item = model.query.get(task_id)
 
-    if not task:
+    if not item:
         return abort(make_response({"details": f"id {task_id} not found"}, 404))
     
-    return task
+    return item
     
 
 @task_bp.route("", methods=["POST"])
@@ -66,13 +66,13 @@ def get_all_tasks():
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     request_body = request.get_json()
 
@@ -91,7 +91,7 @@ def update_task(task_id):
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     db.session.delete(task)
 
@@ -99,23 +99,23 @@ def delete_task(task_id):
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
 
-# def send_slack_message(message:str):
-#     '''
-#     send a message to slack channel
-#     '''
-#     import requests
+def send_slack_message(message:str):
+    '''
+    send a message to slack channel
+    '''
+    import requests
 
-#     payload = '{"text: "%s"}' % message
-#     response = requests.post(
-#         'https://hooks.slack.com/services/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',
-#         data = payload
-#     )
+    payload = '{"text: "%s"}' % message
+    response = requests.post(
+        'https://hooks.slack.com/services/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',
+        data = payload
+    )
 
-#     print(response.text)
+    print(response.text)
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     # request_body = request.get_json()
 
@@ -123,13 +123,13 @@ def mark_complete(task_id):
 
     db.session.commit()
 
-    # send_slack_message(f"Someone just completed the task {task.title}")
+    send_slack_message(f"Someone just completed the task {task.title}")
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     # request_body = request.get_json()
 
