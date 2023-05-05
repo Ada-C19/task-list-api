@@ -13,10 +13,7 @@ class Task(db.Model):
         self_dict["id"] = self.task_id
         self_dict["title"] = self.title
         self_dict["description"] = self.description
-        if not self.completed_at:
-            self_dict["is_complete"] = False
-        else:
-            self_dict["is_complete"] = True
+        self_dict["is_complete"] = False
 
         return self_dict
         # return {

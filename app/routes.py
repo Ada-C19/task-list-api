@@ -69,6 +69,8 @@ def update_task(task_id):
     task.title = request_body["title"]
     task.description = request_body["description"]
     task.completed_at = None
+    
+    # datetime.utcnow()
 
     db.session.commit()
 
