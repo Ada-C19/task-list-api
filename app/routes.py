@@ -77,7 +77,16 @@ def update_task(task_id):
             }), 200
 
 
-# 
+# delete task
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    tasks = validate_task(task_id)
+
+    db.session.delete(tasks)
+    db.session.commit()
+
+    return {"details": f'Task {task_id} "Go on my daily walk 🏞" successfully deleted'}
+
 
 
 # helper function
