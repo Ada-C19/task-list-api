@@ -15,5 +15,8 @@ def create_one_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify(new_task), 201
+    return make_response(f"{new_task.title} has been created"), 201
+
+
+
 
