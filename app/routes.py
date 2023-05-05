@@ -18,3 +18,11 @@ def get_all_tasks():
     tasks = Task.query.all()
     tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response), 200
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_task(task_id):
+    task = Task.query.get(task_id)
+    if task is None:
+        message = f"Task #{task_id} not found"
+        return make_response({"error": message}, 404)
+    return make_response({"task": task.to_dict()}, 200)
