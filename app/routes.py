@@ -2,6 +2,11 @@ from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
 from app import db
 from datetime import date
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -10,7 +15,7 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def create_tasks():
     request_body = request.get_json()
 
-    if not request_body.get("title") or not request_body.get("description") or not request_body.get("completed_at"):
+    if not request_body.get("title") or not request_body.get("description"):
         abort(make_response({"details": "Invalid data"}, 400))
 
     new_task = Task(title=request_body["title"],
@@ -65,10 +70,22 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_task(task_id)
+    
+    path = "https://slack.com/api/chat.postMessage"
+
+    SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
+
+    args = {
+        "token": SLACK_API_TOKEN,
+        "channel": "C0561UUDX4K",
+        "text": f"Someone just completed the task {task.title}"
+    }
 
     task.completed_at = date.today()
 
     db.session.commit()
+
+    requests.post(path, data=args)
 
     return {"task": response_body_complete(task)}
 
