@@ -66,7 +66,7 @@ def get_one_task(task_id):
 
 #Update
 @task_bp.route("/<id>", methods=["PUT"])
-def update_planet(id):
+def update_task(id):
 
     task = validate_task(id)
     request_data = request.get_json()
