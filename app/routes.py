@@ -1,7 +1,7 @@
 from flask import Blueprint, make_response, request, jsonify, abort
 from app.models.task import Task
 from app import db
-from sqlalchemy import asc
+from sqlalchemy import asc, desc
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -55,6 +55,8 @@ def get_all_tasks():
     # if the user typed in 'asc'
     if sort_query == "asc":
         tasks = Task.query.order_by(asc(Task.title)).all()
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(desc(Task.title)).all()
     else:
         tasks = Task.query.all()
     
