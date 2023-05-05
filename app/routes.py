@@ -105,7 +105,6 @@ def finished_task(task_id):
     db.session.commit()
 
     task_response = updated_task.to_dict()
-    print (task_response)
 
     return make_response(jsonify ({"task":task_response}), 200)
 
