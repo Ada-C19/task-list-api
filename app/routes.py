@@ -24,6 +24,9 @@ def validate_task(task_id):
 def add_tasks():
     request_body = request.get_json()
     
+    if "title" not in request_body or "description" not in request_body:
+        return {f"details": "Invalid data"}, 400
+
 
     new_task = Task(
         title = request_body["title"],
@@ -41,6 +44,7 @@ def add_tasks():
 @task_bp.route("", methods=["GET"])
 def get_tasks():
     response = []
+    
     title_query = request.args.get("title")
     if title_query is None:
         all_tasks = Task.query.all()
@@ -65,6 +69,9 @@ def update_task(task_id):
     task = validate_task(task_id)
 
     request_body = request.get_json()
+
+    # if not task.title or not task.description or not task.completed:
+    #     return {f"details": "Invalid data"}, 404
 
     task.title = request_body["title"]
     task.description = request_body["description"]
