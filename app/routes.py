@@ -41,19 +41,26 @@ def get_all_tasks():
 # get one task
 @task_bp.route("/<task_id>", methods = ["GET"])
 def get_one_task(task_id):
-    tasks = validat_task(task_id)
+    tasks = validate_task(task_id)
 
     return tasks.to_dict(),200
 
 
 
 # helper function
-def validat_task(task_id):
+def validate_task(task_id):
     try:
         task_id_num = int(task_id)
     except ValueError:
-        return abort(make_response({"msg": f"invalide id{task_id} not found"}, 400))
+        return abort(make_response({"msg": "id is invalide input"}, 400))
+    
+    # return Task.query.get_or_404(task_id_num)
 
+    task = Task.query.get(task_id_num)
+    if task is None:
+        abort(make_response({"msg": "Task not found"}, 404))
+    
+    return task
 
-    return Task.query.get_or_404(task_id_num)
+    
     
