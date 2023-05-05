@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+from sqlalchemy import desc
 from app.models.task import Task
 from app import db
 
@@ -38,8 +39,14 @@ def create_task():
 @tasks_bp.route("", methods=['GET'])
 def handle_tasks():
     title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
+    
     if title_query:
         tasks = Task.query.filter_by(title=title_query)
+    elif sort_query == "asc":
+        tasks = Task.query.order_by(Task.title)
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
     
