@@ -13,7 +13,7 @@ class Task(db.Model):
                 id=task.task_id,
                 title=task.title,
                 description=task.description,
-                is_complete=task.completed_at
+                is_complete=False
     ) 
         return task_dict
 

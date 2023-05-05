@@ -13,7 +13,3 @@ def validate_model(cls, model_id):
 
         return model
 
-def change_null_value(task):
-    if task['is_complete'] == None:
-        task['is_complete'] = False
-    return task
