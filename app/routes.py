@@ -4,6 +4,7 @@ from app import db
 from app.models.goal import Goal
 from app.models.task import Task
 from datetime import datetime
+# from app.bot import client_slack
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -98,6 +99,20 @@ def delete_task(task_id):
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
 
+# def send_slack_message(message:str):
+#     '''
+#     send a message to slack channel
+#     '''
+#     import requests
+
+#     payload = '{"text: "%s"}' % message
+#     response = requests.post(
+#         'https://hooks.slack.com/services/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',
+#         data = payload
+#     )
+
+#     print(response.text)
+
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_task(task_id)
@@ -107,6 +122,8 @@ def mark_complete(task_id):
     task.completed_at = datetime.utcnow()
 
     db.session.commit()
+
+    # send_slack_message(f"Someone just completed the task {task.title}")
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
@@ -121,6 +138,7 @@ def mark_incomplete(task_id):
     db.session.commit()
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
+
 
 
 
