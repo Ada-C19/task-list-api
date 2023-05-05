@@ -50,6 +50,19 @@ def create_item(cls):
         return make_response({cls.__name__.lower(): new_item.to_dict()}, 201)
     except:
         return make_response({"details": "Invalid data"}, 400)
+    
+def get_all_items(cls):
+    sort_query = request.args.get("sort")
+
+    if sort_query == "asc":
+        items = cls.query.order_by(cls.title.asc())
+    elif sort_query == "desc":
+        items = cls.query.order_by(cls.title.desc())
+    else: 
+        items = cls.query.all()
+
+    items_response = [item.to_dict() for item in items]
+    return jsonify(items_response), 200
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -57,17 +70,7 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    sort_query = request.args.get("sort")
-
-    if sort_query == "asc":
-        tasks = Task.query.order_by(Task.title.asc())
-    elif sort_query == "desc":
-        tasks = Task.query.order_by(Task.title.desc())
-    else: 
-        tasks = Task.query.all()
-
-    tasks_response = [task.to_dict() for task in tasks]
-    return jsonify(tasks_response), 200
+    return get_all_items(Task)
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task(task_id):
@@ -119,3 +122,7 @@ def mark_incomplete(task_id):
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     return create_item(Goal)
+
+@goals_bp.route("", methods=["GET"])
+def get_all_tasks():
+    return get_all_items(Goal)
