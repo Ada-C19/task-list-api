@@ -13,7 +13,7 @@ class Task(db.Model):
             id= self.task_id,
             title = self.title,
             description = self.description,
-            is_complete = False
+            is_complete = True if self.completed_at else False
         )
     
     @classmethod
