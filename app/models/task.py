@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy.sql import false
 
 ### Task Model
 
@@ -26,7 +27,6 @@ class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, nullable=False)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    completed_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True, server_default=None)
+    is_complete = db.Column(db.Boolean, nullable=True, server_default=false())
 
-    def __init__(self):
-        self.completed_at = null
