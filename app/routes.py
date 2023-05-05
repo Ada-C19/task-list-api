@@ -12,11 +12,15 @@ def get_task():
     if "title" not in response_body or "description" not in response_body:
         return jsonify({ "details": "Invalid data"}), 400
     
-    new_task = Task(
-        title = response_body["title"],
-        description = response_body["description"],
-        completed_at = response_body.get("completed_at", None)
-    )
+    # new_task = Task(
+    #     title = response_body["title"],
+    #     description = response_body["description"],
+    #     completed_at = response_body.get("completed_at", None)
+    # )
+
+    #
+    new_task = Task.from_dict(response_body)
+
     db.session.add(new_task)
     db.session.commit() 
 
@@ -47,7 +51,7 @@ def get_all_tasks():
 # get one task
 @task_bp.route("/<task_id>", methods = ["GET"])
 def get_one_task(task_id):
-    tasks = validate_task(task_id)
+    tasks = validate_task(Task,task_id)
 
     return jsonify({"task":{
             "id": tasks.task_id,
@@ -60,7 +64,7 @@ def get_one_task(task_id):
 # get update
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    tasks = validate_task(task_id)
+    tasks = validate_task(Task,task_id)
     request_data = request.get_json()
     
     tasks.title = request_data["title"]
@@ -80,7 +84,7 @@ def update_task(task_id):
 # delete task
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    tasks = validate_task(task_id)
+    tasks = validate_task(Task,task_id)
 
     db.session.delete(tasks)
     db.session.commit()
@@ -90,15 +94,15 @@ def delete_task(task_id):
 
 
 # helper function
-def validate_task(task_id):
+def validate_task(model,task_id):
     try:
-        task_id_num = int(task_id)
+        task_id = int(task_id)
     except ValueError:
         return abort(make_response({"msg": "id is invalide input"}, 400))
     
     # return Task.query.get_or_404(task_id_num)
-
-    task = Task.query.get(task_id_num)
+ 
+    task = model.query.get(task_id)
     if task is None:
         abort(make_response({"msg": "Task not found"}, 404))
     return task
