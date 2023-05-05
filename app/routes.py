@@ -58,14 +58,23 @@ def get_one_task(task_id):
 
 
 # get update
-@task_bp.route("/<id>", methods=["PUT"])
+@task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     tasks = validate_task(task_id)
     request_data = request.get_json()
     
     tasks.title = request_data["title"]
+    tasks.description = request_data["description"]
+    tasks.completed_at = request_data.get("completed_at", None)
 
+    db.session.commit()
 
+    return jsonify({"task":{
+            "id": tasks.task_id,
+            "title": tasks.title,
+            "description": tasks.description,
+            "is_complete": False}
+            }), 200
 
 
 
