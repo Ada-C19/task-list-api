@@ -22,11 +22,14 @@ def validate_model(cls, model_id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task.from_dict(request_body)
-    db.session.add(new_task)
-    db.session.commit()
 
-    return make_response({"task": new_task.to_dict()}, 201)
+    try: 
+        new_task = Task.from_dict(request_body)
+        db.session.add(new_task)
+        db.session.commit()
+        return make_response({"task": new_task.to_dict()}, 201)
+    except:
+        return make_response({"details": "Invalid data"}, 400)
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
