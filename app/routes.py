@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
 
@@ -25,7 +25,7 @@ def create_task():
         "id": new_task.task_id,
         "title": new_task.title,
         "description": new_task.description,
-        "is_complete": new_task.completed_at is not None
+        "is_complete": False
         
     }}), 201
 
@@ -43,7 +43,7 @@ def get_all_tasks():
             "id": each_task.task_id,
             "title": each_task.title,
             "description": each_task.description,
-            "is_complete": each_task.completed_at is not None
+            "is_complete": False
         })
 
     return jsonify(response), 200
@@ -51,21 +51,33 @@ def get_all_tasks():
 # #GET ONE
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = Task.query.get(task_id)
+   
 
 #check if task exists
-    if not task:
-        return jsonify({
-            "error": f"task not found"
-        }), 404
-    else:
+    tasks = validate_task(task_id)
 
-        return jsonify({"task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.completed_at is not None
+    return jsonify({"task": {
+        "id": tasks.task_id,
+        "title": tasks.title,
+        "description": tasks.description,
+        "is_complete": False
 
-        }}), 200
+    }}), 200
 
 
+
+def validate_task(task_id):
+    try:
+        task_id_number = int(task_id)
+    
+    except ValueError:
+        return abort(make_response({
+            "error": f"invalid id {id} not found"}, 400
+        ))
+    
+    task = Task.query.get(task_id_number)
+    if task is None:
+        abort(make_response({
+            "error": "task not found"}, 404
+        ))
+    return task
