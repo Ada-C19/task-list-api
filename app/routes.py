@@ -21,10 +21,18 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify({"task":{
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": new_task.completed_at is not None
-        
-    }}), 201
+    return jsonify(new_task.task_display_dict()), 201
+
+
+#GET ALL TASKS
+
+@task_bp.route("", methods=["GET"])
+def get_all_tasks():
+    response = []   
+    #to extract data from the database not from the task obj - REMINDER
+    tasks = Task.query.all()
+
+    response = [each_task.task_display_dict() for each_task in tasks]
+
+    return jsonify(response), 200
+
