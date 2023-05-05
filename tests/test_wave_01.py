@@ -32,7 +32,7 @@ def test_get_tasks_one_saved_tasks(client, one_task):
     ]
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task(client, one_task):
     # Act
     response = client.get("/tasks/1")
@@ -51,16 +51,22 @@ def test_get_task(client, one_task):
     }
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task_not_found(client):
     # Act
     response = client.get("/tasks/1")
     response_body = response.get_json()
 
     # Assert
+    # task = Task.query.get(1)
+    # print("**********")
+    # print("HERE'S THE TASK ID!!!!!!")
+    # print(task.task_id)   # None
+    # print("**********")
     assert response.status_code == 404
-
-    raise Exception("Complete test with assertion about response body")
+    assert response_body == {
+        "msg": f"No task with id 1"
+    }
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
