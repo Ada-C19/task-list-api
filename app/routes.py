@@ -28,7 +28,13 @@ def get_task():
     }
     }), 201
 
-
+@task_bp.route("", methods = ["GET"])
+def get_all_tasks():
+    response = []
+    tasks = Task.query.all()
+    for task in tasks:
+        response.append(task.to_dict())
+    return jsonify(response), 200
 
 
 
