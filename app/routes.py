@@ -9,7 +9,7 @@ def validate_task(task_id):
     try:
         task_id = int(task_id)
     except:
-        abort(make_response({'msg': f"invalid id {task_id}"}, 400))
+        abort(make_response({"details": "Invalid data"}, 400))
     
     task = Task.query.get(task_id)
     
@@ -19,7 +19,12 @@ def validate_task(task_id):
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     request_body = request.get_json()
-    new_task = Task(title=request_body["title"], description=request_body["description"])
+    try:
+        new_task = Task(title=request_body["title"], description=request_body["description"], completed_at=None)
+    except KeyError:
+        return {
+            "details": "Invalid data"
+        }, 400
 
     db.session.add(new_task)
     db.session.commit()
