@@ -1,11 +1,11 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.task import Task
 
 
 task_bp = Blueprint("task", __name__,url_prefix = "/tasks")
 
-# create
+# create a task
 @task_bp.route("", methods = ["POST"])
 def get_task():
     response_body = request.get_json()
@@ -28,6 +28,7 @@ def get_task():
     }
     }), 201
 
+# get all tasks
 @task_bp.route("", methods = ["GET"])
 def get_all_tasks():
     response = []
@@ -37,5 +38,22 @@ def get_all_tasks():
     return jsonify(response), 200
 
 
+# get one task
+@task_bp.route("/<task_id>", methods = ["GET"])
+def get_one_task(task_id):
+    tasks = validat_task(task_id)
 
+    return tasks.to_dict(),200
+
+
+
+# helper function
+def validat_task(task_id):
+    try:
+        task_id_num = int(task_id)
+    except ValueError:
+        return abort(make_response({"msg": f"invalide id{task_id} not found"}, 400))
+
+
+    return Task.query.get_or_404(task_id_num)
     
