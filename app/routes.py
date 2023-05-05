@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
+from datetime import datetime
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -14,7 +15,7 @@ def validate_task(task_id):
     task = Task.query.get(task_id)
 
     if not task:
-        return abort(make_response({"message": f"id {task_id} not found"}, 404))
+        return abort(make_response({"details": f"id {task_id} not found"}, 404))
     
     return task
     
