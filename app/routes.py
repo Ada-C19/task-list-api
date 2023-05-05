@@ -64,7 +64,29 @@ def get_one_task(task_id):
 
     }}), 200
 
+#Update
+@task_bp.route("/<id>", methods=["PUT"])
+def update_planet(id):
 
+    task = validate_task(id)
+    request_data = request.get_json()
+
+    task.title = request_data["title"]
+    task.description = request_data["description"]
+    task.completed_at = request_data.get("completed_at", None)
+
+    db.session.commit()
+
+    return jsonify({"task": {
+        "id": task.task_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": False
+
+    }}), 200
+
+
+#helper function
 
 def validate_task(task_id):
     try:
