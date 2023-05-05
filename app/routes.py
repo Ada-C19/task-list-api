@@ -47,3 +47,18 @@ def get_all_tasks():
         })
 
     return jsonify(response), 200
+
+# #GET ONE
+@task_bp.route("/<int:task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = Task.query.get(task_id)
+
+    return jsonify({"task": {
+        "id": task.task_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": task.completed_at is not None
+
+    }}), 200
+
+
