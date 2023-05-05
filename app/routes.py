@@ -14,7 +14,7 @@ def validate_task(task_id):
     task = Task.query.get(task_id)
 
     if not task: 
-        abort(make_response({"details": f"Data id {task_id} not found"}, 404))
+        abort(make_response({"details": f"Task id {task_id} not found"}, 404))
         
     return task 
 
@@ -94,12 +94,12 @@ def update_task(task_id):
         }
     }, 200
 
-@tasks_bp.route("/<task_id>/", methods=['PATCH'])
+@tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
 def mark_complete_task(task_id):
     task = validate_task(task_id)
 
-    if task.completed_at:
-        return make_response({"details":f"Task with id {task_id} is already completed"})
+    # if task.completed_at:
+    #     return make_response({"details":f"Task with id {task_id} is already completed"})
 
     task.completed_at = datetime.utcnow()
 
@@ -110,6 +110,24 @@ def mark_complete_task(task_id):
             "title": task.title,
             "description": task.description,
             "is_complete": True 
+        }
+    }, 200
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
+def mark_incomplete_task(task_id):
+    task = validate_task(task_id)
+
+    # if task.completed_at:
+    #     return make_response({"details":f"Task with id {task_id} is already completed"})
+
+    task.completed_at = None
+
+    db.session.commit()
+    return {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False 
         }
     }, 200
 
