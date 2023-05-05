@@ -2,9 +2,11 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 
+
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
+# Helper function
 def validate_task(task_id):
     try:
         task_id = int(task_id)
@@ -16,6 +18,7 @@ def validate_task(task_id):
     return task if task else abort(make_response({'msg': f"No task with id {task_id}"}, 404))
 
 
+# Routes
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     request_body = request.get_json()
