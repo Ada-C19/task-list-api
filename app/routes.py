@@ -1,11 +1,15 @@
 from os import abort
+import os
+import requests
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal 
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 def validate_task(task_id):
     try:
@@ -20,7 +24,9 @@ def validate_task(task_id):
 
     return task
 
-
+'''
+Task CRUD Routes
+'''
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -57,6 +63,7 @@ def get_task(task_id):
     task = validate_task(task_id)
     return make_response({"task": task.response_dict()}, 200)
 
+
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_task(task_id)
@@ -70,6 +77,54 @@ def update_task(task_id):
     db.session.commit()
     return make_response({"task": task.response_dict()}, 200)
 
+'''
+Slack API - Message
+'''
+def slack_message_complete(message):
+    url = 'https://slack.com/api/chat.postMessage'
+    headers = {
+        "Authorization": f"Bearer {os.environ.get('SLACK_TOKEN')}"
+    }
+    params = {'channel': "task-notifications",
+              'text': message}
+
+    print("sending message")
+    message = requests.post(url, data=params, headers=headers)
+    return message.json()
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_task(task_id)
+    
+    if request.method == "PATCH":
+        task = Task.query.get(task_id)
+
+        if task is None:
+            return make_response("", 404)
+        
+        task.completed_at = datetime.today()
+        slack_message_complete(f"Congratulations! You've just completed the task '{task.title}'!")
+
+        db.session.commit()
+
+        return make_response({"task": task.response_dict()}, 200)
+    
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+
+    if request.method == "PATCH":
+        task = Task.query.get(task_id)
+
+        if task is None:
+            return make_response("", 404)
+        
+        task.completed_at = None
+
+        db.session.commit()
+        return make_response({"task": task.response_dict()}, 200)
+    
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = Task.query.get(task_id)
@@ -81,3 +136,36 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response({'details' : f'Task {task.id} "{task.title}" successfully deleted'})
+
+'''
+Goal CRUD Routes
+'''
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    if "title" not in request_body:
+        return make_response({"details": "Invalid data"}, 400)
+    else:
+        new_goal = Goal(title = request_body["title"])
+                    
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return make_response({"goal": {"id": new_goal.id, "title": new_goal.title,}}, 201)
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    goals = Goal.query.all()
+    goals_response = []
+    for goal in goals:
+        goals_response.append({
+            "id": goal.id,
+            "title": goal.title})
+    return jsonify(goals_response)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):    
+    goal = Goal.query.get(goal_id)
+    if goal is None:
+        return make_response("", 404)
+    return make_response({"goal": {"id": goal.id, "title": goal.title}}, 200)

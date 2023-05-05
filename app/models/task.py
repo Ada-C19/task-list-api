@@ -1,5 +1,5 @@
 from app import db 
-# from app.models.goal import Goal
+from app.models.goal import Goal
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
@@ -12,8 +12,7 @@ class Task(db.Model):
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "is_complete": False
-            # "is_complete": self.completed_at != None
+            "is_complete": True if self.completed_at != None else False
         }
 
         return task_dict 
