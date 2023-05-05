@@ -64,6 +64,10 @@ def get_all_items(cls):
     items_response = [item.to_dict() for item in items]
     return jsonify(items_response), 200
 
+def get_item(cls, item_id):
+    item = validate_model(cls, item_id)
+    return make_response({cls.__name__.lower(): item.to_dict()}, 200)
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     return create_item(Task)
@@ -74,8 +78,7 @@ def get_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task(task_id):
-    task = validate_model(Task, task_id)
-    return make_response({"task": task.to_dict()}, 200)
+    return get_item(Task, task_id)
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -124,5 +127,9 @@ def create_goal():
     return create_item(Goal)
 
 @goals_bp.route("", methods=["GET"])
-def get_all_tasks():
+def get_all_goals():
     return get_all_items(Goal)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_goal(goal_id):
+    return get_item(Goal, goal_id)
