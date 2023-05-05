@@ -1,4 +1,5 @@
 from app import db
+from flask import make_response, abort, jsonify
 
 
 class Task(db.Model):
@@ -8,16 +9,21 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(task):
-        return dict(
+        task_dict = dict(
                 id=task.task_id,
                 title=task.title,
                 description=task.description,
                 is_complete=task.completed_at
     ) 
+        return task_dict
 
     @classmethod
     def from_dict(cls, task_data):
-        new_task = Task(title=task_data["title"],
-                        description=task_data["description"],
-                        completed_at=None,)
+        try:
+            new_task = Task(title=task_data["title"],
+                            description=task_data["description"],
+                            completed_at=None,)
+        except KeyError: 
+            abort(make_response(jsonify({"details": "Invalid data"}), 400))
+        
         return new_task
