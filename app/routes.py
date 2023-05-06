@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
 
@@ -21,11 +21,12 @@ def add_task():
         is_complete = False
     
 
-    return jsonify({"id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": is_complete
-            }), 201
+    return jsonify({"task":
+                    {"id": new_task.task_id,
+                    "title": new_task.title,
+                    "description": new_task.description,
+                    "is_complete": is_complete
+            }}), 201
 
 @task_bp.route("", methods=["GET"])
 def get_tasks():
@@ -33,13 +34,28 @@ def get_tasks():
     all_tasks = Task.query.all()
 
     for task in all_tasks:
-        response.append(
-            {
-                "id": task.task_id,
-                "title": task.title,
-                "description": new_task.description,
-                "is_complete": is_complete
-            }
-        )
+        response.append(task.to_dict())
+
+    return jsonify(response), 200 
+
+
+# @task_bp.route("/<task_id>", methods=["GET"])
+# def get_one_task(task_id):
     
-    return jsonify(response), 200
+
+# @task_bp.route("/<task_id>", methods="PUT")
+# def update_task(task_id):
+#     pass
+
+# @task_bp.route("/<task_id>", methods=["DELETE"])
+# def delete_task(task_id):
+#     pass
+
+# def validate_task(task_id):
+#     try:
+#         # some task var = int(task_id)
+#         some_id = int(task_id)
+#     except ValueError:
+#         return abort(make_response({"msg": f"invalid id: {task_id}"}, 400))
+    
+#     return Task.query.get_or_404(task_id)
