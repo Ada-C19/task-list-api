@@ -3,7 +3,23 @@ from app.models.task import Task
 from app import db
 from os import abort
 
+
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
+
+def validate_task_by_id(id):
+    try:
+        book_id = int(book_id)
+    except:
+        abort(make_response({"message":f"book {book_id} invalid"}, 400))
+
+    task = Task.query.get(id)
+
+    if not task:
+        abort(make_response({"message":f"book {book_id} not found"}, 404)) 
+    
+    return task
+    
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
