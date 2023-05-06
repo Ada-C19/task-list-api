@@ -4,16 +4,16 @@ from app.models.task import Task
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
-def validate_model_id(model, id):
+def validate_id(model, id):
     if not id.isnumeric():
-        abort(make_response(f'Error: {id} is invalid', 400))
+        abort(make_response({'Error': f'{id} is invalid'}, 400))
     
     entity = model.query.get(id)
     if not entity:
-        abort(make_response(f'Not found: No {model.__name__} with id#{id} is found', 404))
+        abort(make_response({'Not found': f'No {model.__name__} with id#{id} is found'}, 404))
     return entity
 
-def validate_model_entry(model, request_body):
+def validate_entry(model, request_body):
     for atr in model.get_attributes():
         if atr not in request_body:
             abort(make_response(f'Invalid Request. {model.__name__} {atr} missing', 400))
@@ -31,7 +31,7 @@ def create_response(entity):
 @tasks_bp.route('', methods=['POST'])
 def create_task():
     request_body = request.get_json()
-    valid_request = validate_model_entry(Task, request_body)
+    valid_request = validate_entry(Task, request_body)
 
     new_task = Task.from_dict(valid_request)
     
@@ -50,12 +50,12 @@ def get_tasks():
         tasks = Task.query.all()
     
     task_response = [create_response(task) for task in tasks]
-    
     return jsonify(task_response), 200
 
 @tasks_bp.route('/<task_id>', methods=['GET'])
 def get_task_by_id(task_id):
-    pass
+    task = validate_id(Task, task_id)
+    return {'task': create_response(task)}, 200
 
 @tasks_bp.route('/<task_id>', methods=['PUT'])
 def replace_task(task_id):
