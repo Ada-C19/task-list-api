@@ -8,3 +8,6 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
     is_complete = db.Column(db.Boolean, default=False)
+
+def self_attributes(self):
+    return set('title', 'description')
