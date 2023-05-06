@@ -17,6 +17,11 @@ class Task(db.Model):
             "is_complete": self.completed_at is not None
         }
             
-    
+    @classmethod
+    def from_dict(cls, task_data):
+        new_task = Task(title=task_data["title"], 
+                        description=task_data["description"])   
+
+        return new_task  
             
         
