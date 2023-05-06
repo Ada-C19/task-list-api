@@ -6,11 +6,16 @@ class Goal(db.Model):
     title = db.Column(db.String, nullable=False)
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, tasks=False):
+        goal_dict = {
             "id": self.id,
             "title": self.title
         }
+        
+        if tasks:
+            goal_dict["tasks"] = [task.to_dict() for task in self.tasks]
+        
+        return goal_dict
     
     @classmethod
     def from_dict(cls, goal_dict):

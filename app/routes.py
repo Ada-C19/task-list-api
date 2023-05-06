@@ -179,3 +179,8 @@ def add_tasks_to_goal(goal_id):
     db.session.commit()
 
     return make_response({"id": goal.id, "task_ids": task_ids}, 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    return make_response(goal.to_dict(tasks=True), 200)
