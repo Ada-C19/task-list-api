@@ -1,7 +1,8 @@
 import pytest
+from app.models.task import Task
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_sorted_asc(client, three_tasks):
     # Act
     response = client.get("/tasks?sort=asc")
@@ -29,7 +30,7 @@ def test_get_tasks_sorted_asc(client, three_tasks):
     ]
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_sorted_desc(client, three_tasks):
     # Act
     response = client.get("/tasks?sort=desc")
@@ -55,3 +56,16 @@ def test_get_tasks_sorted_desc(client, three_tasks):
             "is_complete": False,
             "title": "Answer forgotten email 📧"},
     ]
+
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_get_invalid_sort_returns_none(client, three_tasks):
+    # Act
+    response = client.get("/tasks?sort=descending")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert "message" in response_body
+    assert response_body == {
+        "message": "Sort descending invalid.  Try 'asc' or 'desc'."
+    }

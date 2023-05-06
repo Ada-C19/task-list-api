@@ -17,6 +17,15 @@ def validate_task(task_id):
 
     return task
 
+def sort_by_title(tasks, order):
+    if order == 'asc':
+        return sorted(tasks, key=lambda task: task['title']) 
+    elif order == 'desc':
+        return sorted(tasks, key=lambda task: task['title'])[::-1]
+    else:
+        abort(make_response({'message': f"Sort {order} invalid.  Try 'asc' or 'desc'."}, 400))
+
+
 # route for posting a task to db
 @task_bp.route("", methods=['POST'])
 def post_one_task():
@@ -34,9 +43,14 @@ def post_one_task():
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks = Task.query.all()
+    sort_query = request.args.get("sort")
+
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_dict())
+    if sort_query:
+        tasks_response = sort_by_title(tasks_response, sort_query)
+
     return jsonify(tasks_response), 200
 
 # get one saved task
