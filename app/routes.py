@@ -2,6 +2,15 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 from datetime import date
+import requests
+import os
+
+
+SLACK_ENDPOINT = "https://slack.com/api/chat.postMessage"
+SLACK_OATH_TOKEN = os.environ.get('SLACK_BOT_USER_OATH_TOKEN')
+SLACK_HEADERS = {
+    "Authorization": f"Bearer {SLACK_OATH_TOKEN}"
+}
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -17,6 +26,13 @@ def validate_task(task_id):
     task = Task.query.get(task_id)
     
     return task if task else abort(make_response({'msg': f"No task with id {task_id}"}, 404))
+
+
+def send_slack_msg(new_data):
+    channel_id = "C056J4A747L"
+
+    slack_response = requests.post(SLACK_ENDPOINT, headers=SLACK_HEADERS, json=new_data)
+    print(slack_response.json())
 
 
 # Routes
@@ -93,6 +109,13 @@ def mark_task(task_id, mark_status):
     
     if mark_status == "mark_complete":
         task_to_mark.completed_at = date.today()
+        # Send notification in Slack
+        send_slack_msg(
+            {
+                "channel": "task-notifications",
+                "text": f"Someone just completed the task {task_to_mark.title}"
+        }
+        )
     elif mark_status == "mark_incomplete":
         task_to_mark.completed_at = None
 
