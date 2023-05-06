@@ -1,10 +1,9 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.task import Task
-from .routes_helpers import validate_model
+from .routes_helpers import validate_model, slack_call
 from sqlalchemy import text
 from datetime import datetime
-
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -72,6 +71,9 @@ def mark_complete(id):
 
     task = task.to_dict()
 
+    # Slack API call
+    slack_call(task)
+    
     return make_response({"task":task}, 200)
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
