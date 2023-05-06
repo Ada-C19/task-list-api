@@ -9,14 +9,14 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 def validate_task_by_id(id):
     try:
-        book_id = int(book_id)
+        id = int(id)
     except:
-        abort(make_response({"message":f"book {book_id} invalid"}, 400))
+        abort(make_response({"message":f"task {id} invalid"}, 400))
 
     task = Task.query.get(id)
 
     if not task:
-        abort(make_response({"message":f"book {book_id} not found"}, 404)) 
+        abort(make_response({"message":f"task {id} not found"}, 404)) 
     
     return task
     
@@ -58,7 +58,7 @@ def get_all_tasks():
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
-    task = Task.query.get(id)
+    task = validate_task_by_id(id)
     return {
         "task": {
                 "id": task.id,
