@@ -129,6 +129,8 @@ def test_create_goal_missing_title(client):
 
     # Assert
     assert response.status_code == 400
+    assert "error" in response_body
     assert response_body == {
-        "details": "Invalid data"
+        "error": "missing required valies",
+        "details": ['title']
     }

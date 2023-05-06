@@ -22,6 +22,10 @@ class Task(db.Model):
         return task_dict
     
     @classmethod
+    def get_required_fields(self):
+        return ["title", "description"]
+    
+    @classmethod
     def from_dict(cls, task_dict):
         return Task(
             title=task_dict["title"],

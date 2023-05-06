@@ -18,6 +18,10 @@ class Goal(db.Model):
         return goal_dict
     
     @classmethod
+    def get_required_fields(self):
+        return ["title"]
+    
+    @classmethod
     def from_dict(cls, goal_dict):
         return Goal(
             title=goal_dict["title"]

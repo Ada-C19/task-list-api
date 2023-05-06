@@ -147,9 +147,10 @@ def test_create_task_must_contain_title(client):
 
     # Assert
     assert response.status_code == 400
-    assert "details" in response_body
+    assert "error" in response_body
     assert response_body == {
-        "details": "Invalid data"
+        "error": "missing required valies",
+        "details": ['title']
     }
     assert Task.query.all() == []
 
@@ -162,8 +163,9 @@ def test_create_task_must_contain_description(client):
 
     # Assert
     assert response.status_code == 400
-    assert "details" in response_body
+    assert "error" in response_body
     assert response_body == {
-        "details": "Invalid data"
+        "error": "missing required valies",
+        "details": ['description']
     }
     assert Task.query.all() == []
