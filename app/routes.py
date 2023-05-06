@@ -165,3 +165,17 @@ def update_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     return delete_item(Goal, goal_id)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+
+    for task_id in task_ids:
+        task = validate_model(Task, task_id)
+        task.goal_id = goal.id
+
+    db.session.commit()
+
+    return make_response({"id": goal.id, "task_ids": task_ids}, 200)
