@@ -16,3 +16,20 @@ def validate_goal(goal_id):
     goal = Goal.query.get(goal_id)
 
     return goal if goal else abort(make_response({'msg': f"No goal with id {goal_id}"}, 404))
+
+
+# Routes
+@goals_bp.route("", methods=['POST'])
+def create_goal():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal(title=request_body["title"])
+    except KeyError:
+        return {
+            "details": "Invalid data"
+            }, 400
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_dict()}, 201
