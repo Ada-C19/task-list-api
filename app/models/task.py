@@ -11,9 +11,10 @@ class Task(db.Model):
                 "id":self.task_id,
                 "title":self.title,
                 "description": self.description,
-                "completed_at": self.completed_at,
-                "is_complete": self.completed_at is not None
+                "is_complete":self.completed_at is not None
+                # "is_complete":False
                 }
+    
     @classmethod
     def from_dict(cls, task_data):
         return cls(
