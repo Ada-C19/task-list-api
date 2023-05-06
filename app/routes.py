@@ -4,11 +4,19 @@ from app.models.task import Task
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
-def validate_task_id(task_id):
-    pass
+def validate_model_id(model, id):
+    if not id.isnumeric():
+        abort(make_response(f'Error: {id} is invalid', 400))
+    
+    entity = model.query.get(id)
+    if not entity:
+        abort(make_response(f'Not found: No {model.__name} with id#{id} is found', 404))
+    return model
 
-def validate_task_entry(request):
-    pass
+def validate_model_entry(model, request_body):
+    for atr in model.self_attributes():
+        if atr not in request_body:
+            abort(make_response(f'Invalid Request. {model.__name__} {atr} missing', 400))
 
 @tasks_bp.route('', methods=['POST'])
 def create_task():
