@@ -38,3 +38,16 @@ def get_all_tasks():
                 "is_complete": bool(task.completed_at)
             })
     return jsonify(tasks_response)
+
+
+@tasks_bp.route("/<id>", methods=["GET"])
+def get_one_task(id):
+    task = Task.query.get(id)
+    return {
+        "task": {
+                "id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            }
+    }, 200
