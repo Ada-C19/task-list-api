@@ -71,7 +71,7 @@ def get_one_task(id):
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
-    task = Task.query.get(id)
+    task = validate_task_by_id(id)
 
     request_body = request.get_json()
     task.title = request_body["title"]
@@ -90,7 +90,7 @@ def update_task(id):
 
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
-    task = Task.query.get(id)
+    task = validate_task_by_id(id)
 
     db.session.delete(task)
     db.session.commit()
