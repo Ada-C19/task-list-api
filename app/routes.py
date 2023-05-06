@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.task import Task
+from datetime import datetime 
 
 
 task_bp = Blueprint("task", __name__,url_prefix = "/tasks")
@@ -122,3 +123,39 @@ def sort_title_asc_and_desc():
     # })
 
     return jsonify(response), 200
+
+
+# wave 3 
+# mark complete
+@task_bp.route("/<task_id>/mark_complete", methods = ["PATCH"])
+def mark_complete(task_id):
+    task = Task.query.get(task_id)
+    if not task:
+        return jsonify({"msg": "task not found"}), 404
+    
+    if not task.completed_at:
+        task.completed_at = datetime.utcnow()
+        task.is_complete = True
+
+        db.session.commit()
+
+        return jsonify({"task":task.to_dict()}), 200
+
+    else:
+        return jsonify({"task":task.to_dict()}), 200
+    
+
+# mark_imcomplete
+@task_bp.route("/<task_id>/mark_incomplete", methods = ["PATCH"])
+def mark_imcomplete(task_id):
+    task = Task.query.get(task_id)
+    if not task:
+        return jsonify({"msg": "task not found"}), 404
+    
+    task.completed_at = None
+    task.is_complete = False
+
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()}), 200
+
