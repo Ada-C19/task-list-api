@@ -8,13 +8,13 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, default=None, nullable = True)
     
 
-    def task_display_dict(self):
+    def task_to_dict(self):
         return{
             "id": self.task_id,
             "title": self.title, 
             "description": self.description,
-            "completed_at": self.completed_at,
-            "is_complete": self.completed_at is not None
+            "is_complete": self.completed_at is not None,
+            # "is_complete": False
         }
     
 

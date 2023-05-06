@@ -29,39 +29,15 @@ def create_task():
     }}), 201
 
 
-#GET ALL TASKS
-
-@task_bp.route("", methods=["GET"])
-def get_all_tasks():
-    response = []   
-    #to extract data from the database not from the task obj - REMINDER
-    tasks = Task.query.all()
-
-    for each_task in tasks:
-        response.append({
-            "id": each_task.task_id,
-            "title": each_task.title,
-            "description": each_task.description,
-            "is_complete": False
-        })
-
-    return jsonify(response), 200
 
 # #GET ONE
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-   
 
 #check if task exists
     tasks = validate_task(Task, task_id)
 
-    return jsonify({"task": {
-        "id": tasks.task_id,
-        "title": tasks.title,
-        "description": tasks.description,
-        "is_complete": False
-
-    }}), 200
+    return jsonify({"task": tasks.task_to_dict()}), 200
 
 #Update
 @task_bp.route("/<id>", methods=["PUT"])
@@ -76,13 +52,7 @@ def update_task(id):
 
     db.session.commit()
 
-    return jsonify({"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": False
-
-    }}), 200
+    return jsonify({"task": task.task_to_dict()}), 200
 
 #Delete
 @task_bp.route("/<id>", methods=["DELETE"])
@@ -114,21 +84,30 @@ def validate_task(model, task_id):
         ))
     return task
 
-
 # #WAVE 2
-# @task_bp.route("/tasks", methods=["GET"])
-# def sort_title_asc():
-    
-#     response = []
-    
-#     #check for sort as param
-#     task_sort = request.args.get("sort")
 
-#     sort_query = request.args.get("sort")
-#     task_title = Task.title
 
-#     if sort_query == "asc":
-#         tasks = Task.query.order_by(task_title)
+@task_bp.route("", methods=["GET"])
+def get_all_and_sort_title():
+
+    response = []
+
+    query = request.args.get("sort")
+
+#check whether asc or desc
+    if query == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        #otherwise, get all
+        tasks = Task.query.all()
+
+    for each_task in tasks:
+        response.append(each_task.task_to_dict())
+
+    return jsonify(response), 200
+
 
 
 
