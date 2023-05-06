@@ -4,20 +4,27 @@ from app import db
 from app.models.goal import Goal
 from app.models.task import Task
 from datetime import datetime
-# from app.bot import client_slack
+from slack_sdk import WebClient
+import os
+import requests
+from slack_sdk.errors import SlackApiError
+# import ssl
+# ssl._create_default_https_context = ssl._create_unverified_context
+
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-def validate_item(model, task_id):
+def validate_item(model, item_id):
     try:
-        task_id = int(task_id)
+        item_id = int(item_id)
     except ValueError:
         return abort(make_response({"details": "Invalid data"}, 400))
     
-    item = model.query.get(task_id)
+    item = model.query.get(item_id)
 
     if not item:
-        return abort(make_response({"details": f"id {task_id} not found"}, 404))
+        return abort(make_response({"details": f"id {item_id} not found"}, 404))
     
     return item
     
@@ -99,24 +106,30 @@ def delete_task(task_id):
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
 
+def send_slack_message():
+    pass
+    
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_item(Task, task_id)
 
-    # request_body = request.get_json()
-
     task.completed_at = datetime.utcnow()
 
     db.session.commit()
 
+    message = f"Someone just completed a task {task.title}"
+
+    client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+
+    client.chat_postMessage(channel="task-notifications", text=message)
+
     return make_response(jsonify({"task": task.to_dict()}), 200)
+    
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_item(Task, task_id)
-
-    # request_body = request.get_json()
 
     task.completed_at = None
 
@@ -125,5 +138,4 @@ def mark_incomplete(task_id):
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
 
-
-
+@goal_bp.route("", methods=["POST"])
