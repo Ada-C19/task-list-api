@@ -17,9 +17,11 @@ def validate_model_entry(model, request_body):
     for atr in model.self_attributes():
         if atr not in request_body:
             abort(make_response(f'Invalid Request. {model.__name__} {atr} missing', 400))
+    return model
 
 @tasks_bp.route('', methods=['POST'])
 def create_task():
+    
     pass
 
 @tasks_bp.route('', methods=['GET'])
