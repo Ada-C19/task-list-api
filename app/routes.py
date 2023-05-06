@@ -2,6 +2,7 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 
+
 bp = Blueprint("bp", __name__, url_prefix="/tasks")
 
 def validate_model(cls, model_id):
@@ -40,17 +41,20 @@ def creat_task():
 
 @bp.route("", methods=["GET"])
 def read_all_tasks():
-    title_query = request.args.get("title")
+    task_query = Task.query
+    title_query = request.args.get("sort")
 
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    else:
-        tasks = Task.query.all()
+    if title_query == "asc":
+        task_query = Task.query.order_by(Task.title.asc())
+    if title_query == "desc":
+        task_query = Task.query.order_by(Task.title.desc())
 
-    tasks_response = []
+    tasks = task_query.all()
+    task_response = []
     for task in tasks:
-        tasks_response.append(task.to_dict())
-    return jsonify(tasks_response)
+        task_response.append(task.to_dict())
+
+    return jsonify(task_response)
 
 @bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
