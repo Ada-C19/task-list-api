@@ -15,8 +15,8 @@ def add_task():
     
     db.session.add(new_task)
     db.session.commit()
-    
-    return {"task": new_task.to_dict()}, 201
+
+    return {"task": new_task.from_dict()}, 201
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -24,10 +24,11 @@ def get_all_tasks():
     total_tasks = Task.query.all()
     
     for task in total_tasks:
-        tasks_response.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        })
+        # tasks_response.append({
+        #     "id": task.task_id,
+        #     "title": task.title,
+        #     "description": task.description,
+        #     "is_complete": False
+        # })
+        tasks_response.append(task.from_dict())
     return jsonify(tasks_response), 200
