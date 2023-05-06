@@ -1,13 +1,11 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.task import Task
-from app.models.goal import Goal
 from .routes_helpers import validate_model, slack_call
 from sqlalchemy import text
 from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods=["POST"])
 def create_tasks():

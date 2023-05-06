@@ -10,14 +10,13 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
-    new_goal = Goal(title=request_body["title"])
+    new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
     db.session.commit()
 
-    new_goal = dict(id=new_goal.goal_id,title=new_goal.title)
+    new_goal = new_goal.to_dict()
 
-    
     return make_response({"goal":new_goal}, 201)
 
 @goals_bp.route("/<id>", methods=["PUT"])
@@ -29,6 +28,33 @@ def update_goal(id):
     
     db.session.commit()
 
-    goal = dict(id=goal.goal_id,title=goal.title)
+    goal = goal.to_dict()
 
     return make_response({"goal":goal}, 200)
+
+@goals_bp.route("", methods=["GET"])
+def handle_goals():
+    if request.args.get("sort") == "asc":
+        goals = Goal.query.order_by(text("title asc"))
+    elif request.args.get("sort") == "desc":
+        goals = Goal.query.order_by(text("title desc"))
+    else:
+        goals = Goal.query.all()
+    goals_response = [Goal.to_dict(goal) for goal in goals]
+
+    return make_response(jsonify(goals_response),200)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def handle_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    goal = goal.to_dict()
+    return make_response({"goal":goal}, 200)
+
+@goals_bp.route("/<id>", methods=["DELETE"])
+def delete_goal(id):
+    goal = validate_model(Goal, id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return make_response({"details":f'Goal 1 "{goal.title}" successfully deleted'}, 200)
