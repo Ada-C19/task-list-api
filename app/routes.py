@@ -19,9 +19,9 @@ def validate_model_entry(model, request_body):
             abort(make_response(f'Invalid Request. {model.__name__} {atr} missing', 400))
     return request_body
 
-def create_posted_response(entity):
+def create_response(entity):
     entity_dict = entity.to_dict()
-    if not entity_dict['is_complete']:
+    if not entity_dict['completed_at']:
         entity_dict['is_complete'] = False
         del entity_dict['completed_at']
     # else:
@@ -38,11 +38,20 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
-    return {'task': create_posted_response(new_task)}, 201
+    return {'task': create_response(new_task)}, 201
 
 @tasks_bp.route('', methods=['GET'])
 def get_tasks():
-    pass
+    title_query = request.args.get('title')
+    
+    if title_query:
+        tasks = Task.guery.filter(Task.title.ilike(title_query+'%'))
+    else:
+        tasks = Task.query.all()
+    
+    task_response = [create_response(task) for task in tasks]
+    
+    return jsonify(task_response), 200
 
 @tasks_bp.route('/<task_id>', methods=['GET'])
 def get_task_by_id(task_id):
