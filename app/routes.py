@@ -18,11 +18,21 @@ def validate_task_by_id(id):
         abort(make_response({"message":f"task {id} not found"}, 404)) 
     
     return task
+
+
+# def validate_task_by_title(title):
+#     task = Task.get.query.get(title)
+
+#     if not task
     
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+
+    if "title" not in request_body:
+        abort(make_response({"details":"Invalid data"}, 400))
+        
     new_task = Task(title=request_body["title"],
                     description=request_body["description"])
     
