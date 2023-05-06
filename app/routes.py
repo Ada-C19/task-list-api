@@ -21,13 +21,10 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify({"task":{
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": False
+    return jsonify(
+        {"task":new_task.task_to_dict()
         
-    }}), 201
+    }), 201
 
 
 
@@ -35,12 +32,10 @@ def create_task():
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
 
-#check if task exists
-    tasks = validate_task(Task, task_id)
+#check if task_id exists
+    task = validate_task(Task, task_id)
 
-
-
-    return jsonify({"task": tasks.task_to_dict()}), 200
+    return jsonify({"task": task.task_to_dict()}), 200
 
 #Update
 @task_bp.route("/<id>", methods=["PUT"])
