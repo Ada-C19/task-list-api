@@ -100,7 +100,7 @@ def mark_complete(task_id):
         task = Task.query.get(task_id)
 
         if task is None:
-            return make_response("", 404)
+            return make_response({"message":f"Task {task_id} not found"}, 404)
         
         task.completed_at = datetime.today()
         slack_message_complete(f"Congratulations! You've just completed the task '{task.title}'!")
@@ -117,7 +117,7 @@ def mark_incomplete(task_id):
         task = Task.query.get(task_id)
 
         if task is None:
-            return make_response("", 404)
+            return make_response({"message":f"Task {task_id} not found"}, 404)
         
         task.completed_at = None
 
@@ -129,7 +129,7 @@ def mark_incomplete(task_id):
 def delete_task(task_id):
     task = Task.query.get(task_id)
     if task is None:
-        return make_response("", 404)
+        return make_response({"message":f"Task {task_id} not found"}, 404)
     task = validate_task(task_id)
 
     db.session.delete(task)
@@ -167,5 +167,75 @@ def get_all_goals():
 def get_one_goal(goal_id):    
     goal = Goal.query.get(goal_id)
     if goal is None:
-        return make_response("", 404)
+        return make_response({"message" :f"Goal {goal_id} not found"}, 404)
     return make_response({"goal": {"id": goal.id, "title": goal.title}}, 200)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal is None:
+        return make_response({'message': f'Goal {goal_id} not found'}, 404)
+
+    form_data = request.get_json()
+    goal.title = form_data["title"]
+
+    db.session.commit()
+    return make_response({"goal": {"id": goal.id, "title": goal.title}}, 200)
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal is None:
+        return make_response({'message': f'Goal {goal_id} not found'}, 404)
+    
+    db.session.delete(goal)
+    db.session.commit()
+
+    return make_response({'details' : f'Goal {goal_id} "{goal.title}" successfully deleted'})
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    
+    if goal is None:
+        return make_response({'message': f'Goal {goal_id} not found'}, 404)
+
+    tasks = Task.query.join(Goal).filter(Task.goal_id == goal_id).all()
+    task_list = []
+    if tasks:
+        for task in tasks:
+            task_list.append(task.response_dict())
+
+    if request.method == "GET":
+        return make_response({
+                "id": goal.id,
+                "title": goal.title,
+                "tasks": task_list 
+        }, 200)
+    
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_tasks_for_goal(goal_id):
+        goal = Goal.query.get(goal_id)
+    
+        if goal is None:
+            return make_response({'message': f'Goal {goal_id} not found'}, 404)
+
+        # tasks = Task.query.join(Goal).filter(Task.goal_id == goal_id).all()
+        # task_list = []
+        # if tasks:
+        #     for task in tasks:
+        #         task_list.append(task.response_dict())
+        form_data = request.get_json()
+        goal.tasks = []
+
+        task_ids = form_data["task_ids"]
+        for task_id in task_ids:
+            task = Task.query.get(task_id)
+            goal.tasks.append(task)
+
+        db.session.commit()
+
+        return make_response({
+            "id": goal.id, 
+            "task_ids": task_ids
+        }, 200)

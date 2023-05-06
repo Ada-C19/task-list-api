@@ -6,6 +6,7 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String, nullable = False)
     completed_at = db.Column(db.DateTime, nullable=True)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
 
     def response_dict(self):
         task_dict = {
@@ -15,4 +16,8 @@ class Task(db.Model):
             "is_complete": True if self.completed_at != None else False
         }
 
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id 
+
         return task_dict 
+

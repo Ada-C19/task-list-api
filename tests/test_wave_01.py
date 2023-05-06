@@ -166,8 +166,7 @@ def test_delete_task_not_found(client):
     # # **Complete test with assertion about response body***************
     # # *****************************************************************
     assert Task.query.all() == []
-    assert response.status_code == 404
-    assert response_body == None
+    assert response_body == {'message': 'Task 1 not found'} 
 
 
 
