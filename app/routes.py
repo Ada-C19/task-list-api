@@ -128,6 +128,20 @@ def mark_incomplete_task(task_id):
         {"task": task.task_to_dict()}
     ), 200
 
+#Mark Complete
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete_task(task_id):
+    task = validate_task(Task, task_id)
+
+    task = Task.query.get(task_id)
+
+#sets the current date 
+    task.completed_at = datetime.now()
+    db.session.commit()
+
+    return jsonify({
+        "task": task.task_to_dict()
+    })
 
 
 
