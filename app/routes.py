@@ -17,12 +17,19 @@ def validate_model_entry(model, request_body):
     for atr in model.self_attributes():
         if atr not in request_body:
             abort(make_response(f'Invalid Request. {model.__name__} {atr} missing', 400))
-    return model
+    return request_body
 
 @tasks_bp.route('', methods=['POST'])
 def create_task():
+    request_body = request.get_json()
+    valid_request = validate_model_entry(Task, request_body)
     
-    pass
+    new_task = Task.from_dict(valid_request)
+    
+    db.session.add(new_task)
+    db.session.commit()
+    
+    return {'Successfull': 'Task {new_task.title} is created', valid_request}, 201
 
 @tasks_bp.route('', methods=['GET'])
 def get_tasks():
