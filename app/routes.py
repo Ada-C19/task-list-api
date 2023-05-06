@@ -199,7 +199,6 @@ def get_tasks_for_goal(goal_id):
     
     if goal is None:
         return make_response({'message': f'Goal {goal_id} not found'}, 404)
-
     tasks = Task.query.join(Goal).filter(Task.goal_id == goal_id).all()
     task_list = []
     if tasks:
@@ -219,12 +218,12 @@ def post_tasks_for_goal(goal_id):
     
         if goal is None:
             return make_response({'message': f'Goal {goal_id} not found'}, 404)
+        tasks = Task.query.join(Goal).filter(Task.goal_id == goal_id).all()
+        task_list = []
+        if tasks:
+            for task in tasks:
+                task_list.append(task.response_dict())
 
-        # tasks = Task.query.join(Goal).filter(Task.goal_id == goal_id).all()
-        # task_list = []
-        # if tasks:
-        #     for task in tasks:
-        #         task_list.append(task.response_dict())
         form_data = request.get_json()
         goal.tasks = []
 
