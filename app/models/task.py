@@ -1,6 +1,5 @@
 from app import db
 
-
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
@@ -11,7 +10,7 @@ class Task(db.Model):
         return {"id": self.task_id,
                 "title": self.title,
                 "description": self.description,
-                "is_complete": False
+                "is_complete": bool(self.completed_at)
                 }
     
     @classmethod
@@ -19,5 +18,8 @@ class Task(db.Model):
         new_task = Task(title=task_data["title"], 
                         description=task_data["description"],
                         completed_at=None)
+
+        if "completed_at" in task_data and task_data["completed_at"] is not None: 
+            new_task.completed_at = task_data["completed_at"]
         
         return new_task
