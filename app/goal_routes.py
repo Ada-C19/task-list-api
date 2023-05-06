@@ -33,3 +33,21 @@ def create_goal():
     db.session.commit()
 
     return {"goal": new_goal.to_dict()}, 201
+
+
+@goals_bp.route("", methods=['GET'])
+def handle_goals():
+    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
+
+    if title_query:
+        goals = Goal.query.filter_by(title=title_query)
+    elif sort_query == "asc":
+        goals = Goal.query.order_by(Goal.title)
+    elif sort_query == "desc":
+        goals = Goal.query.order_by(Goal.title.desc())
+    else:
+        goals = Goal.query.all()
+
+    goals_response = [goal.to_dict() for goal in goals]
+    return jsonify(goals_response), 200
