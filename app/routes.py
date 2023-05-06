@@ -33,8 +33,11 @@ def handle_tasks():
         tasks = Task.query.filter_by(title='title')
     else:
         tasks = Task.query.all()
-    
-    tasks = Task.query.order_by(text("title asc"))
+        
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(text("title asc"))
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(text("title desc"))
     tasks_response = [Task.to_dict(task) for task in tasks]
 
     if not tasks_response: 
