@@ -51,3 +51,9 @@ def handle_goals():
 
     goals_response = [goal.to_dict() for goal in goals]
     return jsonify(goals_response), 200
+
+
+@goals_bp.route("/<goal_id>", methods=['GET'])
+def handle_goal(goal_id):
+    goal = validate_goal(goal_id)
+    return {"goal": goal.to_dict()}, 200
