@@ -1,6 +1,9 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+from sqlalchemy import text
+from datetime import datetime
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -17,7 +20,7 @@ def validate_task(id):
 
     return task
 
-# Create a Task: Valid Task With null completed_at
+# WAVE 1: Create a Task: Valid Task With null completed_at
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     if request.method == "POST":
@@ -37,9 +40,9 @@ def create_task():
 
     return make_response(jsonify(task_dict), 201)
 
-# Get Tasks: Getting Saved Tasks 
-# Get Tasks: No Saved Tasks
-# Get One Task: One Saved Task
+# WAVE 1: Get Tasks: Getting Saved Tasks 
+# WAVE 1: Get Tasks: No Saved Tasks
+# WAVE1: Get One Task: One Saved Task
 @tasks_bp.route("", methods=["GET"])
 def get_all_saved_tasks():
     tasks = Task.query.all()
@@ -47,8 +50,19 @@ def get_all_saved_tasks():
     for task in tasks:
         tasks_list.append(task.make_dict())
 
+    # WAVE 2: Sorting Tasks: By Title, Ascending, Descending
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(text("title asc"))
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(text("title desc"))
+
+    else:
+        tasks = Task.query.all()
+    tasks_list = [task.make_dict() for task in tasks] 
+
     return jsonify(tasks_list), 200
 
+# WAVE1: Get One Task: One Saved Task cont.
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_saved_task(id):
     task = validate_task(id)
@@ -58,8 +72,7 @@ def get_one_saved_task(id):
     return make_response(jsonify(task_dict), 200)
 
 
-
-# Update Task
+# WAVE 1: Update Task
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
     task = validate_task(id)
@@ -75,7 +88,7 @@ def update_task(id):
     return make_response(jsonify(task_dict), 200)
 
 
-# Delete Task: Deleting a Task
+# WAVE 1: Delete Task: Deleting a Task
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task = validate_task(id)
@@ -87,7 +100,6 @@ def delete_task(id):
     db.session.delete(task)
     db.session.commit()
 
-  
     return make_response(jsonify(deleted_response), 200)
 
 
