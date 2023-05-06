@@ -22,3 +22,19 @@ def create_task():
             "is_complete": bool(new_task.completed_at)
         }
     }, 201
+
+
+@tasks_bp.route("", methods=["GET"])
+def get_all_tasks():
+    tasks = Task.query.all()
+
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append(
+            {
+                "id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            })
+    return jsonify(tasks_response)
