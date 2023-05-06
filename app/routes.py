@@ -137,17 +137,17 @@ def mark_complete(task_id):
     if not task:
         return jsonify({"msg": "task not found"}), 404
     
-    # if not task.completed_at:
-    task.completed_at = datetime.utcnow()
-    # task.is_complete = True
+    if not task.completed_at:
+        task.completed_at = datetime.utcnow()
+        task.is_complete = True
 
-    db.session.commit()
+        db.session.commit()
 
-    message = f"Someone just completed a task {task.title}"
+        message = f"Someone just completed a task {task.title}"
 
-    client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+        client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
 
-    response = client.chat_postMessage(channel="task-notifications", text=message)
+        response = client.chat_postMessage(channel="task-notifications", text=message)
 
          
     return jsonify({"task":task.to_dict()}), 200
