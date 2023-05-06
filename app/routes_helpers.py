@@ -30,5 +30,4 @@ def slack_call(task):
 
     response = requests.request("POST", path, headers=headers, data=data)
 
-    print(response.text)
     return response.text
