@@ -92,7 +92,7 @@ def update_task(id):
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task = validate_task(id)
-  
+
     deleted_response = {
         "details": f'Task {task.task_id} "{task.title}" successfully deleted'
     }
@@ -102,4 +102,29 @@ def delete_task(id):
 
     return make_response(jsonify(deleted_response), 200)
 
+# WAVE 3: Mark Complete on an Incompleted Task
+@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+def mark_complete_on_incomplete(id):
+    task = validate_task(id)
 
+    if not task.completed_at:  # if complete mark as complete
+        task.completed_at = datetime.now()
+
+    db.session.commit()
+
+    task_dict = dict(task=task.make_dict())
+    return make_response(jsonify(task_dict), 200)
+
+
+# WAVE 3: Mark Incomplete on a Completed Task
+@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete_on_complete(id):
+    task = validate_task(id)
+
+    if task.completed_at:
+        task.completed_at = None
+
+    db.session.commit()
+
+    task_dict = dict(task=task.make_dict())
+    return make_response(jsonify(task_dict), 200)
