@@ -12,21 +12,24 @@ def add_task():
         description = request_body["description"],
         completed_at = request_body["completed_at"]
     )
+    
 
     db.session.add(new_task)
     db.session.commit()
 
-    is_complete = True
-    if not new_task.completed_at:
-        is_complete = False
+    return {"task": new_task.to_result()}, 201
+
+    # is_complete = False
+    # if not new_task.completed_at:
+    #     is_complete = True
     
 
-    return jsonify({"task":
-                    {"id": new_task.task_id,
-                    "title": new_task.title,
-                    "description": new_task.description,
-                    "is_complete": is_complete
-            }}), 201
+    # return jsonify({"task":
+    #                 {"id": new_task.task_id,
+    #                 "title": new_task.title,
+    #                 "description": new_task.description,
+    #                 "is_complete": is_complete
+    #         }}), 201
 
 @task_bp.route("", methods=["GET"])
 def get_tasks():
@@ -34,7 +37,7 @@ def get_tasks():
     all_tasks = Task.query.all()
 
     for task in all_tasks:
-        response.append(task.to_dict())
+        response.append(task.to_result())
 
     return jsonify(response), 200 
 
@@ -54,8 +57,8 @@ def get_tasks():
 # def validate_task(task_id):
 #     try:
 #         # some task var = int(task_id)
-#         some_id = int(task_id)
+#         valid_id = int(task_id)
 #     except ValueError:
-#         return abort(make_response({"msg": f"invalid id: {task_id}"}, 400))
+#         return abort(make_response({"msg": f"invalid id: {valid_id}"}, 400))
     
-#     return Task.query.get_or_404(task_id)
+#     return Task.query.get_or_404(valid_id)
