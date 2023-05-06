@@ -7,4 +7,16 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
-    # to_dict 
+    #from_dict is replacing the writing each.
+    def from_dict(self):
+        is_complete = False
+        if not self.completed_at:
+            is_complete = False
+        dic_data = {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": is_complete
+        }
+
+        return dic_data

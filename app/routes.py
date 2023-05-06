@@ -15,19 +15,8 @@ def add_task():
     
     db.session.add(new_task)
     db.session.commit()
-
-    is_complete = True
-    if not new_task.completed_at:
-        is_complete = False
-
-    return jsonify({
-        "task": {
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": is_complete
-        }
-    }), 201
+    
+    return {"task": new_task.to_dict()}, 201
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
