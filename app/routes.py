@@ -11,13 +11,22 @@ def validate_model_id(model, id):
     entity = model.query.get(id)
     if not entity:
         abort(make_response(f'Not found: No {model.__name__} with id#{id} is found', 404))
-    return model
+    return entity
 
 def validate_model_entry(model, request_body):
     for atr in model.get_attributes():
         if atr not in request_body:
             abort(make_response(f'Invalid Request. {model.__name__} {atr} missing', 400))
     return request_body
+
+def create_posted_response(entity):
+    entity_dict = entity.to_dict()
+    if not entity_dict['is_complete']:
+        entity_dict['is_complete'] = False
+        del entity_dict['completed_at']
+    # else:
+    #     task['completed_at'] = func.now() ??? return current datetime?
+    return entity_dict
 
 @tasks_bp.route('', methods=['POST'])
 def create_task():
@@ -29,13 +38,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
-    task = new_task.to_dict()
-    if not task['is_complete']:
-        task = new_task.to_dict()
-        task['is_complete'] = False
-        del task['completed_at']
-        return {'task': task}, 201
-    return {'task': task}, 201
+    return {'task': create_posted_response(new_task)}, 201
 
 @tasks_bp.route('', methods=['GET'])
 def get_tasks():
