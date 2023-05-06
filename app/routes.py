@@ -59,3 +59,12 @@ def update_task(task_id):
     response_dict = {}
     response_dict["task"] = task.to_dict()
     return response_dict
+
+@task_bp.route('/<task_id>', methods = ['DELETE'])
+def delete_task(task_id):
+    task = validate_task(task_id)
+    db.session.delete(task)
+    db.session.commit()
+    return  {
+        "details": f'Task {task_id} "{task.title}" successfully deleted'
+    }
