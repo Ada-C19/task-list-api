@@ -18,12 +18,6 @@ def validate_task_by_id(id):
         abort(make_response({"message":f"task {id} not found"}, 404)) 
     
     return task
-
-
-# def validate_task_by_title(title):
-#     task = Task.get.query.get(title)
-
-#     if not task
     
 
 @tasks_bp.route("", methods=["POST"])
