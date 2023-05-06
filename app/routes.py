@@ -1,13 +1,21 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
+from datetime import datetime
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @bp.route("", methods=["GET"])
 def get_tasks():
+    sort_param = request.args.get("sort")
+
     tasks = Task.query.all()
     tasks_response = [task.to_dict() for task in tasks]
+    if sort_param == "asc":
+        tasks_response.sort(key=lambda task: task["title"])
+    elif sort_param == "desc":
+        tasks_response.sort(reverse=True, key=lambda task: task["title"])
+
     return make_response(jsonify(tasks_response), 200)
 
 
@@ -53,6 +61,19 @@ def delete_one_task(id):
     db.session.commit()
 
     return make_response(jsonify({"details": f'Task {task.task_id} "{task.title}" successfully deleted'}), 200)
+
+@bp.route("/<id>/<mark>", methods=["PATCH"])
+def mark_one_task(id, mark):
+    task = validate_task(id)
+    if mark == "mark_complete":
+        task.completed_at = datetime.now()
+    elif mark == "mark_incomplete":
+        task.completed_at = None
+
+    db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
+    
 
 def validate_task(task_id):
     try:
