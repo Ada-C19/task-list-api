@@ -12,7 +12,6 @@ SLACK_HEADERS = {
     "Authorization": f"Bearer {SLACK_OATH_TOKEN}"
 }
 
-
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
@@ -29,10 +28,8 @@ def validate_task(task_id):
 
 
 def send_slack_msg(new_data):
-    channel_id = "C056J4A747L"
 
     slack_response = requests.post(SLACK_ENDPOINT, headers=SLACK_HEADERS, json=new_data)
-    print(slack_response.json())
 
 
 # Routes
