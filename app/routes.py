@@ -2,6 +2,7 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 
+
 tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
 
 
@@ -39,7 +40,12 @@ def create_task():
 
 @tasks_bp.route("",methods=["GET"])
 def read_all_tasks():
-    tasks = Task.query.all()
+
+    sort_query = request.args.get("sort")
+    if sort_query:
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    else:
+        tasks = Task.query.all()
 
     tasks_response = []
     for task in tasks:
