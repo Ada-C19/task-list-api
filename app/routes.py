@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
+from datetime import datetime
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -36,6 +37,8 @@ def get_one_task(task_id):
 
 #check if task exists
     tasks = validate_task(Task, task_id)
+
+
 
     return jsonify({"task": tasks.task_to_dict()}), 200
 
@@ -107,6 +110,25 @@ def get_all_and_sort_title():
         response.append(each_task.task_to_dict())
 
     return jsonify(response), 200
+
+
+#Mark InComplete
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete_task(task_id):
+    task = validate_task(Task, task_id)
+
+    task = Task.query.get(task_id)
+    
+    #sets the task to incomplete regardless if it's complete or incomplete
+    task.completed_at = None
+    db.session.commit()
+    
+
+    return jsonify(
+        {"task": task.task_to_dict()}
+    ), 200
+
+
 
 
 
