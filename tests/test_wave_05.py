@@ -2,7 +2,6 @@ import pytest
 from app.models.goal import Goal
 
 
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goals_no_saved_goals(client):
     # Act
