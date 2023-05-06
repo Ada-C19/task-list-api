@@ -10,6 +10,26 @@ import requests
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def assign_tasks_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    request_body = request.get_json()
+
+    if "task_ids" not in request_body:
+        return {"details": "Invalid data"}, 400
+    
+    response = []
+    # validate each of the tasks in the request 
+    for task_id in request_body["task_ids"]:
+        task = validate_item(Task, task_id)
+        # for each valid task, add it to the goal
+        db.session.add(task)
+        response.append(task.task_id)
+
+    db.session.commit()
+
+    return make_response({"id": goal.goal_id, "task_ids": response}, 200)
+
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
