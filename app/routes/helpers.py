@@ -57,7 +57,7 @@ def create_item(cls):
         error = "Invalid request body"
         error_dict = {"error": error, "details": error_details}
         abort (make_response(error_dict, 400))        
-    
+
 def get_all_items(cls):
     sort_query = request.args.get("sort")
 
@@ -69,8 +69,8 @@ def get_all_items(cls):
         items = cls.query.all()
 
     if request.args.get("title"):
-        items = items.filter(cls.title == request.args.get("title"))
-        
+        items = cls.query.filter(cls.title== request.args.get("title"))
+
     items_response = [item.to_dict() for item in items]
     return jsonify(items_response), 200
 
