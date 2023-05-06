@@ -10,7 +10,7 @@ def validate_model_id(model, id):
     
     entity = model.query.get(id)
     if not entity:
-        abort(make_response(f'Not found: No {model.__name} with id#{id} is found', 404))
+        abort(make_response(f'Not found: No {model.__name__} with id#{id} is found', 404))
     return model
 
 def validate_model_entry(model, request_body):
