@@ -4,6 +4,9 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import asc, desc
 from datetime import datetime
+import requests
+import os
+import json
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -100,6 +103,25 @@ def delete_task(task_id):
         "details": f'Task {task_id} "{task.title}" successfully deleted'
     }
 
+
+def send_post_to_slack(task):
+    slack_bot_token = os.environ['SLACK_BOT_TOKEN']
+    slack_channel = 'task-notifications'
+    text = f"Task {task.description} completed"
+    headers = {'Authorization': slack_bot_token}
+    data = {
+        'channel': slack_channel,
+        'text': text
+    }
+    response = requests.post(
+        'https://slack.com/api/chat.postMessage', headers=headers, json=data)
+
+    # if response.status_code == 200:
+    #     return 'Message sent to Slack successfully.'
+    # else:
+    #     return 'Failed to send message to Slack.'
+
+
 #responsability: to change (to completed) completed_at in the database with the time stamp 
 # and return the response with is_complete: True:
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
@@ -109,6 +131,11 @@ def turn_complete(task_id):
     task.completed_at = datetime.utcnow()
     db.session.commit()
 
+    #send a message to slack with request:
+    send_post_to_slack(task)
+
+
+    #esto queda:
     return get_external_task_representation(task), 200
 
 
@@ -127,3 +154,12 @@ def get_external_task_representation(task):
     return {
         "task": task.to_dict()
     }
+
+
+
+
+
+
+
+
+
