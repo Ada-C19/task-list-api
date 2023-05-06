@@ -52,6 +52,7 @@ def get_one_task(id):
             }
     }, 200
 
+
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
     task = Task.query.get(id)
@@ -68,4 +69,16 @@ def update_task(id):
                 "description": task.description,
                 "is_complete": bool(task.completed_at)
             }
+    }, 200
+
+
+@tasks_bp.route("/<id>", methods=["DELETE"])
+def delete_task(id):
+    task = Task.query.get(id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return {
+        "details": f"Task {id} \"{task.title}\" successfully deleted"
     }, 200
