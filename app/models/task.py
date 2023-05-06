@@ -23,7 +23,7 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, request_body):
-        if  not 'is_complete' in request_body:
+        if  not 'completed_at' in request_body:
             task = cls(
                     title=request_body['title'],
                     description=request_body['description'])
@@ -31,5 +31,6 @@ class Task(db.Model):
             task = cls(
                     title=request_body['title'],
                     description=request_body['description'],
-                    is_complete=request_body['is_complete'])
+                    is_complete=request_body['is_complete'],
+                    completed_at=request_body['completed_at']) #func.now()??
         return task
