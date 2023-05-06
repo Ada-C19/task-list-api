@@ -12,7 +12,7 @@ class Task(db.Model):
     def from_dict(cls, data_dict):
         return cls(
             title=data_dict["title"],
-            description=data_dict["description"],
+            description=data_dict["description"]
         )
 
     def to_dict(self):

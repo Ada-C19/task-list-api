@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, make_response
 from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
@@ -19,6 +19,19 @@ def get_all_tasks():
 def get_one_task(id):
     task = validate_model(Task, id)
 
-    return jsonify({"task": task.to_dict()}), 200
+    response_body = task.to_dict()
+
+    return jsonify({"task": response_body}), 200
+
+@tasks_bp.route("", methods=["POST"])
+def create_task():
+
+    request_body = request.get_json()
+    new_task = Task.from_dict(request_body)
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return jsonify({f"task": new_task.to_dict()}), 201
 
 

@@ -9,6 +9,6 @@ def validate_model(cls, id):
     model = cls.query.get(id)
 
     if not model:
-        abort(make_response({"message"}))
+        abort(make_response({"message": f"{cls.__name__} with id {id} not found"}, 404))
 
     return model
