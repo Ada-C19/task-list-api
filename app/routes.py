@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+from datetime import *
 
 
 tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
@@ -42,7 +43,7 @@ def create_task():
 def read_all_tasks():
 
     sort_query = request.args.get("sort")
-    
+
     if sort_query == "asc":
         tasks = Task.query.order_by(Task.title.asc()).all()
     elif sort_query == "desc":
@@ -89,3 +90,26 @@ def delete_task(task_id):
     db.session.commit()
 
     return abort(make_response({"details":f"Task {task_id} \"{task.title}\" successfully deleted"}, 200))
+
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def update_task_complete_status(task_id):
+    task = validate_model(Task, task_id)
+
+    if task.completed_at is None:
+        task.completed_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()}), 200
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_task_incomplete_status(task_id):
+    task = validate_model(Task, task_id)
+
+    if task.completed_at != None:
+        task.completed_at = None
+
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()}), 200
