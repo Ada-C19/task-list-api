@@ -58,11 +58,6 @@ def test_get_task_not_found(client):
     response_body = response.get_json()
 
     # Assert
-    # task = Task.query.get(1)
-    # print("**********")
-    # print("HERE'S THE TASK ID!!!!!!")
-    # print(task.task_id)   # None
-    # print("**********")
     assert response.status_code == 404
     assert response_body == {
         "msg": f"No task with id 1"
