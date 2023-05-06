@@ -12,6 +12,10 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 
+# *****************************************************************
+# *********************** HELPER  FUNCTIONS ***********************
+# *****************************************************************
+
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
@@ -79,6 +83,37 @@ def update_item(cls, item_id):
     
     return make_response({cls.__name__.lower(): item.to_dict()}, 200)
 
+def delete_item(cls, item_id):
+    item = validate_model(cls, item_id)
+
+    db.session.delete(item)
+    db.session.commit()
+
+    details = f"{cls.__name__} {item.id} \"{item.title}\" successfully deleted"
+    return make_response({"details": details}, 200)
+
+def mark_item_complete(cls, item_id):
+    item = validate_model(cls, item_id)
+
+    item.completed_at = datetime.now()
+    db.session.commit()
+
+    send_slack_message(item.title)
+
+    return make_response({cls.__name__.lower(): item.to_dict()}, 200)
+
+def mark_item_incomplete(cls, item_id):
+    item = validate_model(cls, item_id)
+
+    item.completed_at = None
+    db.session.commit()
+
+    return make_response({cls.__name__.lower(): item.to_dict()}, 200)
+
+# *****************************************************************
+# ************************** TASK ROUTES **************************
+# *****************************************************************
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     return create_item(Task)
@@ -97,33 +132,19 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_model(Task, task_id)
-
-    db.session.delete(task)
-    db.session.commit()
-
-    details = f"Task {task.task_id} \"{task.title}\" successfully deleted"
-    return make_response({"details": details}, 200)
+    return delete_item(Task, task_id)
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def mark_complete(task_id):
-    task = validate_model(Task, task_id)
-
-    task.completed_at = datetime.now()
-    db.session.commit()
-
-    send_slack_message(task.title)
-
-    return make_response({"task": task.to_dict()}, 200)
+def mark__task_complete(task_id):
+    return mark_item_complete(Task, task_id)
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-def mark_incomplete(task_id):
-    task = validate_model(Task, task_id)
+def mark__task_incomplete(task_id):
+    return mark_item_incomplete(Task, task_id)
 
-    task.completed_at = None
-    db.session.commit()
-
-    return make_response({"task": task.to_dict()}, 200)
+# *****************************************************************
+# ************************** GOAL ROUTES **************************
+# *****************************************************************
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -140,3 +161,7 @@ def get_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     return update_item(Goal, goal_id)
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    return delete_item(Goal, goal_id)
