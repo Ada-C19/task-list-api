@@ -68,6 +68,17 @@ def get_item(cls, item_id):
     item = validate_model(cls, item_id)
     return make_response({cls.__name__.lower(): item.to_dict()}, 200)
 
+def update_item(cls, item_id):
+    item = validate_model(cls, item_id)
+    item_data = request.get_json()
+
+    for key, value in item_data.items():
+        setattr(item, key, value)
+
+    db.session.commit()
+    
+    return make_response({cls.__name__.lower(): item.to_dict()}, 200)
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     return create_item(Task)
@@ -82,15 +93,7 @@ def get_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_model(Task, task_id)
-    task_data = request.get_json()
-
-    task.title = task_data["title"]
-    task.description = task_data["description"]
-
-    db.session.commit()
-    
-    return make_response({"task": task.to_dict()}, 200)
+    return update_item(Task, task_id)
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -133,3 +136,7 @@ def get_all_goals():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_goal(goal_id):
     return get_item(Goal, goal_id)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    return update_item(Goal, goal_id)
