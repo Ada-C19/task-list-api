@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
@@ -25,9 +25,12 @@ def get_one_task(id):
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-
     request_body = request.get_json()
-    new_task = Task.from_dict(request_body)
+    
+    try:
+        new_task = Task.from_dict(request_body)
+    except KeyError:
+        abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_task)
     db.session.commit()
