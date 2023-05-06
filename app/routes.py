@@ -34,4 +34,24 @@ def create_task():
 
     return jsonify({f"task": new_task.to_dict()}), 201
 
+@tasks_bp.route("/<id>", methods=["PUT"])
+def update_task(id):
+    task = validate_model(Task, id)
 
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    db.session.commit()
+
+    return jsonify({"task": task.to_dict()}), 200
+
+@tasks_bp.route("/<id>", methods=["DELETE"])
+def delete_task(id):
+    task = validate_model(Task, id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({"details": f'Task {task.id} "{task.title}" successfully deleted'}), 200
