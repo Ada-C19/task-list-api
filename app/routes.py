@@ -1,4 +1,4 @@
-from flask import Blueprint, request, make_response, request
+from flask import Blueprint, request, make_response, request, abort, jsonify
 from app import db
 from app.models.task import Task
 
@@ -16,10 +16,15 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return {
+    is_complete = True
+    if not new_task.completed_at:
+        is_complete = False
+
+    return jsonify({
         "task": {
+            "id": new_task.task_id,
             "title": new_task.title,
             "description": new_task.description,
-            "is_complete": new_task.completed_at
+            "is_complete": is_complete
         }
-    }
+    }), 201
