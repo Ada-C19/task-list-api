@@ -2,6 +2,10 @@ from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.task import Task
 from datetime import datetime 
+from slack_sdk import WebClient
+import os
+import requests
+from slack_sdk.errors import SlackApiError
 
 
 task_bp = Blueprint("task", __name__,url_prefix = "/tasks")
@@ -133,16 +137,21 @@ def mark_complete(task_id):
     if not task:
         return jsonify({"msg": "task not found"}), 404
     
-    if not task.completed_at:
-        task.completed_at = datetime.utcnow()
-        task.is_complete = True
+    # if not task.completed_at:
+    task.completed_at = datetime.utcnow()
+    # task.is_complete = True
 
-        db.session.commit()
+    db.session.commit()
 
-        return jsonify({"task":task.to_dict()}), 200
+    message = f"Someone just completed a task {task.title}"
 
-    else:
-        return jsonify({"task":task.to_dict()}), 200
+    client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+
+    response = client.chat_postMessage(channel="task-notifications", text=message)
+
+         
+    return jsonify({"task":task.to_dict()}), 200
+
     
 
 # mark_imcomplete
