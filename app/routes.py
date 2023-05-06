@@ -51,3 +51,21 @@ def get_one_task(id):
                 "is_complete": bool(task.completed_at)
             }
     }, 200
+
+@tasks_bp.route("/<id>", methods=["PUT"])
+def update_task(id):
+    task = Task.query.get(id)
+
+    request_body = request.get_json()
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    
+    db.session.commit()
+    return {
+        "task": {
+                "id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": bool(task.completed_at)
+            }
+    }, 200
