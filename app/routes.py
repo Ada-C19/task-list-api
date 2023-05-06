@@ -28,22 +28,15 @@ def handle_task(task_id):
 
 @tasks_bp.route("", methods=["GET"])
 def handle_tasks():
-    title_query = request.args.get("title")
-    if title_query:
-        tasks = Task.query.filter_by(title='title')
-    else:
-        tasks = Task.query.all()
-        
     if request.args.get("sort") == "asc":
         tasks = Task.query.order_by(text("title asc"))
     elif request.args.get("sort") == "desc":
         tasks = Task.query.order_by(text("title desc"))
+    else:
+        tasks = Task.query.all()
     tasks_response = [Task.to_dict(task) for task in tasks]
 
-    if not tasks_response: 
-        return make_response(jsonify(tasks_response),200)
-    else: 
-        return make_response(jsonify(tasks_response),200)
+    return make_response(jsonify(tasks_response),200)
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
@@ -67,3 +60,33 @@ def delete_task(id):
     db.session.commit()
 
     return make_response({"details":f'Task 1 "{task.title}" successfully deleted'}, 200)
+
+@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+def mark_complete(id):
+    task = validate_model(Task, id)
+    request_body = request.get_json()
+
+    task.title = request_body['title'],
+    task.description=request_body['description'],
+    task.completed_at=request_body['completed_at']
+    
+    db.session.commit()
+
+    task = task.to_dict()
+
+    return make_response({"task":task}, 200)
+
+@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(id):
+    task = validate_model(Task, id)
+    request_body = request.get_json()
+
+    task.title = request_body['title'],
+    task.description=request_body['description'],
+    task.completed_at=request_body['completed_at']
+    
+    db.session.commit()
+
+    task = task.to_dict()
+
+    return make_response({"task":task}, 200)

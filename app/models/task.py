@@ -3,18 +3,25 @@ from flask import make_response, abort, jsonify
 
 
 class Task(db.Model):
-    task_id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(task):
-        task_dict = dict(
-                id=task.task_id,
-                title=task.title,
-                description=task.description,
-                is_complete=False
-    ) 
+        if not task.completed_at or task.completed_at == False:
+            task_dict = dict(
+                    id=task.task_id,
+                    title=task.title,
+                    description=task.description,
+                    is_complete=False
+        )
+        else:
+            task_dict = dict(
+                    id=task.task_id,
+                    title=task.title,
+                    description=task.description,
+                    is_complete=True)
         return task_dict
 
     @classmethod

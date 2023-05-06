@@ -5,26 +5,14 @@ from app.models.task import Task
 import pytest
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_on_incomplete_task(client, one_task):
     # Arrange
-    """
-    The future Wave 4 adds special functionality to this route,
-    so for this test, we need to set-up "mocking."
-
-    Mocking will help our tests work in isolation, which is a
-    good thing!
-
-    We need to mock any POST requests that may occur during this
-    test (due to Wave 4).
-
-    There is no action needed here, the tests should work as-is.
-    """
     with patch("requests.post") as mock_get:
         mock_get.return_value.status_code = 200
 
         # Act
-        response = client.patch("/tasks/1/mark_complete")
+        response = client.patch("/tasks/1/mark_complete", json={"title":"Go on my daily walk 🏞", "description":"Notice something new every day", "completed_at":datetime.utcnow()})
     response_body = response.get_json()
 
     # Assert
@@ -42,10 +30,13 @@ def test_mark_complete_on_incomplete_task(client, one_task):
     assert Task.query.get(1).completed_at
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_complete_task(client, completed_task):
     # Act
-    response = client.patch("/tasks/1/mark_incomplete")
+    response = client.patch("/tasks/1/mark_incomplete", json={"title": "Go on my daily walk 🏞",
+            "description": "Notice something new every day",
+            "completed_at": None
+        })
     response_body = response.get_json()
 
     # Assert
@@ -65,18 +56,6 @@ def test_mark_incomplete_on_complete_task(client, completed_task):
 @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_on_completed_task(client, completed_task):
     # Arrange
-    """
-    The future Wave 4 adds special functionality to this route,
-    so for this test, we need to set-up "mocking."
-
-    Mocking will help our tests work in isolation, which is a
-    good thing!
-
-    We need to mock any POST requests that may occur during this
-    test (due to Wave 4).
-
-    There is no action needed here, the tests should work as-is.
-    """
     with patch("requests.post") as mock_get:
         mock_get.return_value.status_code = 200
 
