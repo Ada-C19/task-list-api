@@ -13,7 +13,6 @@ from slack_sdk.errors import SlackApiError
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 def validate_item(model, item_id):
     try:
@@ -137,5 +136,3 @@ def mark_incomplete(task_id):
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
-
-@goal_bp.route("", methods=["POST"])
