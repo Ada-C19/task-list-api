@@ -9,7 +9,19 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True, default=None)
 
     def to_dict(self):
-        return {"id":self.id,
-                "title": self.title,
-                "description": self.description,
-                "is_complete":(self.completed_at != None)}
+        task_as_dict = {}
+        task_as_dict["id"] = self.id
+        task_as_dict["title"] = self.title
+        task_as_dict["description"] = self.description
+        task_as_dict["is_complete"] = (self.completed_at != None)
+    
+        return task_as_dict
+    
+
+#poder usar el metodo de esta clase en create_book y retonarlo en esa 
+# funcion en routes. Lo importante es el decorador y el cls
+    @classmethod
+    def from_dict(cls, task_data):
+        new_task = Task(title=task_data["title"],
+                        description=task_data["description"])
+        return new_task
