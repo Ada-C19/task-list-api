@@ -42,8 +42,11 @@ def create_task():
 def read_all_tasks():
 
     sort_query = request.args.get("sort")
-    if sort_query:
+    
+    if sort_query == "asc":
         tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
 
