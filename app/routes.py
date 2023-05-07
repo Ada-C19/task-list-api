@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.task import Task
 from app import db
+import pdb
 
 #All routes defined with tasks_bp start with url_prefix (/tasks)
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -36,15 +37,23 @@ def create_task():
 
 @tasks_bp.route("", methods=['GET'])
 def get_tasks():
-    task_query = request.args.get('title')
-    if task_query:
-        tasks = Task.query.filter_by(title=task_query)
+    task_query = request.args.get('sort')
+    
+    #get tasks by query parameter
+
+    if task_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif task_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    
+    #get all tasks
     else:
         tasks = Task.query.all()
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response), 200
+
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_one_task(task_id):
