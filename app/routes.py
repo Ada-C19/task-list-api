@@ -1,11 +1,12 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import *
 
 
 tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
-
+goals_bp = Blueprint("goals_bp",__name__, url_prefix="/goals")
 
 
 def validate_model(cls, model_id):
@@ -113,3 +114,21 @@ def update_task_incomplete_status(task_id):
     db.session.commit()
 
     return jsonify({"task":task.to_dict()}), 200
+
+
+#ROUTES FOR GOAL
+
+
+@goals_bp.route("",methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+
+    new_goal = Goal.from_dict(request_body)
+    
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal":{
+                "goal_id": new_goal.goal_id,
+                "title": new_goal.title
+            }}, 201
