@@ -42,12 +42,7 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_task(task_id)
-    return {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.completed_at
-        }
+    return task.to_result(), 200 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
