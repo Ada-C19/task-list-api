@@ -16,7 +16,8 @@ def validate_id(model, id):
 def validate_entry(model, request_body):
     for atr in model.get_attributes():
         if atr not in request_body:
-            abort(make_response({'Invalid Request': f'Missing {model.__name__} {atr}'}, 400))
+            abort(make_response({'details': 'Invalid data'}, 400))
+            # abort(make_response({'Invalid Request': f'Missing {model.__name__} {atr}'}, 400))
     return request_body
 
 def create_response(entity):
@@ -96,4 +97,4 @@ def delete_task(task_id):
     task_title = task.title
     db.session.delete(task)
     db.session.commit()
-    return {'details': f"Task {task_id} '{task_title}' successfully deleted"}, 200
+    return {'details': f'Task {task_id} \"{task_title}\" successfully deleted'}, 200
