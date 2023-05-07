@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.task import Task
 from app import db
-import pdb
+# import pdb
+import datetime
 
 #All routes defined with tasks_bp start with url_prefix (/tasks)
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -38,7 +39,7 @@ def create_task():
 @tasks_bp.route("", methods=['GET'])
 def get_tasks():
     task_query = request.args.get('sort')
-    
+    tasks_response = []
     #get tasks by query parameter
 
     if task_query == "asc":
@@ -49,7 +50,7 @@ def get_tasks():
     #get all tasks
     else:
         tasks = Task.query.all()
-    tasks_response = []
+    
     for task in tasks:
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response), 200
@@ -87,3 +88,26 @@ def delete_one_task(task_id):
 
     task_deleted_details = f"Task {task_id} \"{task_to_delete.title}\" successfully deleted" 
     return {"details": task_deleted_details }, 200
+
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def completed_task(task_id):
+    updated_task=get_valid_task_by_id(Task, task_id)
+    
+    updated_task.completed_at = datetime.datetime.utcnow()
+    db.session.commit()
+    
+    task_response = updated_task.to_dict()
+    
+    return make_response(({"task":task_response}), 200)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def incomplete_task(task_id):
+    updated_task=get_valid_task_by_id(Task, task_id)
+    
+    updated_task.completed_at = None
+    db.session.commit()
+    
+    task_response = updated_task.to_dict()
+    
+    return make_response(({"task":task_response}), 200)
