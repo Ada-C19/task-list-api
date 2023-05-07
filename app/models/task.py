@@ -14,12 +14,14 @@ class Task(db.Model):
                 ) # completed_at = dict_data["completed_at"]
         
     
-    def to_dict(task):
-        # return dict(id=task.task_id,
-        #             title=task.title,
-        #             description=task.description,
-        #             is_complete=False) #task.completed_at
-        return {"task":dict(id=task.task_id,
-                    title=task.title,
-                    description=task.description,
-                    is_complete=False)}#task.completed_at
+    def to_dict(self):
+        return dict(id=self.task_id,
+                    title=self.title,
+                    description=self.description,
+                    is_complete=False) #task.completed_at
+        # return {"task":dict(id=self.task_id,
+        #             title=self.title,
+        #             description=self.description,
+        #             is_complete=False)}#task.completed_at
+    def add_task_key(dict_data):
+        return {"task":dict_data}
