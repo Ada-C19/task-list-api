@@ -49,3 +49,28 @@ def handle_task(task_id):
         "is_complete": is_complete
     }
     }, 200
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = Task.query.get(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+
+    db.session.commit()
+
+    is_complete = False
+    if not task.completed_at:
+        is_complete = False
+
+    return {"task":{
+        "id": task.task_id, 
+        "title": task.title,
+        "description": task.description,
+        "is_complete": False,
+        "is_complete": is_complete
+    }
+    }, 200
