@@ -10,7 +10,24 @@ bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @bp.route("", methods=["GET"])
 def get_all_tasks():
-    tasks = Task.query.all()
+    # tasks = Task.query.all()
+
+
+    sorted_query = request.args.get("sort")
+    if sorted_query == "asc":
+        tasks = Task.query.order_by("title")
+    elif sorted_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all
+
+    # name_query = request.args.get("name")
+    # if name_query is None:
+    #     planets = Planet.query.filter_by(name=name_query)
+    # else:
+    #     planets = Planet.query.all()
+
+
     tasks_list = []
     for task in tasks:
         tasks_list.append(task.to_dict()) 
