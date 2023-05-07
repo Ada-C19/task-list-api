@@ -1,14 +1,4 @@
-# Wave 2: Using Query Params
 
-## Goal
-
-Our task list API allows users to create tasks and get a list of all tasks. Our users will find it useful to be able to sort through these tasks by title! Our goal is to implement a basic sorting feature for our tasks.
-
-## Requirements
-
-The following are required routes for wave 2. Feel free to implement the routes in any order within this wave.
-
-### Tips
 
 - Pay attention to the exact shape of the expected JSON. Double-check nested data structures and the names of the keys for any mispellings.
 - Use the tests in `tests/test_wave_02.py` to guide your implementation.
