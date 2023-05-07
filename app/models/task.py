@@ -8,7 +8,7 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
-    def make_dict(self):
+    def make_task_dict(self):
         return dict(
                 id=self.task_id,
                 title=self.title,

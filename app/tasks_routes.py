@@ -3,9 +3,11 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import text
 from datetime import datetime
-
+import os
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+
 
 def validate_task(id):
     try:
@@ -36,19 +38,19 @@ def create_task():
 
     db.session.add(new_task)
     db.session.commit()
-    task_dict = dict(task=new_task.make_dict())
+    task_dict = dict(task=new_task.make_task_dict())
 
     return make_response(jsonify(task_dict), 201)
 
 # WAVE 1: Get Tasks: Getting Saved Tasks 
 # WAVE 1: Get Tasks: No Saved Tasks
-# WAVE1: Get One Task: One Saved Task
+# WAVE 1: Get One Task: One Saved Task
 @tasks_bp.route("", methods=["GET"])
 def get_all_saved_tasks():
     tasks = Task.query.all()
     tasks_list = []
     for task in tasks:
-        tasks_list.append(task.make_dict())
+        tasks_list.append(task.make_task_dict())
 
     # WAVE 2: Sorting Tasks: By Title, Ascending, Descending
     if request.args.get("sort") == "asc":
@@ -58,16 +60,16 @@ def get_all_saved_tasks():
 
     else:
         tasks = Task.query.all()
-    tasks_list = [task.make_dict() for task in tasks] 
+    tasks_list = [task.make_task_dict() for task in tasks] 
 
     return jsonify(tasks_list), 200
 
-# WAVE1: Get One Task: One Saved Task cont.
+# WAVE 1: Get One Task: One Saved Task cont.
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_saved_task(id):
     task = validate_task(id)
 
-    task_dict = dict(task=task.make_dict())
+    task_dict = dict(task=task.make_task_dict())
 
     return make_response(jsonify(task_dict), 200)
 
@@ -84,7 +86,7 @@ def update_task(id):
 
     db.session.commit()
 
-    task_dict = dict(task=task.make_dict())
+    task_dict = dict(task=task.make_task_dict())
     return make_response(jsonify(task_dict), 200)
 
 
@@ -107,12 +109,25 @@ def delete_task(id):
 def mark_complete_on_incomplete(id):
     task = validate_task(id)
 
+
     if not task.completed_at:  # if complete mark as complete
         task.completed_at = datetime.now()
 
+    API_KEY = os.environ.get("API_KEY")   # WAVE 4 START
+
+    params = {"channel": "api-test-channel", 
+                "title": "My Beautiful Task",
+                "text": "Someone just completed the task My Beautiful Task"}
+    headers = {
+        "Authorization": f"Bearer {API_KEY}"
+    }
+
+    requests.post("https://slack.com/api/chat.postMessage", data=params, headers=headers)  # WAVE 4 END
+        
+
     db.session.commit()
 
-    task_dict = dict(task=task.make_dict())
+    task_dict = dict(task=task.make_task_dict())
     return make_response(jsonify(task_dict), 200)
 
 
@@ -126,5 +141,5 @@ def mark_incomplete_on_complete(id):
 
     db.session.commit()
 
-    task_dict = dict(task=task.make_dict())
+    task_dict = dict(task=task.make_task_dict())
     return make_response(jsonify(task_dict), 200)
