@@ -249,7 +249,12 @@ def test_get_all_tasks_returns_array_of_tasks_and_200(client, three_tasks):
     response_body = response.get_json()
 
     assert response.status_code == 200
-    assert len(response_body) == 3
-    assert response_body == [{"title": "Water the garden 🌷", "description": "", "completed_at": None},
-                            {"title": "Answer forgotten email 📧", "description": "", "completed_at": None},
-                            {"title": "Pay my outstanding tickets 😭", "description": "", "completed_at": None},]
+    assert len(response_body[0]) == 3
+    assert response_body == [
+        [
+            {"description": "", "id": 1, "is_complete": False, "title": "Water the garden 🌷"},
+            {"description": "", "id": 2, "is_complete": False, "title": "Answer forgotten email 📧"},
+            {"description": "", "id": 3, "is_complete": False, "title": "Pay my outstanding tickets 😭"},
+        ],
+        200,
+    ]

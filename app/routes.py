@@ -12,7 +12,6 @@ def get_task_instance(request):
                 completed_at = None
     )
 
-
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     new_task = get_task_instance(request)
@@ -24,26 +23,18 @@ def create_task():
 
     task = new_task.to_json()
 
-
     return make_response(jsonify(task=task), 201)
 
+@tasks_bp.route("", methods=['GET'])
+def get_tasks():
+    tasks = Task.query
+    tasks = tasks.all()
+
+    task_list = [task.to_json() for task in tasks]
+
+    return jsonify(task_list, 200)
 
 
-
-
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "A Brand New Task",
-#     "description": "Test Description",
-#     "is_complete": false
-#   }
-# }
-# ```
-
-# so that I know I successfully created a Task that is saved in the database.
 
 # ### Get Tasks: Getting Saved Tasks
 
