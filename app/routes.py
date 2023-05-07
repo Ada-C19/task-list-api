@@ -24,11 +24,13 @@ def validate_task(cls, task_id):
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     
-    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
 
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    #grab all info from the instance task table
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
         
