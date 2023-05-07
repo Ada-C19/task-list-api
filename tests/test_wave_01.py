@@ -15,6 +15,19 @@ def test_get_tasks_no_saved_tasks_200(client):
     assert response.status_code == 200
     assert response_body == []
 
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_get_all_tasks_returns_array_of_tasks_and_200(client, three_tasks):
+    response = client.get("/tasks")
+    response_body = response.get_json()
+
+    assert response.status_code == 200
+    assert response.status == "200 OK"
+    assert len(response_body) == 3
+    assert response_body == [
+        {"id": 1, "title": "Water the garden 🌷", "description": "", "is_complete": False},
+        {"id": 2, "title": "Answer forgotten email 📧", "description": "", "is_complete": False},
+        {"id": 3, "title": "Pay my outstanding tickets 😭", "description": "", "is_complete": False},
+    ]
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_one_saved_tasks_200(client, one_task):
@@ -39,8 +52,6 @@ def test_get_task_200(client, one_task):
     # Act
     response = client.get("/tasks/1")
     response_body = response.get_json()
-    print(response)
-    print(response_body)
 
     # Assert
     assert response.status_code == 200
@@ -78,20 +89,6 @@ def test_update_task_200(client, one_task):
     assert task.title == "Updated Task Title"
     assert task.description == "Updated Test Description"
     assert task.completed_at == None
-
-# @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_all_tasks_returns_array_of_tasks_and_200(client, three_tasks):
-    response = client.get("/tasks")
-    response_body = response.get_json()
-
-    assert response.status_code == 200
-    assert response.status == "200 OK"
-    assert len(response_body) == 3
-    assert response_body == [
-        {"id": 1, "title": "Water the garden 🌷", "description": "", "is_complete": False},
-        {"id": 2, "title": "Answer forgotten email 📧", "description": "", "is_complete": False},
-        {"id": 3, "title": "Pay my outstanding tickets 😭", "description": "", "is_complete": False},
-    ]
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_task_200(client, one_task):
@@ -182,11 +179,12 @@ def test_create_task_must_contain_description_400(client):
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_invalid_task_returns_400(client):
     response = client.get("/tasks/mystery")
-
     response_body = response.get_json()
+    print(response)
+    print(response_body)
 
     assert response.status_code == 400
-    assert response_body == {'message': 'Task mystery is invalid.'}
+    assert response_body == {'message': 'Invalid task ID: mystery'}
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_update_task_not_found_400(client):

@@ -55,8 +55,7 @@ def get_tasks():
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
     task = get_task_by_id(task_id)
-    
-    return task.to_json(), 200
+    return make_response(jsonify({"task": task.to_json()})), 200
 
 
 
