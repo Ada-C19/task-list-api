@@ -1,12 +1,13 @@
 from app import db
 from .tasks_routes import validate_model
+from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, abort, make_response, request
 
 goals_bp = Blueprint("goals_bp",__name__, url_prefix="/goals")
 
 @goals_bp.route("",methods=["POST"])
-def create_goal():
+def create_goal_2():
     request_body = request.get_json()
 
     try:
@@ -66,3 +67,25 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return abort(make_response({"details":f"Goal {goal_id} \"{goal.title}\" successfully deleted"}, 200))
+
+
+#RELATIONSHIP
+#Goals(parent) with tasks(child)
+@goals_bp.route("/goals/<goal_id>/tasks",methods=["POST"])
+def create_goal(task_id):
+
+    task = validate_model(Task, task_id)
+
+    request_body = request.get_json()
+    new_goal = Goal(
+        title=request_body["title"],
+        task=task
+    )
+    
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal":{
+                "id": new_goal.goal_id,
+                "title": new_goal.title
+            }}, 201
