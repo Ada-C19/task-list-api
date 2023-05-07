@@ -34,19 +34,31 @@ def create_a_task():
     return {
         "task": new_task.to_dict()
     }, 201
-    
+
+# @tasks_bp.route("", methods=["GET"])
+# def get_tasks_asc_sort():
+#     sort_asc = request.args.get("sort=asc")
+#     sort_desc = request.args.get("sort=desc")
+#     if sort_asc:
+#         tasks = Task.query.order_by(Task.title.asc())
+#     if sort_desc:
+#         tasks = Task.query.order_by(Task.title.desc())
+#     return tasks
+
 @tasks_bp.route("", methods=["GET"])
 def get_saved_tasks():
     tasks = Task.query.all()
+    sort_request = request.args.get("sort")
     task_response = []
-    # Question: Isn't query.all() return result as a list already? why append again?
-    if tasks is not None:
+    if tasks:
+        if sort_request:
+            if sort_request == "asc":
+                tasks = Task.query.order_by(Task.title.asc())
+            elif sort_request == "desc":
+                tasks = Task.query.order_by(Task.title.desc())
         for task in tasks:
-    # Question: will this work without to_dict()?
             task_response.append(task.to_dict())
-        return jsonify(task_response), 200
-    else:
-        return tasks, 200
+    return jsonify(task_response), 200
     
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
