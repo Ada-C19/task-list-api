@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
 
+
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @task_bp.route("", methods=["POST"])
@@ -26,9 +27,16 @@ def add_task():
 
 @task_bp.route("", methods=["GET"])
 def get_tasks():
-    response = []
+    sort = request.args.get("sort")
+
+    if sort == "asc":
+        task = Task.query.order_by(Task.title.asc()).all()
+    else:
+        task = Task.query.order_by(Task.title.desc()).all()
+    
     all_tasks = Task.query.all()
 
+    response = []
     for task in all_tasks:
         response.append(task.to_result())
 
