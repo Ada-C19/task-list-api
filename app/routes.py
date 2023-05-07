@@ -3,6 +3,8 @@ from app.models.task import Task
 from app import db
 # import pdb
 import datetime
+import os
+from slack_sdk import WebClient
 
 #All routes defined with tasks_bp start with url_prefix (/tasks)
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -107,6 +109,15 @@ def incomplete_task(task_id):
     
     updated_task.completed_at = None
     db.session.commit()
+    
+    slack_token = os.environ["SLACK_BOT_TOKEN"]
+    
+    client = WebClient(token=slack_token)
+    
+    result = client.chat_postMessage(
+        channel="task-notifications",
+        text=f"Someone just completed the task{updated_task.title}"
+    )
     
     task_response = updated_task.to_dict()
     
