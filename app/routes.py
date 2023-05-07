@@ -15,6 +15,41 @@ task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
 
+#helper function
+
+def validate_task(model, task_id):
+    try:
+        task_id = int(task_id)
+
+    except ValueError:
+        return abort(make_response({
+            "error": f"invalid id {task_id} not found"}, 400
+        ))
+
+    task = model.query.get(task_id)
+    if task is None:
+        abort(make_response({
+            "error": "task not found"}, 404
+        ))
+    return task
+
+
+def validate_goal(model, goal_id):
+    try:
+        goal_id = int(goal_id)
+
+    except ValueError:
+        return abort(make_response({
+            "error": f"invalid id {goal_id} not found"}, 400
+        ))
+
+    task = model.query.get(goal_id)
+    if task is None:
+        abort(make_response({
+            "error": "goal not found"}, 404
+        ))
+    return task
+
 #WAVE 1
 
 #CREATE
@@ -73,23 +108,7 @@ def delete_task(id):
     return {"details": f'Task {id} "Go on my daily walk 🏞" successfully deleted'}, 200
 
 
-#helper function
 
-def validate_task(model, task_id):
-    try:
-        task_id = int(task_id)
-    
-    except ValueError:
-        return abort(make_response({
-            "error": f"invalid id {task_id} not found"}, 400
-        ))
-    
-    task = model.query.get(task_id)
-    if task is None:
-        abort(make_response({
-            "error": "task not found"}, 404
-        ))
-    return task
 
 # #WAVE 2
 
@@ -194,3 +213,14 @@ def get_all_goals():
         response.append(each_goal.goal_to_dict())
 
     return jsonify(response), 200
+
+#GET ONE
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+
+    goal = validate_goal(Goal, goal_id)
+
+    return jsonify({
+        "goal": goal.goal_to_dict()
+    }), 200
+
