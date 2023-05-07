@@ -7,7 +7,15 @@ task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @task_bp.route("", methods = ["GET"])
 def get_tasks():
     response = []
-    all_tasks = Task.query.all()
+    title_sort_query = request.args.get("sort")
+
+    if title_sort_query is None:
+        all_tasks = Task.query.all()
+    elif "asc" in title_sort_query: 
+        all_tasks = Task.query.order_by(Task.title.asc()).all()
+    elif "desc" in title_sort_query:
+        all_tasks = Task.query.order_by(Task.title.desc()).all()
+
     for task in all_tasks:
         response.append(task.to_dict())
     return jsonify(response), 200
