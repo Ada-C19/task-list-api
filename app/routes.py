@@ -224,3 +224,17 @@ def get_one_goal(goal_id):
         "goal": goal.goal_to_dict()
     }), 200
 
+#UPDATE
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+
+    goal = validate_goal(Goal, goal_id)
+    request_data = request.get_json()
+
+    goal.title = request_data["title"]
+
+    db.session.commit()
+
+    return jsonify({
+        "goal": goal.goal_to_dict()
+    }), 200
