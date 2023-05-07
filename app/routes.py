@@ -238,3 +238,16 @@ def update_goal(goal_id):
     return jsonify({
         "goal": goal.goal_to_dict()
     }), 200
+
+#DELETE
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+
+    goal = validate_goal(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return{
+        "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
+    }, 200
