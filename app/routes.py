@@ -74,6 +74,16 @@ def update_task(task_id):
 
     return make_response(jsonify(task=task)), 200
 
+@tasks_bp.route("/<task_id>", methods=['DELETE'])
+def delete_task(task_id):
+    task = get_task_by_id(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    message = f'Task {task_id} "{task.title}" successfully deleted'
+
+    return make_response({"details" : message}), 200
 
 
 

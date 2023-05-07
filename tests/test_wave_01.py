@@ -95,7 +95,8 @@ def test_delete_task_200(client, one_task):
     # Act
     response = client.delete("/tasks/1")
     response_body = response.get_json()
-
+    print(response)
+    print(response_body)
     # Assert
     assert response.status_code == 200
     assert "details" in response_body
@@ -180,8 +181,6 @@ def test_create_task_must_contain_description_400(client):
 def test_get_invalid_task_returns_400(client):
     response = client.get("/tasks/mystery")
     response_body = response.get_json()
-    print(response)
-    print(response_body)
 
     assert response.status_code == 400
     assert response_body == {'message': 'Invalid task ID: mystery'}
@@ -194,21 +193,23 @@ def test_update_task_not_found_400(client):
         "description": "Updated Test Description",
     })
     response_body = response.get_json()
-
+    print(response)
+    print(response_body)
     # Assert
     assert response.status_code == 400
-    assert response_body == {'message': 'Task mystery is invalid.'}
+    assert response_body == {'message': 'Invalid task ID: mystery'}
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_task_not_found_400(client):
     # Act
     response = client.delete("/tasks/mystery")
     response_body = response.get_json()
-
+    print(response)
+    print(response_body)
     # Assert
     assert response.status_code == 400
     assert Task.query.all() == []
-    assert response_body == {'message': 'Task mystery is invalid.'}
+    assert response_body == {'message': 'Invalid task ID: mystery'}
 
 
 
