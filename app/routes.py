@@ -75,6 +75,7 @@ def update_task(task_id):
     }
     }, 200
 
+######GET CLARIFICATION ON THE RETURN MESSAGE
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = Task.query.get(task_id)
@@ -93,3 +94,14 @@ def delete_task(task_id):
     return make_response(f"Task {task.task_id} successfully deleted")
     
 
+def validate_item(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({"message": f"invalid task_id: {task_id}"}, 400))
+    
+    task = Task.query.get(task_id)
+    if not task:
+        abort(make_response({"message": f"task {task_id} not found"}, 404))
+
+    return task
