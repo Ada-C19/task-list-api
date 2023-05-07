@@ -5,17 +5,17 @@ class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, nullable = True, default = False )
+    completed_at = db.Column(db.DateTime, nullable = True)
 
     def to_result(self):
         is_complete = True
         if not self.completed_at:
-            is_complete = Flase
+            is_complete = False
         return {
             "id":self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete":is_complete
+            "is_complete": is_complete
         }
 # def to_dict(self):
 #         task_as_dict = {}
