@@ -1,30 +1,30 @@
-# from flask import Blueprint, jsonify, abort, make_response, request
-# from app.models.task import Task
-# from app import db
+from flask import Blueprint, jsonify, abort, make_response, request
+from app.models.task import Task
+from app import db
 
-# tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
+tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
-# @tasks_bp.route("", methods=['POST'])
-# def create_task():
-#     pass
+def get_task_instance(request):
+        task_info = request.get_json
+        return Task(
+        title=task_info['title'],
+        description=task_info['description'],
+        completed_at=task_info['completed_at']
+    )
+
+@tasks_bp.route("", methods=['POST'])
+def create_task():
+    new_task = get_task_instance(task_info)
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    message = f"CREATED"
+
+    return make_response(201, message)
 
 
 
-# ### Create a Task: Valid Task With `null` `completed_at`
-
-# As a client, I want to be able to make a `POST` request to `/tasks` with the following HTTP request body
-
-# ```json
-# {
-#   "title": "A Brand New Task",
-#   "description": "Test Description",
-#   "completed_at": null
-# }
-# ```
-
-# and get this response:
-
-# `201 CREATED`
 
 # ```json
 # {
