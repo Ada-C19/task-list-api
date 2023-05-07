@@ -74,8 +74,12 @@ def post_task_ids(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
 
-    goal.tasks = Task(task_id=request_body["task_ids"][0])
-
+    tasks = Task.query.filter(Task.task_id.in_(request_body['task_ids'])).all()
+    for task in tasks:
+        goal.tasks.append(task)
+    
     db.session.commit()
 
-    return make_response({"id":1,"task_ids":[1,2,3]}, 200)
+    added_task_ids = [task.task_id for task in tasks]
+
+    return make_response({"id":goal.goal_id,"task_ids":added_task_ids}, 200)
