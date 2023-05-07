@@ -16,6 +16,3 @@ class Task(db.Model):
         task_as_dict["is_complete"] = bool(self.completed_at)
 
         return task_as_dict
-    # ----------------------------------------
-    # IMPLEMENT THIS TO_DICT FUNCTION TO ROUTES
-    # ----------------------------------------
