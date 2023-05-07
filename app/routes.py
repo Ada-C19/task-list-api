@@ -35,7 +35,8 @@ def get_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def read_one_task(task_id):
-    task = Task.query.get(task_id)
+    # task = Task.query.get(task_id)
+    task = validate_item(task_id)
 
     is_complete = False
     if not task.completed_at:
@@ -52,7 +53,8 @@ def read_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = Task.query.get(task_id)
+    # task = Task.query.get(task_id)
+    task = validate_item(task_id)
 
     request_body = request.get_json()
 
@@ -78,7 +80,8 @@ def update_task(task_id):
 ######GET CLARIFICATION ON THE RETURN MESSAGE
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = Task.query.get(task_id)
+    # task = Task.query.get(task_id)
+    task = validate_item(task_id)
 
     db.session.delete(task)
     db.session.commit()
