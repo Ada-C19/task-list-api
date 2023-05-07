@@ -95,6 +95,7 @@ def update_task(task_id):
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
+
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_item(Task, task_id)
@@ -106,7 +107,6 @@ def delete_task(task_id):
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
 
     
-
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_item(Task, task_id)

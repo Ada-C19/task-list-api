@@ -9,7 +9,9 @@ import os
 import requests
 from slack_sdk.errors import SlackApiError
 
+
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
+
 
 def validate_item(model, item_id):
     try:
@@ -23,6 +25,7 @@ def validate_item(model, item_id):
         return abort(make_response({"details": f"id {item_id} not found"}, 404))
     
     return item
+
 
 @goal_bp.route("", methods=["POST"])
 def add_goals():
@@ -40,6 +43,7 @@ def add_goals():
 
     return make_response(jsonify({"goal": new_goal.goal_to_dict()}), 201)
 
+
 @goal_bp.route("", methods=["GET"])
 def get_all_goals():
     response = []
@@ -51,10 +55,12 @@ def get_all_goals():
 
     return make_response(jsonify(response), 200)
 
+
 @goal_bp.route("/<goal_id>", methods=["GET"])
 def get_one_task(goal_id):
     goal = validate_item(Goal, goal_id)
     return make_response(jsonify({"goal": goal.goal_to_dict()}), 200)
+
 
 @goal_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
@@ -67,6 +73,7 @@ def update_goal(goal_id):
     db.session.commit()
 
     return make_response(jsonify({"goal": goal.goal_to_dict()}), 200)
+
 
 @goal_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_one_task(goal_id):
