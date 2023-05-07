@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime 
 from slack_sdk import WebClient
 import os
-import requests
 from slack_sdk.errors import SlackApiError
 
 
@@ -13,7 +13,7 @@ task_bp = Blueprint("task", __name__,url_prefix = "/tasks")
 # wave 1 
 # create a task
 @task_bp.route("", methods = ["POST"])
-def get_task():
+def create_task():
     response_body = request.get_json()
     if "title" not in response_body or "description" not in response_body:
         return jsonify({ "details": "Invalid data"}), 400
@@ -31,6 +31,7 @@ def get_task():
             "is_complete": False
     }
     }), 201
+
 
 # get all tasks
 # @task_bp.route("", methods = ["GET"])
@@ -139,7 +140,7 @@ def mark_complete(task_id):
     
     if not task.completed_at:
         task.completed_at = datetime.utcnow()
-        task.is_complete = True
+        task.is_complete = True 
 
         db.session.commit()
 
@@ -168,3 +169,50 @@ def mark_imcomplete(task_id):
 
     return jsonify({"task":task.to_dict()}), 200
 
+
+# GOAL
+
+goal_bp = Blueprint("goal", __name__,url_prefix = "/goals")
+# wave 5
+# create a goal
+@goal_bp.route("", methods = ["POST"])
+def create_goal():
+    response_body = request.get_json()
+    if "title" not in response_body:
+        return jsonify({"details": "Invalid data"}), 400
+    
+    new_goal = Goal.from_goal_dict(response_body)
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify({
+                    "goal":{
+                    "id":new_goal.goal_id,
+                    "title":new_goal.title
+    }}), 201
+
+
+# helper function
+def validate_goal(model,goal_id):
+    try:
+        goal_id = int(goal_id)
+    except ValueError:
+        return abort(make_response({"msg": "id is invalide input"}, 400))
+    
+    # return Task.query.get_or_404(task_id_num)
+ 
+    goal = model.query.get(goal_id)
+    if goal is None:
+        abort(make_response({"msg": "goal not found"}, 404))
+    return goal
+
+
+@goal_bp.route("/<goal_id", methods = ["GET"])
+def get_one_goal(goal_id):
+    tasks = validate_task(Task,goal_id)
+
+    return jsonify({"goal":{
+            "id": tasks.task_id,
+            "title": tasks.title,
+            }}), 200
