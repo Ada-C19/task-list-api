@@ -2,14 +2,13 @@ from os import abort
 import os
 import requests
 from app import db
-from app.models.task import Task
 from app.models.goal import Goal 
+from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
 
-
-tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
+tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 def validate_model(cls, model_id):
     try:
@@ -45,6 +44,7 @@ def create_task():
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
     title_query = request.args.get("sort")
+    print("reading all tasks")
     if title_query:
         tasks = Task.query.filter_by(title=title_query)
     if title_query == "asc":
