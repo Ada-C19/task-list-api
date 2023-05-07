@@ -88,7 +88,6 @@ def delete_task(task_id):
     return {"details": f'Task {task_id} "Go on my daily walk 🏞" successfully deleted'}
 
 
-
 # helper function
 def validate_task(model,task_id):
     try:
@@ -153,7 +152,6 @@ def mark_complete(task_id):
          
     return jsonify({"task":task.to_dict()}), 200
 
-    
 
 # mark_imcomplete
 @task_bp.route("/<task_id>/mark_incomplete", methods = ["PATCH"])
@@ -170,9 +168,11 @@ def mark_imcomplete(task_id):
     return jsonify({"task":task.to_dict()}), 200
 
 
-# GOAL
 
+# GOAL
 goal_bp = Blueprint("goal", __name__,url_prefix = "/goals")
+
+
 # wave 5
 # create a goal
 @goal_bp.route("", methods = ["POST"])
@@ -204,15 +204,42 @@ def validate_goal(model,goal_id):
  
     goal = model.query.get(goal_id)
     if goal is None:
-        abort(make_response({"msg": "goal not found"}, 404))
+        abort(make_response({"msg": "Goal not found"}, 404))
     return goal
 
 
-@goal_bp.route("/<goal_id", methods = ["GET"])
+# get goals
+@goal_bp.route("", methods = ["GET"])
+def get_all_goals():
+    response = []
+    goals = Goal.query.all()
+    for goal in goals:
+        response.append(goal.goal_to_dict())
+    return jsonify(response), 200
+
+
+# get one goal
+@goal_bp.route("/<goal_id>", methods = ["GET"])
 def get_one_goal(goal_id):
-    tasks = validate_task(Task,goal_id)
+    goals = validate_goal(Goal,goal_id)
 
     return jsonify({"goal":{
-            "id": tasks.task_id,
-            "title": tasks.title,
+            "id": goals.goal_id,
+            "title": goals.title,
             }}), 200
+
+# update goal
+@goal_bp.route("/<goal_id>", methods = ["PUT"])
+def update_goal(goal_id):
+    goal = validate_goal(Goal,goal_id)
+    request_data = request.get_json()
+    
+    goal.title = request_data["title"]
+
+    db.session.commit()
+
+    return jsonify({"goal":{
+            "id": goal.goal_id,
+            "title": goal.title
+            }
+            }), 200

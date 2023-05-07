@@ -5,7 +5,8 @@ class Goal(db.Model):
     title = db.Column(db.String)
 
     def goal_to_dict(self):
-        return {"id":self.goal_id,
+        return {
+                "id":self.goal_id,
                 "title":self.title
                 }
 
