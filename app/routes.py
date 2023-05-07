@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+# POST request to create new task
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -21,3 +22,19 @@ def create_task():
         "is_complete": False
         }
     }, 201
+
+
+@tasks_bp.route("", methods=["GET"])
+def get_all_tasks():
+    tasks = Task.query.all()
+    tasks_response = []
+
+    for task in tasks:
+        tasks_response.append({
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+
+        })
+    return jsonify(tasks_response), 200
