@@ -11,6 +11,13 @@ def get_tasks():
     tasks = Task.query.all()
     tasks_response = []
     if len(tasks) != 0:
+        sort_query = request.args.get("sort")
+        if sort_query == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
+            
+        else:
+            tasks = Task.query.order_by(Task.title.desc())
+            
         for task in tasks:
             tasks_response.append( {
                 "id": task.task_id,
@@ -22,6 +29,9 @@ def get_tasks():
     return jsonify(tasks_response)
 
 ### Create a Task: Valid Task With `null` `completed_at`
+### Create a Task: Invalid Task With Missing Data
+#### Missing `title`
+#### Missing `description`
 @task_list_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -81,11 +91,6 @@ def delete_task(task_id):
     db.session.commit()
     
     return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}
-
-### Create a Task: Invalid Task With Missing Data
-#### Missing `title`
-#### Missing `description`
-
 
 ### No matching Task: Get, Update, and Delete
 def validate_task (model, item_id):
