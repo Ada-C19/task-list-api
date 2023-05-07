@@ -1,6 +1,7 @@
 from flask import Blueprint, make_response, jsonify, request, abort
 from app.models.task import Task
 from app import db
+from datetime import datetime
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -19,7 +20,7 @@ def get_all_tasks():
     elif sorted_query == "desc":
         tasks = Task.query.order_by(Task.title.desc())
     else:
-        tasks = Task.query.all
+        tasks = Task.query.all()
 
     # name_query = request.args.get("name")
     # if name_query is None:
@@ -123,6 +124,39 @@ def delete_task(id):
     db.session.commit()
 
     return {"details" : f'Task {id} "{task.title}" successfully deleted'}, 200
+
+
+@bp.route("/<id>/mark_complete", methods=["PATCH"])
+def complete_task(id):
+    task = validate_task(id)
+    # request_body = request.get_json()
+
+    # if request_body is None:
+    #     return {"details": "Invalid data"}, 400
+
+    # if "completed_at" in request_body:
+    if not task.completed_at:
+        task.completed_at = datetime.now()
+    task.is_complete = True
+    # else:
+    #     return {"details": "Invalid data"}, 400
+
+
+    db.session.commit()
+    return {"task": task.to_dict()}, 200    
+
+
+@bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def incomplete_task(id):
+    task = validate_task(id)
+    # request_body = request.get_json()
+
+    if task.completed_at:
+        task.completed_at = None
+    task.is_complete = False
+
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
 
 
 
