@@ -131,12 +131,6 @@ def test_update_task_not_found(client):
     assert response_body["msg"] == "Task not found"
 
 
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
-
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_task(client, one_task):
     # Act
