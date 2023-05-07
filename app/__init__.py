@@ -21,6 +21,8 @@ def create_app(test_config=None):
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_TEST_DATABASE_URI")
+        
+    TOKEN = os.environ.get("SLACK_TOLKEN")
 
     # Import models here for Alembic setup
     from app.models.task import Task

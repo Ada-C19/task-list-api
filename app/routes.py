@@ -3,6 +3,8 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 import datetime
 from sqlalchemy.orm.exc import NoResultFound
+import os
+import requests
 
 
 bp = Blueprint("bp", __name__, url_prefix="/tasks")
@@ -101,6 +103,9 @@ def delete_task(task_id):
 
 @bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
+    slack_channel = "#task-notifications"
+    slack_token = os.environ.get("SLACK_TOLKEN")
+
     try:
         task = validate_model(Task, task_id)
     except NoResultFound:
@@ -109,6 +114,12 @@ def mark_complete(task_id):
     if task.completed_at is None:
         task.completed_at = datetime.datetime.now()
         db.session.commit()
+
+    requests.post("https://slack.com/api/chat.postMessage", data={
+        "token": slack_token,
+        "channel": slack_channel,
+        "text": f"Someone just completed the task {task.title}"
+    })
     
     task_data = task.to_dict()
     if task.completed_at:
@@ -119,6 +130,8 @@ def mark_complete(task_id):
     return make_response(jsonify({
         "task": task_data
     }), 200)
+
+
 
 @bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
