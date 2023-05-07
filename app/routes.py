@@ -99,7 +99,10 @@ def delete_task(task_id):
 #     "details": "Task {task.task_id}"
 # })
 
-    return make_response(f"Task {task.task_id} successfully deleted")
+    # return make_response(f"Task {task.task_id} successfully deleted")
+    return {
+        "details": f'Task {task_id} \"{task.title}\" successfully deleted'
+    }, 200
     
 
 def validate_item(task_id):
