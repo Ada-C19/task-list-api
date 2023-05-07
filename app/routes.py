@@ -9,13 +9,17 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task(name=request_body["title"],
-                        description=request_body["description"],
-                        completed_at=request_body["completed_at"])
+    new_task = Task(title=request_body["title"],
+                    description=request_body["description"],
+                    completed_at=request_body["completed_at"])
     db.session.add(new_task)
     db.session.commit()
-
-    return make_response(f"Task {new_task.name} successfully created"), 201
+# replacing make_response(f...) with jsonify to debug
+    return {"task":{
+        "id": new_task.task_id,
+        "title": new_task.title,
+        "description": new_task.description,
+        "is_complete": (new_task.completed_at != None)}}, 201
 
 @tasks_bp.route("", methods=['GET'])
 def handle_tasks():
@@ -46,7 +50,7 @@ def handle_task(task_id):
 
     return {
         "task_id": task.id,
-        "title": task.name,
+        "title": task.title,
         "description": task.description,
         "completed_at": task.completed_at
     }

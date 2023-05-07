@@ -6,7 +6,7 @@ class Task(db.Model):
     title = db.Column(db.String)
     #had String(80) from Animals Sapphire Flasky
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True, default=None)
 
 
     def to_dict(self):
@@ -14,5 +14,5 @@ class Task(db.Model):
             "task_id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "completed_at": self.completed_at
+            "is_complete": (self.completed_at!=None)
         }
