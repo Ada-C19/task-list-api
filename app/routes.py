@@ -251,3 +251,31 @@ def delete_goal(goal_id):
     return{
         "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
     }, 200
+
+
+#ONE TO MANY
+@goal_bp.route("/<int:goal_id>/tasks", methods=["POST"])
+def get_tasks_list(goal_id):
+
+    goal = validate_goal(Goal, goal_id) #goal_id 7
+
+    request_data = request.get_json()
+    task_ids_list = request_data["task_ids"]  #[1,2,3]
+
+    for each_task_id in task_ids_list:
+        task = Task.query.get(each_task_id) #get elem in database
+        task.goal_id = goal_id #set the goal_id as the task_data's goal_id
+        db.session.commit()
+        
+    return jsonify(
+        {
+            "id": goal_id,
+            "task_ids": task_ids_list
+        }
+    ), 200
+
+
+
+
+
+
