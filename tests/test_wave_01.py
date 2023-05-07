@@ -135,7 +135,7 @@ def test_update_task_not_found(client):
     response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 404
+   
 
     assert response.status_code == 404
 
