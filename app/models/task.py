@@ -8,15 +8,38 @@ class Task(db.Model):
     description = db.Column(db.Text, nullable=False)
     completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
-    def __init__(self, title, description, completed_at=None):
-        self.title = title
-        self.description = description
-        self.completed_at = None
-
     def to_json(self):
-            return {
-            'task_id': self.task_id,
-            'description': self.description,
-            'completed_at': self.completed_at,
-            }
+        return {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": self.completed_at is not None
+        }
+    
+
+    # def to_json(self):
+    #         return dict(
+    #             id=self.task_id,
+    #             title = self.title,
+    #             description = self.description,
+    #             is_complete=self.completed_at is not None
+    #         )
+    
+    # def __init__(self, title, description, completed_at=datetime.utcnow()):
+    #     self.title = title
+    #     self.description = description
+    #     self.completed_at = completed_at
+
+
+    
+
+
+
+
+
+
+
+    
+    
+    
     

@@ -4,24 +4,27 @@ from app import db
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
-def get_task_instance(request):
-        task_info = request.get_json
-        return Task(
-        title=task_info['title'],
-        description=task_info['description'],
-        completed_at=task_info['completed_at']
-    )
 
 @tasks_bp.route("", methods=['POST'])
 def create_task():
-    new_task = get_task_instance(task_info)
+    task_info = request.get_json()
+
+    new_task = Task(
+        title = task_info["title"],
+        description = task_info["description"],
+        completed_at = None
+    )
 
     db.session.add(new_task)
     db.session.commit()
 
-    message = f"CREATED"
+    # message = f"201 CREATED"
 
-    return make_response(201, message)
+    task = new_task.to_json()
+
+    return make_response(jsonify(task=task), 201)
+
+
 
 
 
