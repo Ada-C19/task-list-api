@@ -78,7 +78,7 @@ def delete_task(task_id):
     }
     
 @task_bp.route('/<task_id>/mark_complete', methods = ['PATCH'])
-def update_to_completed(task_id):
+def update_to_complete(task_id):
     date_data = datetime.now()
     task = validate_task(task_id)
     task.completed_at = date_data
@@ -89,4 +89,13 @@ def update_to_completed(task_id):
     response_dict["task"]["is_complete"] = True
     
     
+    return make_response(response_dict, 200)
+
+@task_bp.route('/<task_id>/mark_incomplete', methods = ['PATCH'])
+def update_to_incomplete(task_id):
+    task = validate_task(task_id)
+    task.completed_at = None
+    db.session.commit()
+    response_dict = {}
+    response_dict["task"] = task.to_dict()
     return make_response(response_dict, 200)
