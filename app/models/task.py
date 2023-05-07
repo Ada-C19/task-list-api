@@ -26,14 +26,18 @@ class Task(db.Model):
                     "is_complete": True
                 }
             }
+  
          
     @classmethod
     def from_dict(cls, task_dict):
-        if not task_dict.get("completed_at"):
-            return cls(title=task_dict["title"],
-                       description=task_dict["description"],
-                       completed_at=None)
-        else:
-            return cls(title=task_dict["title"],
-                       description=task_dict["description"],
-                       completed_at=task_dict["completed_at"])
+        try:
+            if not task_dict.get("completed_at"):
+                return cls(title=task_dict["title"],
+                           description=task_dict["description"],
+                           completed_at=None)
+            else:
+                return cls(title=task_dict["title"],
+                           description=task_dict["description"],
+                           completed_at=task_dict["completed_at"])
+        except KeyError as error:
+            return f"Missing or invalid key {error}"
