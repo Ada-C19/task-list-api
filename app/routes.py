@@ -8,13 +8,13 @@ task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def add_task():
     request_body = request.get_json()
 
-    if not "title" in request_body or not "description" in request_body or not "completed" in request_body:
+    if not "title" in request_body or not "description" in request_body:
         abort(make_response({"details": "Invalid data"},400))
 
     new_task = Task(
         title = request_body["title"],
-        description = request_body["description"],
-        completed_at = request_body["completed_at"]
+        description = request_body["description"]
+        # completed_at = request_body["completed_at"]
     )
     
 
@@ -61,7 +61,7 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return make_response({"details": f"Task {task_id} successfully deleted"})
+    return make_response({"details": f'Task {task_id} "{task.title}" successfully deleted'})
 
 def validate_task(task_id):
     try:
