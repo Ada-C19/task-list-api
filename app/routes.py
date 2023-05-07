@@ -2,7 +2,14 @@ from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
 from datetime import datetime
+import os
+import requests
+from dotenv import load_dotenv
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
+
+load_dotenv()
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
 
@@ -134,11 +141,20 @@ def mark_complete_task(task_id):
     task.completed_at = datetime.now()
     db.session.commit()
 
+    #slack start
+    slack_token = os.environ.get("SLACK_API_TOKEN")
+    slack_message = f"Somone just completed the task {task.title}"
+    slack_client = WebClient(token=slack_token)
+
+    try:
+        response = slack_client.chat_postMessage(
+            channel = "task-notifications",
+            text=slack_message
+        )
+    except SlackApiError as error:
+        print(f"error {error}")
+
     return jsonify({
         "task": task.task_to_dict()
-    })
-
-
-
-
+    }), 200
 
