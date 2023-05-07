@@ -12,6 +12,27 @@ def get_task_instance(request):
                 completed_at = None
     )
 
+def validate_task_by_id(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({"message": f"Invalid task ID: {task_id}"}, 400))
+
+    return task_id
+
+def get_task_by_id(task_id):
+    task_id = validate_task_by_id(task_id)
+    task = Task.query.get(task_id)
+
+    if not task:
+        abort(make_response({'message': f'Task {task_id} was not found.'}, 404))
+        
+    return task 
+
+
+
+
+
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     new_task = get_task_instance(request)
@@ -19,55 +40,27 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    # message = "201 CREATED"
-
     task = new_task.to_json()
 
-    return make_response(jsonify(task=task), 201)
+    return make_response(jsonify(task=task)), 201
 
 @tasks_bp.route("", methods=['GET'])
 def get_tasks():
-    tasks = Task.query
-    tasks = tasks.all()
+    tasks = Task.query.all()
 
     task_list = [task.to_json() for task in tasks]
 
-    return jsonify(task_list, 200)
+    return jsonify(task_list), 200
+
+@tasks_bp.route("/<task_id>", methods=['GET'])
+def get_one_task(task_id):
+    task = get_task_by_id(task_id)
+    
+    return task.to_json(), 200
 
 
 
-# ### Get Tasks: Getting Saved Tasks
 
-# As a client, I want to be able to make a `GET` request to `/tasks` when there is at least one saved task and get this response:
-
-# `200 OK`
-
-# ```json
-# [
-#   {
-#     "id": 1,
-#     "title": "Example Task Title 1",
-#     "description": "Example Task Description 1",
-#     "is_complete": false
-#   },
-#   {
-#     "id": 2,
-#     "title": "Example Task Title 2",
-#     "description": "Example Task Description 2",
-#     "is_complete": false
-#   }
-# ]
-# ```
-
-# ### Get Tasks: No Saved Tasks
-
-# As a client, I want to be able to make a `GET` request to `/tasks` when there are zero saved tasks and get this response:
-
-# `200 OK`
-
-# ```json
-# []
-# ```
 
 # ### Get One Task: One Saved Task
 
