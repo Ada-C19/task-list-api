@@ -38,15 +38,9 @@ Consider places in your code that deal with one model at a time. Is there any re
     - Takes in a dictionary in the shape of the JSON our API receives in the create and update routes
     - Returns an instance of `Task` 
 
-### Use List Comprehensions
 
-Use list comprehensions in your `routes.py` logic.
 
-### Route Helper Methods
 
-If you have not already refactored your `routes.py` to use helper methods, do so now!
-
-Consider code with complex or repetitive logic, and refactor it into helper methods. Watch your `routes.py` file become cleaner and more readable!
 
 ### More Query Params
 

@@ -12,7 +12,7 @@ def get_task_instance(request):
                 completed_at = None
     )
 
-def validate_task_by_id(task_id):
+def validate_task_id(task_id):
     try:
         task_id = int(task_id)
     except:
@@ -21,7 +21,7 @@ def validate_task_by_id(task_id):
     return task_id
 
 def get_task_by_id(task_id):
-    task_id = validate_task_by_id(task_id)
+    task_id = validate_task_id(task_id)
     task = Task.query.get(task_id)
 
     if not task:
@@ -29,8 +29,14 @@ def get_task_by_id(task_id):
         
     return task 
 
+def update_task_from_request(task, request):
+    task_info = request.get_json()
 
+    task.title = task_info["title"],
+    task.description = task_info["description"],
+    task.completed_at = None
 
+    return task
 
 
 @tasks_bp.route("", methods=['POST'])
@@ -57,54 +63,21 @@ def get_one_task(task_id):
     task = get_task_by_id(task_id)
     return make_response(jsonify({"task": task.to_json()})), 200
 
+@tasks_bp.route("/<task_id>", methods=['PUT'])
+def update_task(task_id):
+    task = get_task_by_id(task_id)
+    updated_task = update_task_from_request(task, request)
+
+    db.session.commit()
+
+    task = updated_task.to_json()
+
+    return make_response(jsonify(task=task)), 200
 
 
 
 
-# ### Get One Task: One Saved Task
 
-# As a client, I want to be able to make a `GET` request to `/tasks/1` when there is at least one saved task and get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "Example Task Title 1",
-#     "description": "Example Task Description 1",
-#     "is_complete": false
-#   }
-# }
-# ```
-
-# ### Update Task
-
-# As a client, I want to be able to make a `PUT` request to `/tasks/1` when there is at least one saved task with this request body:
-
-# ```json
-# {
-#   "title": "Updated Task Title",
-#   "description": "Updated Test Description",
-# }
-# ```
-
-# and get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "Updated Task Title",
-#     "description": "Updated Test Description",
-#     "is_complete": false
-#   }
-# }
-# ```
-
-# Note that the update endpoint does update the `completed_at` attribute. This will be updated with custom endpoints implemented in Wave 03.
 
 # ### Delete Task: Deleting a Task
 
