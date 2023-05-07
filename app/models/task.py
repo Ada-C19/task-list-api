@@ -18,11 +18,5 @@ class Task(db.Model):
             "is_complete": is_complete
         }
 
-    # def to_dict(self):
-    #     return {
-    #         "id": self.task_id,
-    #         "title": self.title,
-    #         "description": self.description,
-    #         "completed_at": self.completed_at 
-    #     }
+
 

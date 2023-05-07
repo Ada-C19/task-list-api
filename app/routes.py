@@ -19,17 +19,6 @@ def add_task():
 
     return {"task": new_task.to_result()}, 201
 
-    # is_complete = False
-    # if not new_task.completed_at:
-    #     is_complete = True
-    
-
-    # return jsonify({"task":
-    #                 {"id": new_task.task_id,
-    #                 "title": new_task.title,
-    #                 "description": new_task.description,
-    #                 "is_complete": is_complete
-    #         }}), 201
 
 @task_bp.route("", methods=["GET"])
 def get_tasks():
@@ -42,23 +31,43 @@ def get_tasks():
     return jsonify(response), 200 
 
 
-# @task_bp.route("/<task_id>", methods=["GET"])
-# def get_one_task(task_id):
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    one_task = validate_task(task_id)
+
+    return make_response({"task": one_task.to_result()})
+
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    db.session.commit()
+
+    return make_response(task.to_result())
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_task(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response(f"Task {task_id} successfully deleted.")
+
+def validate_task(task_id):
+    try:
+        task_id= int(task_id)
+    except ValueError:
+        abort(make_response({"message": f"invalid id: {task_id}"}, 400))
     
+    task = Task.query.get(task_id)
 
-# @task_bp.route("/<task_id>", methods="PUT")
-# def update_task(task_id):
-#     pass
+    if not task:
+        abort(make_response({"message": f"Task {task_id} not found."}, 404))
 
-# @task_bp.route("/<task_id>", methods=["DELETE"])
-# def delete_task(task_id):
-#     pass
-
-# def validate_task(task_id):
-#     try:
-#         # some task var = int(task_id)
-#         valid_id = int(task_id)
-#     except ValueError:
-#         return abort(make_response({"msg": f"invalid id: {valid_id}"}, 400))
-    
-#     return Task.query.get_or_404(valid_id)
+    return task.query.get(task_id)
