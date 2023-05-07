@@ -33,14 +33,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return {
-        "task": {
-            "id": new_task.id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": bool(new_task.completed_at)
-        }
-    }, 201
+    return {"task": new_task.to_dict()}, 201
 
 
 @tasks_bp.route("", methods=["GET"])
@@ -49,27 +42,15 @@ def get_all_tasks():
 
     tasks_response = []
     for task in tasks:
-        tasks_response.append(
-            {
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            })
+        tasks_response.append(task.to_dict())
     return jsonify(tasks_response)
 
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     task = validate_task_by_id(id)
-    return {
-        "task": {
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            }
-    }, 200
+    print("IM PRINTING", task.to_dict())
+    return {"task": task.to_dict()}, 200
 
 
 @tasks_bp.route("/<id>", methods=["PUT"])
@@ -81,14 +62,7 @@ def update_task(id):
     task.description = request_body["description"]
     
     db.session.commit()
-    return {
-        "task": {
-                "id": task.id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)
-            }
-    }, 200
+    return {"task": task.to_dict()}, 200
 
 
 @tasks_bp.route("/<id>", methods=["DELETE"])
