@@ -10,17 +10,17 @@ class Task(db.Model):
     
 
     def to_dict(self):
-        goal_as_dict = {}
-        goal_as_dict["task_id"] = self.task_id
-        goal_as_dict["title"] = self.title
-        goal_as_dict["description"] = self.description
-        goal_as_dict["completed_at"] = self.completed_at
+        task_as_dict = {}
+        task_as_dict["task_id"] = self.task_id
+        task_as_dict["title"] = self.title
+        task_as_dict["description"] = self.description
+        task_as_dict["completed_at"] = self.completed_at
 
-        return goal_as_dict
+        return task_as_dict
 
     @classmethod
-    def from_dict(cls, goal_data):
-        new_goal = Goal(title=goal_data["title"],
-                        description=goal_data["description"]
+    def from_dict(cls, task_data):
+        new_task = Task(title=task_data["title"],
+                        description=task_data["description"]
                         )
-        return new_goal
+        return new_task
