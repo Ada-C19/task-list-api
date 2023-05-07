@@ -68,7 +68,7 @@ As a client, I want to be able to make a `POST` request to `/tasks` with the fol
 
 and get this response:
 
-`201 CREATED`
+`201 CREATED` 
 
 ```json
 {
