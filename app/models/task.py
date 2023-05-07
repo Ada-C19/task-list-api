@@ -8,8 +8,15 @@ class Task(db.Model):
     description = db.Column (db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
-    def make_dict(self):
+    def to_dict(self):
         return { "task_id": self.id,
                 "title": self.title,
                 "description": self.description,
                 "completed_at": self.completed_at}
+    
+    @classmethod
+    def from_dict(cls, task_data):
+        new_task = Task(title=task_data["title"], 
+                            description=task_data["description"],
+                            completed_at=task_data["completed at"])
+        return task_data
