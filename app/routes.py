@@ -25,6 +25,9 @@ def get_tasks():
 @task_list_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+    if "title" not in request_body or "description" not in request_body:
+        return {"details": "Invalid data"}, 400
+    
     new_task = Task(title=request_body["title"],
                     description=request_body["description"])
     
@@ -79,23 +82,21 @@ def delete_task(task_id):
     
     return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}
 
-    
-### No matching Task: Get, Update, and Delete
-
-
 ### Create a Task: Invalid Task With Missing Data
-
 #### Missing `title`
-
 #### Missing `description`
 
-#### Missing `completed_at`
 
-# Helper function
+### No matching Task: Get, Update, and Delete
 def validate_task (model, item_id):
     try:
         item_id_int = int(item_id)
     except:
-        return abort(make_response({"message":f"task {item_id_int} invalid"}, 400))
+        return abort(make_response({"message":f"Task {item_id_int} invalid"}, 400))
     
-    return model.query.get_or_404(item_id)
+    task = model.query.get(item_id_int)
+    
+    if not task:
+        return abort(make_response({"message":f"Task {item_id_int} not found"}, 404))
+    
+    return task
