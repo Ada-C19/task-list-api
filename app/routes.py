@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 import os
 import requests
@@ -11,6 +12,7 @@ from slack_sdk.errors import SlackApiError
 
 load_dotenv()
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
 
 #WAVE 1
@@ -158,3 +160,24 @@ def mark_complete_task(task_id):
         "task": task.task_to_dict()
     }), 200
 
+#START OF GOAL
+
+#CREATE
+@goal_bp.route("", methods = ["POST"])
+def create_goal():
+    request_body = request.get_json()
+
+    if "title" not in request_body:
+        return jsonify({
+            "details": "Invalid data"
+        }
+        ), 400
+    
+    new_goal = Goal.from_dict(request_body)
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify(
+        {
+            "goal": new_goal.goal_to_dict()
+        }), 201
