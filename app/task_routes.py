@@ -105,8 +105,6 @@ def delete_task(task_id):
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
 
-def send_slack_message():
-    pass
     
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])

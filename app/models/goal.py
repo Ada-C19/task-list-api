@@ -2,14 +2,14 @@ from app import db
 
 
 class Goal(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    goal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
 
-    # def goal_to_dict(self):
-    #     return {
-    #         "id": self.id,
-    #         "title": self.title,
-    #         }
+    def goal_to_dict(self):
+        return {
+            "id": self.goal_id,
+            "title": self.title,
+            }
     
 
     # @classmethod
