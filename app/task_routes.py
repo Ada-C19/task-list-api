@@ -11,7 +11,6 @@ import json
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 
 #helper function
@@ -178,69 +177,69 @@ def turn_incomplete(task_id):
     return get_external_task_representation(task), 200
 
 
-#goals routes:
-@goals_bp.route("", methods=["POST"])
-def create_goal():
-    request_body = request.get_json()
-    if not request_body.get("title"):
-        abort(make_response({
-            "details": "Invalid data"
-        }, 400))
+# #goals routes:
+# @goals_bp.route("", methods=["POST"])
+# def create_goal():
+#     request_body = request.get_json()
+#     if not request_body.get("title"):
+#         abort(make_response({
+#             "details": "Invalid data"
+#         }, 400))
 
-    new_goal = Goal.from_dict(request_body)
+#     new_goal = Goal.from_dict(request_body)
 
-    db.session.add(new_goal)
-    db.session.commit()
+#     db.session.add(new_goal)
+#     db.session.commit()
 
-    return {
-        "goal": new_goal.to_dict()
-    }, 201
+#     return {
+#         "goal": new_goal.to_dict()
+#     }, 201
 
-#este no tiene tests --> get all goals
-@goals_bp.route("", methods=["GET"])
-def get_goals():
-    goals_response = []
-    goals = Goal.query.all()
+# #este no tiene tests --> get all goals
+# @goals_bp.route("", methods=["GET"])
+# def get_goals():
+#     goals_response = []
+#     goals = Goal.query.all()
 
-    for goal in goals:
-        goals_response.append(goal.to_dict())
-    return jsonify(goals_response)
-
-
-#get goal by id
-@goals_bp.route("/<goal_id>", methods=["GET"])
-def get_goal_by_id(goal_id):
-    goal = validate_model(Goal, goal_id)
-    return {
-        "goal": goal.to_dict()
-    }, 200
+#     for goal in goals:
+#         goals_response.append(goal.to_dict())
+#     return jsonify(goals_response)
 
 
-#Update goal by id:
-@goals_bp.route("/<goal_id>", methods=["PUT"])
-def update_goal_by_id(goal_id):
-    goal = validate_model(Goal, goal_id)
+# #get goal by id
+# @goals_bp.route("/<goal_id>", methods=["GET"])
+# def get_goal_by_id(goal_id):
+#     goal = validate_model(Goal, goal_id)
+#     return {
+#         "goal": goal.to_dict()
+#     }, 200
 
-    request_body = request.get_json()
-    goal.title = request_body["title"]
 
-    db.session.commit()
+# #Update goal by id:
+# @goals_bp.route("/<goal_id>", methods=["PUT"])
+# def update_goal_by_id(goal_id):
+#     goal = validate_model(Goal, goal_id)
 
-    return {
-        "goal": goal.to_dict()
-    }
+#     request_body = request.get_json()
+#     goal.title = request_body["title"]
 
-#Delete goal
-@goals_bp.route("/<goal_id>", methods=["DELETE"])
-def delete_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
+#     db.session.commit()
 
-    db.session.delete(goal)
-    db.session.commit()
+#     return {
+#         "goal": goal.to_dict()
+#     }
 
-    return {
-                "details": f'Goal {goal_id} "{goal.title}" successfully deleted'
-            }
+# #Delete goal
+# @goals_bp.route("/<goal_id>", methods=["DELETE"])
+# def delete_goal(goal_id):
+#     goal = validate_model(Goal, goal_id)
+
+#     db.session.delete(goal)
+#     db.session.commit()
+
+#     return {
+#                 "details": f'Goal {goal_id} "{goal.title}" successfully deleted'
+#             }
 
 
 
