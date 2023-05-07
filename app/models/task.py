@@ -8,7 +8,7 @@ class Task(db.Model):
     description = db.Column(db.Text, nullable=False)
     completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
-    def __init__(self, title, description):
+    def __init__(self, title, description, completed_at=None):
         self.title = title
         self.description = description
         self.completed_at = None
