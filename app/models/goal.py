@@ -5,6 +5,7 @@ from flask import make_response, abort, jsonify
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
+    tasks = db.relationship("Task", back_populates="goal")
 
     def to_dict(goal):
         return dict(id=goal.goal_id, title=goal.title)

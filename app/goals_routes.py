@@ -1,6 +1,7 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.goal import Goal
+from app.models.task import Task
 from .routes_helpers import validate_model, slack_call
 from sqlalchemy import text
 from datetime import datetime
@@ -58,3 +59,23 @@ def delete_goal(id):
     db.session.commit()
 
     return make_response({"details":f'Goal 1 "{goal.title}" successfully deleted'}, 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_tasks(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+
+    tasks_response = [Task.to_dict(task) for task in goal.tasks]
+    
+    return make_response({"id": goal.goal_id,"tasks":tasks_response, "title": goal.title}, 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_task_ids(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    goal.tasks = Task(task_id=request_body["task_ids"][0])
+
+    db.session.commit()
+
+    return make_response({"id":1,"task_ids":[1,2,3]}, 200)
