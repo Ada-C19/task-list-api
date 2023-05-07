@@ -34,7 +34,7 @@ def get_all_tasks():
     return jsonify(tasks_response), 200
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
-def handle_task(task_id):
+def read_one_task(task_id):
     task = Task.query.get(task_id)
 
     is_complete = False
