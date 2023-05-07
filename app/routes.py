@@ -5,7 +5,7 @@ from app import db
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
 def get_task_instance(request):
-        task_info = request.get_json()
+        task_info = validate_data(request)
         return Task(
                 title = task_info["title"],
                 description = task_info["description"],
@@ -37,6 +37,21 @@ def update_task_from_request(task, request):
     task.completed_at = None
 
     return task
+
+def validate_data(request):
+    task_info = request.get_json()
+    if not "title" in task_info or not "description" in task_info:
+        abort(make_response({"details": "Invalid data"}, 400))
+    if not "completed_at" in task_info:
+        task_info["completed_at"] = None
+    return task_info
+
+# def validate_data(request):
+#     task_info = request.get_json()
+#     if "title" not in task_info or "description" not in task_info or "completed_at" not in task_info:
+#         abort(make_response({"details": "Invalid data"}, 400))
+
+#     return task_info
 
 
 @tasks_bp.route("", methods=['POST'])
@@ -87,36 +102,6 @@ def delete_task(task_id):
 
 
 
-
-
-# ### Delete Task: Deleting a Task
-
-# As a client, I want to be able to make a `DELETE` request to `/tasks/1` when there is at least one saved task and get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "details": "Task 1 \"Go on my daily walk 🏞\" successfully deleted"
-# }
-# ```
-
-# ### No matching Task: Get, Update, and Delete
-
-# As a client, if I make any of the following requests:
-
-#   * `GET` `/tasks/<task_id>`
-#   * `UPDATE` `/tasks/<task_id>`
-#   * `DELETE` `/tasks/<task_id>`
-
-# and there is no existing task with `task_id`
-
-# The response code should be `404`.
-
-# You may choose the response body.
-
-# Make sure to complete the tests for non-existing tasks to check that the correct response body is returned.
- 
 
 # ### Create a Task: Invalid Task With Missing Data
 
