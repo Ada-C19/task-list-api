@@ -25,11 +25,14 @@ def create_task():
     request_body = request.get_json()
     title = request_body.get("title")
     description = request_body.get("description")
+
     if not description or not title:
         return {"details": "Invalid data"}, 400
+    
     new_task = Task(title=title, description=description)
     db.session.add(new_task)
     db.session.commit()
+
     return {"task": {
         "id": new_task.task_id,
         "title": new_task.title,
@@ -40,16 +43,19 @@ def create_task():
 #reads one task as long as at least one is saved   
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    title_query = request.args.get("title")
-
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    #grab all info from the instance task table
+    sorting_query = request.args.get("sort")
+    if sorting_query == "asc":
+        tasks=Task.query.order_by(Task.title.asc())
+    elif sorting_query=="desc":
+        tasks=Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
-        
-    task_dict = [task.to_dict() for task in tasks]
-    return jsonify(task_dict), 200
+    
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append(task.to_dict())
+    
+    return make_response(jsonify(tasks_response), 200)
 
 #gets one task by id
 @tasks_bp.route("/<task_id>", methods=["GET"])
