@@ -11,7 +11,7 @@ class Goal(db.Model):
             goal_as_dict["title"] = self.title
 
             return goal_as_dict
-
+    
 
     @classmethod
     def from_dict(cls, goal_data):

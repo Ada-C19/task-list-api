@@ -158,6 +158,7 @@ def read_one_task(goal_id):
         "id": goal.goal_id,
         "title": goal.title}}, 200
 
+
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal_to_update = validate_model(Goal, goal_id)

@@ -13,7 +13,6 @@ def test_get_goals_no_saved_goals(client):
     assert response_body == []
 
 
-
 def test_get_goals_one_saved_goal(client, one_goal):
     # Act
     response = client.get("/goals")
