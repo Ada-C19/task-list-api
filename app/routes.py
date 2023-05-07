@@ -2,6 +2,7 @@ from flask import Blueprint, request, make_response, jsonify, abort
 from app import db
 from app.models.task import Task
 from app.routes_helpers import validate_model
+from sqlalchemy import desc
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -24,10 +25,12 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
 
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
    
