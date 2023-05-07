@@ -8,7 +8,6 @@ import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-
 def validate_task(id):
     try:
         id = int(id)
@@ -25,10 +24,9 @@ def validate_task(id):
 # WAVE 1: Create a Task: Valid Task With null completed_at
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-    if request.method == "POST":
-        request_body = request.get_json()
-        if "title" not in request_body or "description" not in request_body:
-            return make_response(jsonify({"details": "Invalid data"}), 400)
+    request_body = request.get_json()
+    if "title" not in request_body or "description" not in request_body:
+        return make_response(jsonify({"details": "Invalid data"}), 400)
         
     new_task = Task(
         title = request_body["title"],
@@ -57,9 +55,9 @@ def get_all_saved_tasks():
         tasks = Task.query.order_by(text("title asc"))
     elif request.args.get("sort") == "desc":
         tasks = Task.query.order_by(text("title desc"))
-
     else:
         tasks = Task.query.all()
+        
     tasks_list = [task.make_task_dict() for task in tasks] 
 
     return jsonify(tasks_list), 200
