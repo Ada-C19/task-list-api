@@ -3,7 +3,7 @@ from app import db
 class Task(db.Model):
     __tablename__ = 'tasks'
 
-    task_id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.Text, nullable=False)
     completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
