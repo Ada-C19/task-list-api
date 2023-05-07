@@ -56,6 +56,7 @@ def get_tasks():
 @tasks_bp.route('/<task_id>', methods=['GET'])
 def get_task_by_id(task_id):
     task = validate_id(Task, task_id)
+    
     return {'task': create_response(task)}, 200
 
 @tasks_bp.route('/<task_id>', methods=['PUT'])
@@ -94,7 +95,10 @@ def update_task(task_id):
 @tasks_bp.route('/<task_id>', methods=['DELETE'])
 def delete_task(task_id):
     task = validate_id(Task, task_id)
+    
     task_title = task.title
+    
     db.session.delete(task)
     db.session.commit()
-    return {'details': f'Task {task_id} \"{task_title}\" successfully deleted'}, 200
+    
+    return {'details': f'Task {task_id} "{task_title}" successfully deleted'}, 200
