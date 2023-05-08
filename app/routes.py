@@ -1,4 +1,4 @@
-from flask import Blueprint,jsonify, request, make_response
+from flask import Blueprint,jsonify, request, make_response, abort
 from app.models.task import Task
 from app import db
 
@@ -33,8 +33,22 @@ def get_tasks():
 
     return jsonify(response), 200
 
-# @task_bp.route("/<id>", methods=["GET"])
-# def get_one_task(task_id):
-#     task = Task.query.get(task_id)
-#     return task.to_dict(), 200
+@task_bp.route("/<id>", methods=["GET"])
+def get_one_task(id):
+    validate_id(Task,id)
+
+    task = Task.query.get(id)
+
+    return {"task" : task.to_dict()}, 200
+
+
+def validate_id(model, item_id):
+    try:
+        item_id = int(item_id)
+    except ValueError:
+        return abort(make_response({"msg": f"invalid endpoint: {item_id}"},404))
+    
+    return model.query.get_or_404(item_id)
+
+
 
