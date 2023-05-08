@@ -11,10 +11,7 @@ class Task(db.Model):
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": False
+            "is_complete": self.completed_at is not None
         }
-
-        if self.completed_at:
-            task["is_complete"] = True
 
         return task
