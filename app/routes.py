@@ -77,3 +77,13 @@ def complete_task(id):
 
     return jsonify({"task": task.to_dict()}), 200
 
+@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def incomplete_task(id):
+    task = validate_model(Task, id)
+
+    task.completed_at = None
+
+    db.session.commit()
+
+    return jsonify({"task": task.to_dict()}), 200
+
