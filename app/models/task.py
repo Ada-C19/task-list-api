@@ -9,16 +9,9 @@ class Task(db.Model):
 
     
     def to_dict(self):
-        if self.completed_at:
-            return {
-                "id": self.task_id,
-                "title": self.title,
-                "description": self.description,
-                "is_complete": bool(self.completed_at)
-            }
-        else:
-            return {"id": self.task_id,
-                "title": self.title,
-                "description": self.description,
-                "is_complete": bool(self.completed_at)
-            }
+        return {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": bool(self.completed_at)
+        }

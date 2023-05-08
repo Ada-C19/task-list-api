@@ -107,7 +107,9 @@ def mark_complete(task_id):
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": slack_api
     }
-    requests.post(url='https://slack.com/api/chat.postMessage', json=data, headers=headers)
+    r = requests.post(url='https://slack.com/api/chat.postMessage', json={"text": f"Someone just completed the task {task.title}"})
+    r.headers["Content-Type"] = "application/x-www-form-urlencoded"
+    r.headers["Authorization"] = slack_api
     return {"task": task.to_dict()},200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
