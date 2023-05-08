@@ -88,6 +88,18 @@ def mark_task_as_complete(task_id):
 
     return {"task": task.to_dict()}, 200
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_as_incomplete(task_id):
+    """Mark task specifed by id as complete."""
+    task = validate_task(task_id)
+
+    task.completed_at = None
+    task.is_complete = False
+
+    db.session.commit()
+
+    return {"task": task.to_dict()}, 200
+
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
