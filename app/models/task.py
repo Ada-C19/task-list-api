@@ -10,8 +10,8 @@ class Task(db.Model):
     #from_dict is replacing the writing each.
     def from_dict(self):
         is_complete = False
-        if not self.completed_at:
-            is_complete = False
+        if self.completed_at:
+            is_complete = True
         dic_data = {
             "id": self.task_id,
             "title": self.title,

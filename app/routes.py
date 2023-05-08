@@ -58,8 +58,8 @@ def read_one_task(task_id):
     task = validate_item(task_id)
 
     is_complete = False
-    if not task.completed_at:
-        is_complete = False
+    if task.completed_at:
+        is_complete = True
 
     return {"task":{
         "id": task.task_id, 
@@ -84,8 +84,8 @@ def update_task(task_id):
     db.session.commit()
 
     is_complete = False
-    if not task.completed_at:
-        is_complete = False
+    if task.completed_at:
+        is_complete = True
 
     return {"task":{
         "id": task.task_id, 
