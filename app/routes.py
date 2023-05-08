@@ -135,8 +135,6 @@ def validate_item(task_id):
 def mark_complete_task(task_id):
     task = validate_item(task_id)
 
-    request_body = request.get_json()
-
     task.completed_at = datetime.now()
 
     db.session.commit()
