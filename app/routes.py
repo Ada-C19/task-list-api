@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify
 from app.models.task import Task
 from app import db
 
@@ -61,6 +61,6 @@ def delete_task(task_id):
     db.session.delete(task_to_delete)
     db.session.commit()
 
-    return make_response(jsonify({
+    return jsonify({
         "details": f'Task {task_id} "{task_to_delete.title}" successfully deleted'
-    }), 200)
+    }), 200
