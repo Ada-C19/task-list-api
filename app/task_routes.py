@@ -7,7 +7,7 @@ import os
 import requests
 
 
-bp = Blueprint("bp", __name__, url_prefix="/tasks")
+task_bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
 
 
 def validate_model(cls, model_id):
@@ -25,7 +25,7 @@ def validate_model(cls, model_id):
     return model
 
 
-@bp.route("", methods=["POST"])
+@task_bp.route("", methods=["POST"])
 def creat_task():
     request_body = request.get_json()
 
@@ -47,7 +47,7 @@ def creat_task():
     }), 201)
 
 
-@bp.route("", methods=["GET"])
+@task_bp.route("", methods=["GET"])
 def read_all_tasks():
     task_query = Task.query
     title_query = request.args.get("sort")
@@ -65,13 +65,13 @@ def read_all_tasks():
     return jsonify(task_response)
 
 
-@bp.route("/<task_id>", methods=["GET"])
+@task_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
     return jsonify({"task": task.to_dict()}), 200
 
 
-@bp.route("/<task_id>", methods=["PUT"])
+@task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
@@ -92,7 +92,7 @@ def update_task(task_id):
     }), 200)
 
 
-@bp.route("/<task_id>", methods=["DELETE"])
+@task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
 
@@ -101,7 +101,7 @@ def delete_task(task_id):
 
     return make_response(jsonify({"details": f"Task 1 \"{task.title}\" successfully deleted"})), 200
 
-@bp.route("<task_id>/mark_complete", methods=["PATCH"])
+@task_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     slack_channel = "#task-notifications"
     slack_token = os.environ.get("SLACK_TOLKEN")
@@ -133,7 +133,7 @@ def mark_complete(task_id):
 
 
 
-@bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
+@task_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     try:
         task = validate_model(Task, task_id)
