@@ -285,6 +285,15 @@ def get_tasks_for_specific_goal(goal_id):
 #this returns a list of all tasks instances that has the goal_id
     tasks_obj_list = Task.query.filter_by(goal_id = goal_id).all()
 
+#checking if tasks is empty
+    if not tasks_obj_list:
+        return jsonify(
+            {
+            "id": goal.goal_id,
+            "title": goal.title,
+            "tasks": []
+            })
+
     for each_task in tasks_obj_list:
         return jsonify(
             {"tasks": each_task.task_to_dict()}
