@@ -42,13 +42,19 @@ def get_task():
     response = []
 
     title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
 
-    if title_query is None:
-        all_tasks = Task.query.all()
+    if title_query:
+        tasks = Task.query.all()
+    elif sort_query == "asc":
+        tasks = Task.query.order_by(Task.title)
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     else:
-        all_tasks = Task.query.filter_by(title=title_query)
-
-    for task in all_tasks:
+        tasks = Task.query.filter_by(title=title_query)
+    
+    #refactor to do list comprehension
+    for task in tasks: 
         response.append(task.to_dict())
 
     return (jsonify(response), 200)
