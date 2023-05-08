@@ -36,7 +36,6 @@ def get_tasks():
     else:
         all_tasks = Task.query.all()
 
-    # all_tasks = Task.query.all()
 
     response = []
     for task in all_tasks:
@@ -51,6 +50,7 @@ def get_one_task(task_id):
 
     return make_response({"task": one_task.to_result()})
 
+
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_task(task_id)
@@ -64,6 +64,7 @@ def update_task(task_id):
 
     return make_response({"task": task.to_result()})
 
+
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_task(task_id)
@@ -72,6 +73,7 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response({"details": f'Task {task_id} "{task.title}" successfully deleted'})
+
 
 def validate_task(task_id):
     try:
@@ -85,3 +87,8 @@ def validate_task(task_id):
         abort(make_response({"message": f"Task {task_id} not found."}, 404))
 
     return task.query.get(task_id)
+
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_completee(task_id):
+    pass
