@@ -20,7 +20,9 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    print(request_body) #{'title': 'Testing Again', 'description': 'More debugging', 'completed_at': None}
+    if 'title' not in request_body or 'description' not in request_body:
+        return {"details": "Invalid data"}, 400
+    
     new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
