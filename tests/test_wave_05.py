@@ -81,17 +81,22 @@ def test_create_goal(client):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
-    raise Exception("Complete test")
-    # Act
-    # ---- Complete Act Here ----
+    response = client.put("/goals/1", json={
+        "title": "My Very New Goal"
+    })
+    response_body = response.get_json()
 
     # Assert
     # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # assertion 3 goes here
+    assert response.status_code == 200
+    assert "goal" in response_body
+    assert response_body == {
+        "goal": {
+            "id": 1,
+            "title": "My Very New Goal"
+        }
+    }
     # ---- Complete Assertions Here ----
 
 
