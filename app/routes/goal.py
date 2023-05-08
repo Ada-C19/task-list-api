@@ -2,7 +2,7 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from app.routes.helpers import create_item, get_all_items, get_item, \
-  update_item, delete_item, validate_model
+    update_item, delete_item, validate_model
 from flask import Blueprint, request, make_response
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -33,9 +33,14 @@ def add_tasks_to_goal(goal_id):
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
 
+    for task in goal.tasks:
+        task.goal_id = None
+
     for task_id in task_ids:
         task = validate_model(Task, task_id)
         task.goal_id = goal.id
+    
+    goal.title = request.args.get("title", goal.title)
 
     db.session.commit()
 
