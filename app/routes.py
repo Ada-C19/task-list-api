@@ -21,9 +21,17 @@ def create_task():
 
 @tasks_bp.route("", methods=['GET'])
 def handle_tasks():
+    title_query = request.args.get("sort")
 
-    tasks = Task.query.all()
+    if title_query:
+        if title_query == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
+        elif title_query == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
     tasks_response = [Task.to_dict(task) for task in tasks]
+
     return jsonify(tasks_response), 200
 
 def get_valid_item_by_id(model, id):
