@@ -219,6 +219,7 @@ def get_all_goals():
 def get_one_goal(goal_id):
 
     goal = validate_goal(Goal, goal_id)
+    
 
     return jsonify({
         "goal": goal.goal_to_dict()
@@ -263,10 +264,12 @@ def get_tasks_list(goal_id):
     task_ids_list = request_data["task_ids"]  #[1,2,3]
 
     for each_task_id in task_ids_list:
-        task = Task.query.get(each_task_id) #get elem in database
-        task.goal_id = goal_id #set the goal_id as the task_data's goal_id
-        db.session.commit()
+        task_obj = Task.query.get(each_task_id) #get elem in database
         
+     
+        task_obj.goal_id = goal_id #set the goal_id as the task_data's goal_id
+        db.session.commit()
+     
     return jsonify(
         {
             "id": goal_id,
@@ -274,7 +277,18 @@ def get_tasks_list(goal_id):
         }
     ), 200
 
+#GET GOAL
+@goal_bp.route("/<goal_id>/tasks", methods = ["GET"])
+def get_tasks_for_specific_goal(goal_id):
+    goal = validate_goal(Goal, goal_id)
 
+#this returns a list of all tasks instances that has the goal_id
+    tasks_obj_list = Task.query.filter_by(goal_id = goal_id).all()
+
+    for each_task in tasks_obj_list:
+        return jsonify(
+            {"tasks": each_task.task_to_dict()}
+        ), 200
 
 
 
