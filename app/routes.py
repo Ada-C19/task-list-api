@@ -7,7 +7,7 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    print(request_body)
+    print(request_body) #{'title': 'Testing Again', 'description': 'More debugging', 'completed_at': None}
     new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
@@ -38,3 +38,19 @@ def get_task(task_id):
     task = Task.query.get(task_id)
 
     return {"task": task.to_dict()}, 200
+
+@tasks_bp.route("<task_id>", methods=["PUT"])
+def update_task(task_id):
+    request_body = request.get_json()
+    
+    #optionally, to only accept a put request if all attributes in task are being updated
+    # if 'title' and 'description' not in request_body:
+    #     return {'Error': ""}
+    
+    task_to_update = Task.query.get(task_id)
+    task_to_update.title = request_body["title"]
+    task_to_update.description = request_body["description"]
+
+    db.session.commit()
+
+    return {"task": task_to_update.to_dict()}, 200
