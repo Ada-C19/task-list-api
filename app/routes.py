@@ -3,6 +3,7 @@ from app.models.task import Task
 from app import db
 from helper import validate_model
 from sqlalchemy import asc, desc
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -32,9 +33,9 @@ def get_all_tasks():
     sort_query = request.args.get("sort")
 
     if sort_query == "asc":
-        all_tasks = Task.query.order_by(asc(Task.title)).all()
+        all_tasks = Task.query.order_by(asc("title")).all()
     elif sort_query == "desc":
-        all_tasks = Task.query.order_by(desc(Task.title)).all()
+        all_tasks = Task.query.order_by(desc("title")).all()
     else:
         all_tasks = Task.query.all()
 
@@ -50,6 +51,7 @@ def get_one_task(task_id):
     return (jsonify(response), 200)
 
 
+# PUT
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task_to_update = validate_model(Task, task_id)
@@ -63,6 +65,7 @@ def update_task(task_id):
     return make_response(jsonify(message), 200)
 
 
+# DELETE
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task_to_delete = validate_model(Task, task_id)
@@ -71,5 +74,27 @@ def delete_task(task_id):
 
     message = {
         "details": f'Task {task_id} "{task_to_delete.title}" successfully deleted'}
-
     return (jsonify(message), 200)
+
+
+# PATCH
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task_to_mark = validate_model(Task, task_id)
+
+    task_to_mark.completed_at = datetime.now()
+    db.session.commit()
+
+    message = {"task": task_to_mark.to_dict()}
+    return make_response(jsonify(message), 200)
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task_to_mark = validate_model(Task, task_id)
+
+    task_to_mark.completed_at = None
+    db.session.commit()
+
+    message = {"task": task_to_mark.to_dict()}
+    return make_response(jsonify(message), 200)

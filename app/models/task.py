@@ -8,12 +8,16 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self):
-        return {
-            "id": self.task_id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": False
-        }
+        dict = {}
+        dict["id"] = self.task_id
+        dict["title"] = self.title
+        dict["description"] = self.description
+        if self.completed_at:
+            dict["is_complete"] = True
+        else:
+            dict["is_complete"] = False
+
+        return dict
 
     @classmethod
     def from_dict(self, data):
