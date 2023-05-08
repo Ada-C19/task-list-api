@@ -2,6 +2,7 @@ from flask import Blueprint, request, make_response, request, abort, jsonify
 from app import db
 from app.models.task import Task
 from sqlalchemy import asc, desc
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -90,7 +91,7 @@ def update_task(task_id):
         "id": task.task_id, 
         "title": task.title,
         "description": task.description,
-        "is_complete": False,
+        # "is_complete": False,
         "is_complete": is_complete
     }
     }, 200
@@ -129,3 +130,23 @@ def validate_item(task_id):
         abort(make_response({"message": f"task {task_id} not found"}, 404))
 
     return task
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete_task(task_id):
+    task = validate_item(task_id)
+
+    request_body = request.get_json()
+
+    task.completed_at = datetime.now()
+
+    db.session.commit()
+
+    is_complete = True
+
+    return {"task":{
+        "id": task.task_id, 
+        "title": task.title,
+        "description": task.description,
+        "is_complete": is_complete
+    }
+    }, 200
