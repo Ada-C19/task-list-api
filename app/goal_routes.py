@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app.models.goal import Goal
+from app.models.task import Task
 from app import db
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -17,7 +18,23 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    return make_response(jsonify({"goal": new_goal.to_dict()}), 201)
+    return make_response({"goal": new_goal.to_dict()}, 201)
+
+# CREATE TASK TO GOAL ENDPOINT
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    goal = validate_goal(goal_id)
+
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = Task.query.get(task_id)
+        task.goal_id = goal.goal_id
+
+    db.session.commit()
+
+    return make_response({"id": goal.goal_id,
+                          "task_ids": request_body["task_ids"]})
 
 # GET GOALS ENDPOINT
 @goals_bp.route("", methods=["GET"])
@@ -37,6 +54,21 @@ def read_one_goal(goal_id):
     goal = validate_goal(goal_id)
 
     return {"goal": goal.to_dict()}
+
+# GET TASK BY GOAL ENDPOINT
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_task_by_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    tasks = Task.query.filter(Task.goal_id == goal.goal_id)
+
+    tasks_body = [task_dict(task) for task in tasks]
+
+    return make_response(jsonify({
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_body
+    }))
 
 # UPDATE GOAL ENDPOINT
 @goals_bp.route("/<goal_id>", methods=["PUT"])
@@ -75,3 +107,12 @@ def validate_goal(goal_id):
         abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
 
     return goal
+
+def task_dict(task):
+    return {
+        "id": task.task_id,
+        "goal_id": task.goal_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": False
+    }
