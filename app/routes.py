@@ -1,6 +1,7 @@
 from flask import Blueprint, request, make_response, request, abort, jsonify
 from app import db
 from app.models.task import Task
+from sqlalchemy import asc, desc
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -27,7 +28,18 @@ def add_task():
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
-    total_tasks = Task.query.all()
+
+    ### Creating the query Params######
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        total_tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_query == "desc":
+        total_tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+    ####End of Query#############
+        #indent back one tab if this doesnt work.(indent back was original placemebt.)
+        #rn it's inside the else statement
+        total_tasks = Task.query.all()
     
     for task in total_tasks:
         # tasks_response.append({
