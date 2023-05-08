@@ -64,7 +64,7 @@ def mark_complete(id):
     response_body = dict(task=task.to_dict())
 
     # Slack API call
-    # slack_call(response_body['task'])
+    slack_call(response_body['task'])
     
     return make_response(jsonify(response_body), 200)
 
