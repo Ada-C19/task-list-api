@@ -2,7 +2,7 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from datetime import datetime
-
+import requests, os
 
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
 
@@ -27,7 +27,7 @@ def get_tasks():
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": False
+                "is_complete": is_complete_status(task.completed_at)
                 } )
         
     return jsonify(tasks_response)
@@ -64,7 +64,7 @@ def get_one_task(task_id):
         "id": task.task_id,
         "title": task.title,
         "description": task.description,
-        "is_complete": False
+        "is_complete": is_complete_status(task.completed_at)
     } }
 
 ### Update Task
@@ -96,7 +96,40 @@ def delete_task(task_id):
     
     return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}
 
+### Mark Complete on an Incompleted Task
+### Mark Incomplete on a Completed Task
+### Mark Complete on a Completed Task
+### Mark Incomplete on an Incompleted Task
+@task_list_bp.route("/<task_id>/<mark_status>", methods=["PATCH"])
+def mark_comp_or_incomp(task_id, mark_status):
+    task = validate_task(Task, task_id)
+    # task is an instance that's being updated
+    
+    if mark_status == "mark_complete":
+        task.completed_at = datetime.today()
+        path = "https://slack.com/api/chat.postMessage"
+        slack_api_token = os.environ.get("SLACK_API_TOKEN")
+
+        response = requests.patch(path, data = {"channel": "task-notifications",
+                                        "text": f"Someone just completed the task {task.title}"}, 
+                                        headers = {"Authorization": f"Bearer {slack_api_token}"})
+        # response is an object
+                
+    else:
+        task.completed_at = None
+
+    db.session.commit()
+    
+    return {"task": {
+        "id": task.task_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": is_complete_status(task.completed_at)
+    } } 
+    
 ### No matching Task: Get, Update, and Delete
+## Mark Complete and Mark Incomplete for Missing Tasks
+# Helper function
 def validate_task (model, item_id):
     try:
         item_id_int = int(item_id)
@@ -108,33 +141,14 @@ def validate_task (model, item_id):
     if not task:
         return abort(make_response({"message":f"Task {item_id_int} not found"}, 404))
     
-    return task
-
-@task_list_bp.route("/<task_id>/<mark_status>", methods=["PATCH"])
-def mark_comp_or_incomp(task_id, mark_status):
-    task = validate_task(Task, task_id)
-    # task is an instance that's being updated
+    return task    
     
-    if mark_status == "mark_complete":
-        task.completed_at = datetime.today()
-        
-    else:
-        task.completed_at = None
-
-    db.session.commit()
-    
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": is_complete_status(mark_status)
-    } } 
-    
-def is_complete_status(mark_status):
-    if mark_status == "mark_complete":
-        return True
-    else:
+# Helper function
+def is_complete_status(completed_at):
+    if completed_at is None:
         return False
+    else:
+        return True
     
     
     
