@@ -1,11 +1,15 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
+from datetime import datetime
+
 
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
 
 ### Get Tasks: No Saved Tasks
 ### Get Tasks: Getting Saved Tasks
+### Sorting Tasks: By Title, Ascending
+### Sorting Tasks: By Title, Descending
 @task_list_bp.route("", methods=["GET"])
 def get_tasks():
     tasks = Task.query.all()
@@ -105,3 +109,35 @@ def validate_task (model, item_id):
         return abort(make_response({"message":f"Task {item_id_int} not found"}, 404))
     
     return task
+
+@task_list_bp.route("/<task_id>/<mark_status>", methods=["PATCH"])
+def mark_comp_or_incomp(task_id, mark_status):
+    task = validate_task(Task, task_id)
+    # task is an instance that's being updated
+    
+    if mark_status == "mark_complete":
+        task.completed_at = datetime.today()
+        
+    else:
+        task.completed_at = None
+
+    db.session.commit()
+    
+    return {"task": {
+        "id": task.task_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": is_complete_status(mark_status)
+    } } 
+    
+def is_complete_status(mark_status):
+    if mark_status == "mark_complete":
+        return True
+    else:
+        return False
+    
+    
+    
+    
+    
+    
