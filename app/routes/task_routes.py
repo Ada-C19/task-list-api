@@ -33,7 +33,14 @@ def create_task():
 # GET ALL ENDPOINT
 @task_bp.route("", methods=["GET"])
 def handle_tasks():
-    task_query = Task.query.all()
+
+    sort_param = request.args.get("sort")
+    if sort_param == "asc":
+        task_query = Task.query.order_by(Task.title.asc())
+    elif sort_param == "desc":
+        task_query = Task.query.order_by(Task.title.desc())
+    else:
+        task_query = Task.query.all()
 
     tasks_response = [task.to_dict() for task in task_query]
 
