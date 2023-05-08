@@ -1,15 +1,40 @@
-from flask import Blueprint, db, jsonify, request
+from flask import Blueprint,jsonify, request, make_response
+from app.models.task import Task
+from app import db
 
 
-task_bp = Blueprint("tasks"), __name__,url_prefix="/tasks"
+task_bp = Blueprint("tasks", __name__,url_prefix="/tasks")
 
 #post a task
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
-    # new_task = 
+    new_task = Task.from_dict(request_body)
+
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {"id": new_task.id}, 201
+    return {"task" : new_task.to_dict()}, 201
+
+
+@task_bp.route("", methods=["GET"])
+def get_tasks():
+    response = []
+    title_query = request.args.get("title")
+
+    if title_query is None:
+        all_tasks = Task.query.all()
+    else:
+        all_tasks = Task.query.filter_by(title=title_query)
+
+    for task in all_tasks:
+        response.append(task.to_dict())
+
+    return jsonify(response), 200
+
+# @task_bp.route("/<id>", methods=["GET"])
+# def get_one_task(task_id):
+#     task = Task.query.get(task_id)
+#     return task.to_dict(), 200
+
