@@ -98,18 +98,14 @@ def mark_complete(task_id):
     task = validate_task(task_id)
     task.completed_at = datetime.now()
     db.session.commit()
-    # url = 'https://slack.com/api/chat.postMessage'
     data = {
-    "text": f"Someone just completed the task {task.title}"
-    # "channel" : "C056ZUNCFUH"
+        "channel": "task-list-api",
+        "token": slack_api,
+        "text": f"Someone just completed the task {task.title}"
     }
-    headers={
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": slack_api
-    }
-    r = requests.post(url='https://slack.com/api/chat.postMessage', json={"text": f"Someone just completed the task {task.title}"})
-    r.headers["Content-Type"] = "application/x-www-form-urlencoded"
-    r.headers["Authorization"] = slack_api
+    # Interact with Slack Bot API
+    requests.post(url='https://slack.com/api/chat.postMessage', data=data)
+
     return {"task": task.to_dict()},200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
