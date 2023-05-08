@@ -293,17 +293,16 @@ def get_tasks_with_one_goal(goal_id):
     return jsonify(response_body), 200
 
 
-@task_bp.route("/<task_id>", methods = ["GET"])
+@task_bp.route("/<int:task_id>", methods = ["GET"])
 def get_task_includes_goal_id(task_id):
-    # goal = validate_goal(Goal,goal_id)
-
     task = validate_goal(Task,task_id)
-    # goal = task.goal_id
-    return jsonify(response_body = {"task":
-                     {"id": task.task_id,
-                      "goal_id":task.goal_id,
-                      "title":task.title,
-                      "description":task.description,
-                      "is_complete":False
-                      }
-                      }), 200
+    goal_id = task.goal.goal_id # to access the id attribute of the Goal object associated with the Task.
+    response_body = {"task":
+                {"id": task.task_id,
+                "goal_id":goal_id,
+                "title":task.title,
+                "description":task.description,
+                "is_complete":False
+                }
+                }
+    return jsonify(response_body), 200
