@@ -1,4 +1,5 @@
 import pytest
+from app.models.goal import Goal
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -82,7 +83,9 @@ def test_create_goal(client):
             "title": "My New Goal"
         }
     }
-
+    new_goal = Goal.query.get(1)
+    assert new_goal
+    assert new_goal.title == "My New Goal"
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):

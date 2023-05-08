@@ -10,7 +10,7 @@ import os
 
 goals_bp = Blueprint("goals_bp",__name__, url_prefix="/goals")
 
-@goals_bp.route("/goals", methods=["POST"])
+@goals_bp.route("", methods=["POST"])
 def post_goal():
     request_body = request.get_json()
     
@@ -29,4 +29,17 @@ def post_goal():
             "id": new_goal.goal_id,
             "title": new_goal.title
         }
-    }
+    }, 201
+
+@goals_bp.route("", methods=["GET"])
+def read_all_goals():
+    goals = Goal.query.all()
+
+    goal_response = []
+
+    for goal in goals:
+        goal_response.append({
+            "title": goal.title
+        })
+    
+    return jsonify(goal_response), 200
