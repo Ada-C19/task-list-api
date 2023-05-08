@@ -34,10 +34,7 @@ def assign_tasks_to_goal(goal_id):
 def get_all_tasks_of_one_goal(goal_id):
     goal = validate_item(Goal, goal_id)
     tasks = Task.query.filter_by(goal_id = int(goal_id)).all()
-    response = []
-
-    for task in tasks:
-        response.append(task.to_dict())
+    response = [task.to_dict() for task in tasks]
     
     return make_response({"id": int(goal_id), "title": goal.title, "tasks": response}, 200)
 
@@ -57,11 +54,16 @@ def create_goal():
 
 @goals_bp.route("", methods = ["GET"])
 def get_all_goals():
-    response = []
-    all_goals = Goal.query.all()
+    sort_query = request.get.args("sort")
 
-    for goal in all_goals:
-        response.append(goal.to_dict())
+    if sort_query is None:
+        all_goals = Goal.query.all()
+    elif sort_query is "asc":
+        all_goals = Goal.query.order_by(Goal.title.asc)
+    elif sort_query is "desc":
+        all_goals = Goal.query.order_by(Goal.title.desc)
+
+    response = [goal.to_dict() for goal in all_goals]
     
     return jsonify(response), 200
 
@@ -101,12 +103,14 @@ def create_task():
     if "title" not in request_body or "description" not in request_body:
         return {"details": "Invalid data"}, 400
 
-    if "completed_at" in request_body:
+    if "completed_at" in request_body and isinstance(request_body["completed_at"], datetime):
         new_task = Task(
             title = request_body["title"],
             description = request_body["description"],
             completed_at = request_body["completed_at"]
         )
+    elif "completed_at" in request_body and not isinstance(request_body["completed_at"], datetime):
+        return make_response({"details": "Completed_at must be a datetime"}, 400)
     else:
         new_task = Task(
             title = request_body["title"],
@@ -120,20 +124,37 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    response = []
-    sort_query = request.args.get("sort")
+    alpha_sort_query = request.args.get("sort")
+    id_query = request.args.get("id")
+    title_query = request.args.get("title")
 
-    if sort_query is None:
+    if alpha_sort_query is None and id_query is None and title_query is None:
         all_tasks = Task.query.all()
-    elif sort_query == "asc":
-        all_tasks = Task.query.order_by(Task.title.asc())
-    else:
-        all_tasks = Task.query.order_by(Task.title.desc())
-
-    for task in all_tasks: 
-        response.append(task.to_dict())
+    elif alpha_sort_query == "asc":
+        if id_query is None and title_query is None:
+            all_tasks = Task.query.order_by(Task.title.asc())
+        elif id_query == "asc":
+            all_tasks = Task.query.order_by(Task.title.asc(), Task.task_id.asc())
+        elif id_query == "desc":
+            all_tasks = Task.query.order_by(Task.title.asc(), Task.task_id.desc())
+    elif alpha_sort_query == "desc":
+        if id_query is None and title_query is None:
+            all_tasks = Task.query.order_by(Task.title.desc())
+        elif id_query == "asc":
+            all_tasks = Task.query.order_by(Task.title.desc(), Task.task_id.asc())
+        elif id_query == "desc":
+            all_tasks = Task.query.order_by(Task.title.desc(), Task.task_id.desc())
+    elif id_query == "asc":
+        all_tasks = Task.query.order_by(Task.task_id.asc())
+    elif id_query == "desc":
+        all_tasks = Task.query.order_by(Task.task_id.desc())
+    elif title_query is not None:
+        all_tasks = Task.query.filter_by(title=title_query)
+    
+    response = [task.to_dict() for task in all_tasks]
 
     return jsonify(response), 200
+
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
