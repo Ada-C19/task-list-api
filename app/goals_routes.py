@@ -71,21 +71,22 @@ def delete_goal(goal_id):
 
 #RELATIONSHIP
 #Goals(parent) with tasks(child)
-@goals_bp.route("/goals/<goal_id>/tasks",methods=["POST"])
-def create_goal(task_id):
+#Como usuario, quiero agregar tasks a un goal
+@goals_bp.route("/<goal_id>/tasks",methods=["POST"])
+def create_goal(goal_id):
 
-    task = validate_model(Task, task_id)
+    goal_from_id = validate_model(Goal, goal_id)
 
     request_body = request.get_json()
-    new_goal = Goal(
-        title=request_body["title"],
-        task=task
-    )
-    
-    db.session.add(new_goal)
-    db.session.commit()
+    for i in request_body["task_ids"]:
+        task_to_update = validate_model(Task, i)
+        task_to_update.goal = goal_from_id
+        db.session.commit()
 
-    return {"goal":{
-                "id": new_goal.goal_id,
-                "title": new_goal.title
-            }}, 201
+    return make_response(jsonify({
+                "id": int(goal_id),
+                "task_ids":request_body["task_ids"]
+            })), 200
+
+
+
