@@ -1,5 +1,3 @@
-from flask import Blueprint
-
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
@@ -9,17 +7,17 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task(title=request_body["title"],
-                    description=request_body["description"],
-                    completed_at=request_body["completed_at"])
+
+    try:
+        new_task = Task.from_dict(request_body)
+        new_task.completed_at = None
+    except:
+        abort(make_response({"details": "Invalid data"}, 400))
+
     db.session.add(new_task)
     db.session.commit()
-# replacing make_response(f...) with jsonify to debug
-    return {"task":{
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": (new_task.completed_at != None)}}, 201
+
+    return {"task":new_task.to_dict()}, 201
 
 @tasks_bp.route("", methods=['GET'])
 def handle_tasks():
@@ -28,62 +26,45 @@ def handle_tasks():
     tasks_response = [Task.to_dict(task) for task in tasks]
     return jsonify(tasks_response), 200
 
-def validate_task(task_id):
+def get_valid_item_by_id(model, id):
     try:
-        task_id = int(task_id)
+        id = int(id)
     except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
+        abort(make_response({"message":f"Task {id} invalid"}, 400))
 
-    task = Task.query.get(task_id)
-    
-    if task is None:
-        abort(make_response({"message":f"task {task_id} not found"}, 404))
-    
-    return task
+    item = model.query.get(id)
+
+    return item if item else abort(make_response({"message":f"Task {id} not found"}, 404))
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
-    task = validate_task(task_id)
+    task = get_valid_item_by_id(Task, task_id)
     # may not need line below, has worked for others as it's already
-    # returned in validate_task
+    # returned in get_valid_item_by_id
     Task.query.get(task_id)
 
-    return {
-        "task_id": task.id,
+    return {"task":{
+        "id": task.task_id,
         "title": task.title,
         "description": task.description,
-        "completed_at": task.completed_at
-    }
-
-# @tasks_bp.route("/<task_id>", methods=["GET"])
-# def single_task(task_id):
-#     task = validate_task(task_id)
-#     Task.query.get(task_id)
-
-#     return {
-#         "task_id": task.id,
-#         "name": task.name,
-#         "description": task.description,
-#         "completed_at": task.completed_at
-#     }
+        "is_complete": (task.completed_at != None)}}, 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = get_valid_item_by_id(Task, task_id)
     request_body = request.get_json()
 
-    task.name = request_body["name"]
+    task.title = request_body["title"]
     task.description = request_body["description"]
-    task.completed_at = request_body["completed_at"]
 
     db.session.commit()
 
-    return make_response(f"Task #{task_id} successfully updated")
+    return {"task":task.to_dict()},200
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = get_valid_item_by_id(Task, task_id)
     db.session.delete(task)
     db.session.commit()
 
-    return make_response(f"Task #{task_id} successfully deleted")
+    return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}
