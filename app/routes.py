@@ -293,11 +293,25 @@ def get_tasks_for_specific_goal(goal_id):
             "title": goal.title,
             "tasks": []
             })
-
+    #insert this to pass tasks for specific goal - second to last
+  
+    task_list = []
     for each_task in tasks_obj_list:
-        return jsonify(
-            {"tasks": each_task.task_to_dict()}
-        ), 200
+        task_list.append(each_task.task_to_dict_to_goal())
+        
+    return jsonify(
+        {
+            "id":goal.goal_id,
+            "title": goal.title,
+            "tasks": task_list
+        }
+    ), 200
+
+#comment out when passing second to last
+    # for each_task in tasks_obj_list:
+    #     return jsonify(
+    #         {"tasks": each_task.task_to_dict()}
+    #     ), 200
 
 
 
