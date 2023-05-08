@@ -13,5 +13,6 @@ class Task(db.Model):
             id=self.task_id,
             title=self.title,
             description=self.description,
+            completed_at=self.completed_at,
             is_complete=self.is_complete
         )
