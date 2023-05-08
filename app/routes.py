@@ -21,19 +21,24 @@ def validate_task(task_id):
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
-    new_task = Task(
-        title = request_body["title"],
-        description = request_body["description"],
-        completed_at = request_body["completed_at"]
-    )
+    try:
+        new_task = Task(
+            title = request_body["title"],
+            description = request_body["description"],
+            completed_at = None
+        )
+    except KeyError:
+        return {
+            "details": "Invalid data"
+        }, 400
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {"msg": f"Task {new_task.title} successfully created"}, 201
+    return {"task": new_task.to_dict()}, 201
 
 @task_bp.route("", methods=["GET"])
-def add_task():
+def get_task():
     response = []
 
     title_query = request.args.get("title")
@@ -52,7 +57,7 @@ def add_task():
 def get_one_task(task_id):
     task = validate_task(task_id)
 
-    return task.to_dict(), 200
+    return {"task":task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -62,11 +67,10 @@ def update_task(task_id):
 
     task.title = request_body["title"]
     task.description = request_body["description"]
-    task.completed_at = request_body["completed_at"]
 
     db.session.commit()
 
-    return make_response({"msg": f"Task {task_id} was successfully updated"}, 200)
+    return {"task":task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -75,4 +79,4 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return make_response({"msg": f"Task {task_id} was deleted"}, 200)
+    return {'details': f'Task {task.task_id} "{task.title}" successfully deleted'}, 200
