@@ -7,14 +7,12 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime)
 
     def to_dict(self):
-        task =  {
+        return {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": self.completed_at is not None
         }
-
-        return task
 
     @classmethod
     def from_dict(cls, task_data):
