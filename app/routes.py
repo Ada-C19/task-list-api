@@ -101,12 +101,12 @@ def mark_complete(task_id):
     return make_response({"task": task.to_result()})
 
 
-# @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-# def mark_incomplete(task_id):
-#     task = validate_task(task_id) 
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_task(task_id) 
 
-#     task.completed_at = None
+    task.completed_at = None
 
-#     db.session.commit()
+    db.session.commit()
 
-#     return make_response({"task": task.to_result()})
+    return make_response({"task": task.to_result()})
