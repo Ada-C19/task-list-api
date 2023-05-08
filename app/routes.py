@@ -51,6 +51,7 @@ def read_all_tasks():
     title_query = request.args.get("title")
     description_query = request.args.get("description")
     completed_at_query = request.args.get("completed_at")
+    sort_query = request.args.get("sort")
 
     if title_query:
         tasks = Tasks.query.filter_by(title=title_query)
@@ -58,6 +59,11 @@ def read_all_tasks():
         tasks = Task.query.filter_by(description=description_query)
     elif completed_at_query:
         tasks = Task.query.filter_by(completed_at=completed_at_query)
+    elif sort_query:
+        if sort_query == 'asc':
+            tasks = Task.query.order_by(Task.title).all()
+        elif sort_query == 'desc':
+            tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
 
@@ -114,3 +120,4 @@ def delete_task(task_id):
     db.session.commit()
 
     return jsonify({"details":f'Task {task.task_id} "{task.title}" successfully deleted'}), 200
+    
