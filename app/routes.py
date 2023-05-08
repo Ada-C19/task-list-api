@@ -43,8 +43,6 @@ def get_all_tasks():
         total_tasks = Task.query.order_by(Task.title.desc()).all()
     else:
     ####End of Query#############
-        #indent back one tab if this doesnt work.(indent back was original placemebt.)
-        #rn it's inside the else statement
         total_tasks = Task.query.all()
     
     for task in total_tasks:
@@ -137,7 +135,7 @@ def validate_item(task_id):
     return task
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def mark_complete_on_incomplete_task(task_id):
+def mark_complete_task(task_id):
     task = validate_item(task_id)
 
     task.completed_at = datetime.now()
@@ -165,7 +163,7 @@ def mark_complete_on_incomplete_task(task_id):
     }, 200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-def mark_incomplete_on_completed_task(task_id):
+def mark_incomplete_task(task_id):
     task = validate_item(task_id)
 
     task.completed_at = None
