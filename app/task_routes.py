@@ -15,16 +15,18 @@ path = "https://slack.com/api/chat.postMessage"
 KEY = os.environ.get("API_SECRET_KEY")
     
 # helper function
-def validate_task(id):
+def validate_model(cls, id):
     try:
         id = int(id)
     except:
-        abort(make_response({"message":f"Task {id} is invalid"}, 400))
+        abort(make_response({"message":f"{cls.__name__} {id} is invalid"}, 400))
         
-    task = Task.query.get(id)
-    if not task:
-        abort(make_response({"message":f"Task {id} not found" }, 404))
-    return task
+    model = cls.query.get(id)
+    if not model:
+        abort(make_response({"message":f"{cls.__name__} {id} not found" }, 404))
+    
+    return model
+
 @task_bp.route('', methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -60,14 +62,14 @@ def get_all_tasks():
     
 @task_bp.route('/<task_id>', methods=['GET'])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     response_dict = {}
     response_dict["task"]=task.to_dict()
     return response_dict
     
 @task_bp.route('/<task_id>', methods = ['PUT'])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     request_body = request.get_json()
     task.title = request_body['title']
     task.description = request_body['description']
@@ -79,7 +81,7 @@ def update_task(task_id):
 
 @task_bp.route('/<task_id>', methods = ['DELETE'])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     db.session.delete(task)
     db.session.commit()
     return  {
@@ -89,7 +91,7 @@ def delete_task(task_id):
 @task_bp.route('/<task_id>/mark_complete', methods = ['PATCH'])
 def update_to_complete(task_id):
     date_data = datetime.now()
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = date_data
     db.session.commit()
     
@@ -109,7 +111,7 @@ def update_to_complete(task_id):
 
 @task_bp.route('/<task_id>/mark_incomplete', methods = ['PATCH'])
 def update_to_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = None
     db.session.commit()
     response_dict = {}
