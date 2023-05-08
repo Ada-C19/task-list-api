@@ -29,11 +29,14 @@ def read_all_tasks():
     
     tasks_response = []
     for task in all_tasks:
-        tasks_response.append({
-            'id':task.task_id,
-            'title': task.title,
-            'description':task.description,
-            'is_complete': False 
-        })
+        tasks_response.append(task.to_dict())
 
     return jsonify(tasks_response), 200
+
+@tasks_bp.route("<task_id>", methods=["GET"])
+def get_task(task_id):
+    task = Task.query.get(task_id)
+
+    return {
+        "task": task.to_dict()
+    }

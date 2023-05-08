@@ -16,12 +16,16 @@ class Task(db.Model):
         )
 
         return new_task
+    
+    def is_complete(self):
+        if self.completed_at:
+            return True
+        return False
 
-    # def to_dict(self):
-    #     return {
-    #         "id": self.task_id,
-    #         "title": self.title,
-    #         "description": self.description,
-    #         "completed_at": self.completed_at,
-    #         "is_complete": self.is_complete
-    #     }
+    def to_dict(self):
+        return {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": self.is_complete()
+        }
