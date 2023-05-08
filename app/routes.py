@@ -113,7 +113,6 @@ def validate_task(model,task_id):
 @task_bp.route("", methods =["GET"])
 def sort_title_asc_and_desc():
     sort_by = request.args.get("sort")
-    response =[]
 
     if sort_by == "asc":
         tasks = Task.query.order_by(Task.title.asc()).all()
@@ -121,9 +120,9 @@ def sort_title_asc_and_desc():
         tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all() # this line could save one function for get_all_tasks
+    
 
-    for task in tasks:
-        response.append(task.to_dict())
+    response =[task.to_dict() for task in tasks]
 
     return jsonify(response), 200
 
@@ -276,12 +275,9 @@ def create_goal_with_tasks(goal_id):
 # get tasks with goal and no goal, no task
 @goal_bp.route("/<int:goal_id>/tasks", methods = ["GET"])
 def get_tasks_with_one_goal(goal_id):
+
     goal = validate_goal(Goal,goal_id) 
-    goal_tasks = []
-    for task in goal.tasks:
-        if not task:
-            return []
-        goal_tasks.append(task.to_dict())
+    goal_tasks = [task.to_dict() for task in goal.tasks if task]
     for task in goal_tasks:
         task["goal_id"] = goal_id
     response_body = {
