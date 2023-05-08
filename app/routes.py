@@ -90,7 +90,7 @@ def mark_task_as_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_as_incomplete(task_id):
-    """Mark task specifed by id as complete."""
+    """Mark task specifed by id as incomplete."""
     task = validate_task(task_id)
 
     task.completed_at = None
