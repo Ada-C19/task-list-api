@@ -27,6 +27,7 @@ def validate_model(cls, id):
     
     return model
 
+
 @task_bp.route('', methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -41,10 +42,8 @@ def create_task():
         details = {"details": "Invalid data"}
 
         return make_response(details, 400)
-
-        
     
-    return response_dict
+        
 @task_bp.route('', methods=['GET'])
 def get_all_tasks():
     sort = request.args.get("sort")
@@ -60,12 +59,14 @@ def get_all_tasks():
         task_response.append(task.to_dict())
     return jsonify(task_response)
     
+    
 @task_bp.route('/<task_id>', methods=['GET'])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
     response_dict = {}
     response_dict["task"]=task.to_dict()
     return response_dict
+
     
 @task_bp.route('/<task_id>', methods = ['PUT'])
 def update_task(task_id):
@@ -79,6 +80,7 @@ def update_task(task_id):
     response_dict["task"] = task.to_dict()
     return response_dict
 
+
 @task_bp.route('/<task_id>', methods = ['DELETE'])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
@@ -87,6 +89,7 @@ def delete_task(task_id):
     return  {
         "details": f'Task {task_id} "{task.title}" successfully deleted'
     }
+    
     
 @task_bp.route('/<task_id>/mark_complete', methods = ['PATCH'])
 def update_to_complete(task_id):
@@ -108,6 +111,7 @@ def update_to_complete(task_id):
     requests.post(path, headers=headers, data=data ).json()
     return make_response(response_dict, 200)
     
+
 
 @task_bp.route('/<task_id>/mark_incomplete', methods = ['PATCH'])
 def update_to_incomplete(task_id):
