@@ -1,8 +1,13 @@
-from flask import Blueprint, request, make_response, request, abort, jsonify
+from flask import Blueprint, request, make_response, request, abort, jsonify 
 from app import db
 from app.models.task import Task
 from sqlalchemy import asc, desc
 from datetime import datetime
+#to call slack api?:
+from dotenv import load_dotenv
+import requests 
+import os
+load_dotenv()
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -140,6 +145,15 @@ def mark_complete_on_incomplete_task(task_id):
     db.session.commit()
 
     is_complete = True
+
+##### Trying to do send slackbot message:
+
+    # ID of channel 
+    channel = "C056F5G01SS"
+    SLACKBOT_TOKEN = os.environ.get("SLACKBOT_TOKEN_API")
+    slack_text = f"Someone just completed the task {task.title}"
+
+#####End of trying to send slackbot message
 
     return {"task":{
         "id": task.task_id, 
