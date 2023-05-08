@@ -103,7 +103,7 @@ def delete_task(task_id):
 
 @task_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    slack_channel = "#task-notifications"
+    slack_channel = "#tasks-notifications"
     slack_token = os.environ.get("SLACK_TOLKEN")
 
     try:
