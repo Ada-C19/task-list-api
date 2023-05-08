@@ -71,9 +71,13 @@ def delete_goal(goal_id):
 
 #RELATIONSHIP
 #Goals(parent) with tasks(child)
-#Como usuario, quiero agregar tasks a un goal
+#Como usuario, quiero agregar tasks a un goal (el goal te lo da el usuario en 
+# en la URL y como request_body te da la lista de tasks)
+
+#Preguntar porque POST si solo esta update????????????
+
 @goals_bp.route("/<goal_id>/tasks",methods=["POST"])
-def create_goal(goal_id):
+def update_goal_id_in_task(goal_id):
 
     goal_from_id = validate_model(Goal, goal_id)
 
@@ -89,4 +93,26 @@ def create_goal(goal_id):
             })), 200
 
 
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 
+def read_tasks_of_one_specific_goal(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+
+    tasks_response = []
+    for task in goal.tasks:
+        tasks_response.append(
+            {
+            "id": task.id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete":(task.completed_at != None)
+            }
+        )
+
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }
