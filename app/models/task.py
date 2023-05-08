@@ -12,11 +12,17 @@ class Task(db.Model):
         return {"id": self.task_id,
                 "title": self.title,
                 "description": self.description,
-                "is_complete": (self.completed_at != None)} 
+                "is_complete": (self.completed_at!=None)} 
     
-    # @classmethod
-    # def from_dict(cls, task_data):
-    #     new_task = (title=task_data["title"], 
-    #                 description=task_data["description"],
-    #                 complete_at=task_data["complete_at"])
-    #     return new_task
+    @classmethod
+    def from_dict(cls, task_data):
+        new_task = cls(title=task_data["title"],
+                        description=task_data["description"])
+        return new_task
+
+
+
+
+
+
+
