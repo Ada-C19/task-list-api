@@ -15,6 +15,8 @@ def validate_model(task_id):
 
     if not task:
         abort(make_response({"message": f"Task {task_id} not found"}, 404))
+    
+    return task
 
 
 @tasks_bp.route("", methods=["POST"])
