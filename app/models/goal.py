@@ -1,9 +1,11 @@
 from app import db
 
-#var si hereda de task
+
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
+    #Relationship
+    tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
     def to_dict(self):
         return {

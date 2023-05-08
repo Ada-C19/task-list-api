@@ -36,20 +36,6 @@ def get_external_task_representation(task):
     }
 
 
-# def validate_model(model_id):
-#     try:
-#         task_id = int(task_id)
-#     except:
-#         abort(make_response({"message": f"task {task_id} invalid"}, 400))
-
-#     task = Task.query.get(task_id)
-
-#     if not task:
-#         abort(make_response({"message": f"task {task_id} not found"}, 404))
-
-#     return task
-
-
 #POST request
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -71,7 +57,6 @@ def create_task():
     #     calculated_is_complete = False
     # else:
     #     calculated_is_complete = True
-
     calculated_is_complete = not new_task.completed_at is None
     return get_external_task_representation(new_task), 201
 
