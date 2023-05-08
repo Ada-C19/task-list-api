@@ -259,30 +259,20 @@ def delete_goal(goal_id):
 
 # wave 6 
 # sending a list task to goal
-@goal_bp.route("/goals/<goal_id>/tasks", methods = ["POST"])
-def create_task_by_goal(goal_id):
-    response = []
-    tasks = Task.query.all()
-    for task in tasks:
-        response.append(task.to_dict())
+@goal_bp.route("/<int:goal_id>/tasks", methods = ["POST"])
+def create_goal_with_tasks(goal_id):
+    goals = validate_goal(Goal,goal_id)
+    response_body = request.get_json()
+    task_ids = response_body["task_ids"]
+    for task_id in task_ids:
+        task = Task.query.get(task_id)
+        task.goal_id = goal_id
+
+        db.session.commit()
+
+    return jsonify({"id":goal_id, "task_ids": task_ids}), 200
 
 
 
 
 
-    goal = Goal.query.get(goal_id)
-    if not goal:
-        return jsonify({'msg': 'Goal not found'}), 404
-
-    task_ids = request.json.get('task_id', [])
-    tasks = Task.query.filter(Task.task_id.in_(task_ids)).all()
-
-    for task in tasks:
-        goal.task.append(task)
-
-    db.session.commit()    
-
-    return jsonify({
-        'id': goal.goal_id,
-        'task_ids': [task.task_id for task in goal.task]
-    }), 200
