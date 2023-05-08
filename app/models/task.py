@@ -11,12 +11,17 @@ class Task(db.Model):
 
 
     def to_dict(self):
-        return {
+        task_dict = {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": self.completed_at is not None
         }
+        if self.goal:
+            task_dict["goal"] = self.goal.name
+
+        return task_dict
+
 
 
     @classmethod
