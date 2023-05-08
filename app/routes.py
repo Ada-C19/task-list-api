@@ -35,15 +35,30 @@ def add_task():
             }, 201
 
 
+# @task_bp.route("", methods=["GET"])
+# def get_at_least_one_task():
+#     response = []
+#     all_tasks = Task.query.all() 
+#     for task in all_tasks: 
+#         response.append(task.to_dict())
+
+#     return jsonify(response), 200
+
 @task_bp.route("", methods=["GET"])
 def get_at_least_one_task():
     response = []
-    all_tasks = Task.query.all() 
+    sort_order = request.args.get('sort', None)
+    if sort_order == 'asc':
+        all_tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_order == 'desc':
+        all_tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        all_tasks = Task.query.all()
+        
     for task in all_tasks: 
         response.append(task.to_dict())
 
     return jsonify(response), 200
-
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
