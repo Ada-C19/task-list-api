@@ -2,6 +2,7 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 import copy
+import datetime
 
 tasks_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -40,17 +41,16 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    """Get all tasks or a task by param."""
+    """Get all tasks and sort by title if specifed."""
     sort_query = request.args.get("sort")
 
-    # Retrieve all tasks, or a task specified by certain criteria
-    all_tasks = Task.query.all()
-
-    all_tasks_copy = copy.deepcopy(all_tasks)
+    # Retrieve all tasks, and order by asc or desc if specifed
     if sort_query == "asc":
-        all_tasks = sorted(all_tasks_copy, key=lambda t: t.title)
+        all_tasks = Task.query.order_by(Task.title.asc())
     elif sort_query == "desc":
-        all_tasks = sorted(all_tasks_copy, key=lambda t: t.title, reverse=True)
+        all_tasks = Task.query.order_by(Task.title.desc())
+    else:
+        all_tasks = Task.query.all()
 
     response = [task.to_dict() for task in all_tasks]
 
@@ -71,6 +71,22 @@ def update_task(task_id):
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
+
+    db.session.commit()
+
+    return {"task": task.to_dict()}, 200
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_as_complete(task_id):
+    """Mark task specifed by id as complete."""
+    task = validate_task(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    # task.completed_at = request_body[datetime.datetime.now()]
+    # task.is_complete = request_body[True]
 
     db.session.commit()
 
