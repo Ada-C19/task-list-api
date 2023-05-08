@@ -11,14 +11,14 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def get_all_tasks():
     
     sort_param = request.args.get("sort")
-    tasks = Task.query
+    task_query = Task.query
 
     if sort_param == "asc":
-        tasks = Task.query.order_by(asc("title"))
+        task_query = task_query.order_by(asc(Task.title))
     if sort_param == "desc":
-        tasks = Task.query.order_by(desc("title"))
+        task_query = task_query.order_by(desc(Task.title))
 
-    task_list = [task.to_dict() for task in tasks]
+    task_list = [task.to_dict() for task in task_query]
 
     return jsonify(task_list), 200
 
