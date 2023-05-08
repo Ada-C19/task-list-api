@@ -8,10 +8,10 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     is_complete = db.Column(db.Boolean)
 
-def to_dict(self):
-    return {
-        "id": self.task_id,
-        "title": self.title,
-        "description": self.description,
-        "is_complete": self.is_complete
-    }
+    def to_dict(self):
+        return dict(
+            id=self.task_id,
+            title=self.title,
+            description=self.description,
+            is_complete=self.is_complete
+        )
