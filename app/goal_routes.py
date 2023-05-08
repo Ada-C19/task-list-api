@@ -34,9 +34,7 @@ def add_goals():
     if "title" not in request_body:
         return {f"details": "Invalid data"}, 400
     
-    new_goal = Goal(
-        title = request_body["title"]
-    )
+    new_goal = Goal(title=request_body["title"])
 
     db.session.add(new_goal)
     db.session.commit()
@@ -57,7 +55,7 @@ def get_all_goals():
 
 
 @goal_bp.route("/<goal_id>", methods=["GET"])
-def get_one_task(goal_id):
+def get_one_goal(goal_id):
     goal = validate_item(Goal, goal_id)
     return make_response(jsonify({"goal": goal.goal_to_dict()}), 200)
 
@@ -84,3 +82,38 @@ def delete_one_task(goal_id):
     db.session.commit()
 
     return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
+
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    task_ids = request_body["task_ids"]
+
+    for task_id in task_ids:
+        new_task = validate_item(Task, task_id)
+        goal.tasks.append(new_task)
+
+    db.session.commit()
+
+    return {"id": int(goal_id), "task_ids": task_ids}, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_one_goal(goal_id):
+
+    goal = validate_item(Goal, goal_id)
+
+    goal_dict = goal.goal_to_dict()
+    goal_dict["tasks"]= []
+
+    for task in goal.tasks:
+        task_dict = task.to_dict()
+        task_dict["goal_id"] = int(goal_id)
+        goal_dict["tasks"].append(task_dict)
+
+
+    return jsonify(goal_dict), 200
+
+    

@@ -84,6 +84,7 @@ def update_task(task_id):
 
     task.title = request_body["title"]
     task.description = request_body["description"]
+
     if "completed_at" in request_body:
         task.completed_at = datetime.utcnow()
     else:

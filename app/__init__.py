@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 
 
+
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
@@ -12,6 +13,8 @@ load_dotenv()
 
 def create_app(test_config=None):
     app = Flask(__name__)
+
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     if test_config is None:
@@ -25,16 +28,15 @@ def create_app(test_config=None):
     # Import models here for Alembic setup
     from app.models.task import Task
     from app.models.goal import Goal
-    # from app.models.goal_task import GoalTask
 
     db.init_app(app)
     migrate.init_app(app, db)
 
     # Register Blueprints here
-    from .task_routes import task_bp
+    from app.task_routes import task_bp
     app.register_blueprint(task_bp)
 
-    from .goal_routes import goal_bp
+    from app.goal_routes import goal_bp
     app.register_blueprint(goal_bp)
 
     return app
