@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
+import datetime
+import os
+from slack_sdk import WebClient
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -76,3 +79,30 @@ def delete_task(task_id):
     db.session.commit()
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    updated_task=get_valid_item_by_id(Task, task_id)
+    updated_task.completed_at = datetime.datetime.utcnow()
+    db.session.commit()
+    
+    slack_token = os.environ["SLACK_TOKEN"]
+    client = WebClient(token=slack_token)
+
+    result = client.chat_postMessage(
+        channel="task-notifications",
+        text=f"Someone just completed the task {updated_task.title}"
+    )
+
+    task_response = updated_task.to_dict()
+    
+    return make_response(jsonify({"task":task_response}), 200)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = get_valid_item_by_id(Task, task_id)
+    if task.completed_at is None:
+        return {"task": task.to_dict()}, 200
+    task.completed_at = None
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
