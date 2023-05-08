@@ -44,7 +44,7 @@ def create_task():
 
 
 # get one task
-@task_bp.route("/<task_id>", methods = ["GET"])
+@task_bp.route("/<int:task_id>", methods = ["GET"])
 def get_one_task(task_id):
     tasks = validate_task(Task,task_id)
 
@@ -276,8 +276,7 @@ def create_goal_with_tasks(goal_id):
 # get tasks with goal and no goal, no task
 @goal_bp.route("/<int:goal_id>/tasks", methods = ["GET"])
 def get_tasks_with_one_goal(goal_id):
-
-    goal = validate_goal(Goal,goal_id)
+    goal = validate_goal(Goal,goal_id) 
     goal_tasks = []
     for task in goal.tasks:
         if not task:
@@ -297,7 +296,8 @@ def get_tasks_with_one_goal(goal_id):
 def get_task_includes_goal_id(task_id):
     task = validate_goal(Task,task_id)
     goal_id = task.goal.goal_id # to access the id attribute of the Goal object associated with the Task.
-    response_body = {"task":
+    if goal_id == task.goal_id:
+        response_body = {"task":
                 {"id": task.task_id,
                 "goal_id":goal_id,
                 "title":task.title,
