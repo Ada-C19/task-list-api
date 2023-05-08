@@ -52,7 +52,8 @@ def get_one_task(task_id):
             "id": tasks.task_id,
             "title": tasks.title,
             "description": tasks.description,
-            "is_complete": False}
+            "is_complete": False
+            }
             }), 200
 
 
@@ -272,7 +273,37 @@ def create_goal_with_tasks(goal_id):
 
     return jsonify({"id":goal_id, "task_ids": task_ids}), 200
 
+# get tasks with goal and no goal, no task
+@goal_bp.route("/<int:goal_id>/tasks", methods = ["GET"])
+def get_tasks_with_one_goal(goal_id):
+
+    goal = validate_goal(Goal,goal_id)
+    goal_tasks = []
+    for task in goal.tasks:
+        if not task:
+            return []
+        goal_tasks.append(task.to_dict())
+    for task in goal_tasks:
+        task["goal_id"] = goal_id
+    response_body = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": goal_tasks
+    }
+    return jsonify(response_body), 200
 
 
+@task_bp.route("/<task_id>", methods = ["GET"])
+def get_task_includes_goal_id(task_id):
+    # goal = validate_goal(Goal,goal_id)
 
-
+    task = validate_goal(Task,task_id)
+    # goal = task.goal_id
+    return jsonify(response_body = {"task":
+                     {"id": task.task_id,
+                      "goal_id":task.goal_id,
+                      "title":task.title,
+                      "description":task.description,
+                      "is_complete":False
+                      }
+                      }), 200
