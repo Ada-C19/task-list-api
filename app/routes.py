@@ -81,12 +81,8 @@ def mark_task_as_complete(task_id):
     """Mark task specifed by id as complete."""
     task = validate_task(task_id)
 
-    request_body = request.get_json()
-
-    task.title = request_body["title"]
-    task.description = request_body["description"]
-    # task.completed_at = request_body[datetime.datetime.now()]
-    # task.is_complete = request_body[True]
+    task.completed_at = datetime.datetime.now()
+    task.is_complete = True
 
     db.session.commit()
 
