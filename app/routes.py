@@ -78,7 +78,6 @@ def update_one_task(task_id):
         task.title = request_body["title"]
     if "description" in request_body:
         task.description = request_body["description"]
-    #TODO:Update the completed_at attribute
     db.session.commit()
     return {"task": task.to_dict()}, 200
 
@@ -97,25 +96,23 @@ def delete_one_task(task_id):
 def mark_complete(task_id):
     slack_api = os.environ.get("SLACK_BOT_TOKEN")
     task = validate_task(task_id)
-    # task.is_complete = True
     task.completed_at = datetime.now()
     db.session.commit()
     # url = 'https://slack.com/api/chat.postMessage'
     data = {
-    "text": f"Someone just completed the task {task.title}",
-    "channel" : "C056ZUNCFUH"
+    "text": f"Someone just completed the task {task.title}"
+    # "channel" : "C056ZUNCFUH"
     }
     headers={
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": slack_api
     }
-    requests.post(url='https://slack.com/api/chat.postMessage', data=data, headers=headers)
+    requests.post(url='https://slack.com/api/chat.postMessage', json=data, headers=headers)
     return {"task": task.to_dict()},200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_task(task_id)
-    task.is_complete = False
     task.completed_at = None
     db.session.commit()
     return {"task": task.to_dict()},200
