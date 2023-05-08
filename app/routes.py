@@ -13,23 +13,27 @@ def validate_task(task_id):
         abort(make_response({"message":f"task {task_id} invalid"}, 400))
 
     task = Task.query.get(task_id)
-
     if not task:
         abort(make_response({"message":f"task {task_id} not found"}, 404))
 
-    return task.query.get(task_id)
+    return task
+# query.get(task_id)
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+
+    if not "title" in request_body or not "description" in request_body:
+        abort (make_response({"details": "Invalid data"}, 400))
+
     new_task = Task(title=request_body["title"],
-                    description=request_body["description"],
-                    completed_at=request_body["completed_at"])
+                    description=request_body["description"])
+                    # completed_at=request_body["completed_at"])
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {"Task" : new_task.to_result()},201
+    return {"task" : new_task.to_result()}, 201
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
@@ -42,30 +46,29 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_task(task_id)
-    return task.to_result(), 200 
+    return {"task": task.to_result()}, 200 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_task(task_id)
-
     request_body = request.get_json()
 
     task.title = request_body["title"]
     task.description = request_body["description"]
     
-
     db.session.commit()
 
-    return make_response(f"Task #{task_id} successfully updated"), 200
+    return {"task": task.to_result()}, 200 
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task_to_delete = validate_task(task_id)
 
-    db.session.delete(task)
+    db.session.delete(task_to_delete)
     db.session.commit()
 
-    return make_response(f"Task #{task_id} successfully deleted"), 200
+    # return {"details": task.to_result()}, 200 
 
+    return make_response({"details":f'Task {task_id} "{task_to_delete.title}" successfully deleted'})
 
 
