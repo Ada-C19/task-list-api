@@ -165,12 +165,12 @@ def mark_complete_task(task_id):
     #slack start
     slack_token = os.environ.get("SLACK_API_TOKEN")
     slack_message = f"Somone just completed the task {task.title}"
-    slack_client = WebClient(token=slack_token)
+    slack_client = WebClient(token=slack_token) #carries the token 
 
     try:
         response = slack_client.chat_postMessage(
-            channel = "task-notifications",
-            text=slack_message
+            channel = "task-notifications", #where to send
+            text=slack_message #what to send
         )
     except SlackApiError as error:
         print(f"error {error}")
