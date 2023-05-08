@@ -15,16 +15,15 @@ def create_tasks():
     db.session.add(new_task)
     db.session.commit()
 
-    new_task = new_task.to_dict()
+    response_body = dict(task=new_task.to_dict())
 
-    
-    return make_response({"task":new_task}, 201)
+    return make_response(jsonify(response_body), 201)
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
     task = validate_model(Task, task_id)
-    task = task.to_dict()
-    return make_response({"task":task}, 200)
+    response_body = dict(task=task.to_dict())
+    return make_response(jsonify(response_body), 200)
 
 @tasks_bp.route("", methods=["GET"])
 def handle_tasks():
@@ -34,9 +33,9 @@ def handle_tasks():
         tasks = Task.query.order_by(text("title desc"))
     else:
         tasks = Task.query.all()
-    tasks_response = [Task.to_dict(task) for task in tasks]
+    response_body = [Task.to_dict(task) for task in tasks]
 
-    return make_response(jsonify(tasks_response),200)
+    return make_response(jsonify(response_body),200)
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
@@ -48,9 +47,9 @@ def update_task(id):
     
     db.session.commit()
 
-    task = task.to_dict()
+    response_body = dict(task=task.to_dict())
 
-    return make_response({"task":task}, 200)
+    return make_response(jsonify(response_body), 200)
 
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
@@ -59,7 +58,9 @@ def delete_task(id):
     db.session.delete(task)
     db.session.commit()
 
-    return make_response({"details":f'Task 1 "{task.title}" successfully deleted'}, 200)
+    response_body = dict(details=f'Task {task.task_id} "{task.title}" successfully deleted')
+
+    return make_response(jsonify(response_body), 200)
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_complete(id):
@@ -69,12 +70,12 @@ def mark_complete(id):
     
     db.session.commit()
 
-    task = task.to_dict()
+    response_body = dict(task=task.to_dict())
 
     # Slack API call
-    # slack_call(task)
+    slack_call(response_body['task'])
     
-    return make_response({"task":task}, 200)
+    return make_response(jsonify(response_body), 200)
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(id):
@@ -84,6 +85,6 @@ def mark_incomplete(id):
     
     db.session.commit()
 
-    task = task.to_dict()
+    response_body = dict(task=task.to_dict())
 
-    return make_response({"task":task}, 200)
+    return make_response(jsonify(response_body), 200)
