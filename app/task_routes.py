@@ -4,21 +4,9 @@ from app.models.task import Task
 import requests
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
+from app.routes_helper import validate_model
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-
-def validate_task(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message":f"Task {task_id} invalid"}, 400))
-
-    task = Task.query.get(task_id)
-
-    if not task:
-        abort(make_response({"message": f"Task {task_id} not found"}, 404))
-
-    return task
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -38,24 +26,10 @@ def create_task():
 
     return make_response(jsonify(response_body), 201)
 
-# @tasks_bp.route("", methods=["GET"])
-# def read_all_tasks():
-#     tasks_response=[]
-#     tasks= Task.query.all()
-
-#     for task in tasks:
-#         tasks_response.append({
-#             "id":task.task_id,
-#             "title": task.title,
-#             "description": task.description,})
-#         if task.completed_at == None:
-#             tasks_response[tasks.index(task)]["is_complete"] = False
-
-#     return jsonify(tasks_response)
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
-    task= validate_task(task_id)
+    task= validate_model(Task, task_id)
     response_body = {}
     
     response_body["task"] = task.to_dict()
@@ -64,7 +38,7 @@ def read_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task= validate_task(task_id)
+    task= validate_model(Task, task_id)
 
     request_body = request.get_json()
     response_body = {}
@@ -79,7 +53,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -105,7 +79,7 @@ def read_all_tasks():
 #Wave 3 & 4 endpoints
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_as_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     path = "https://slack.com/api/chat.postMessage"
     SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
     
@@ -131,7 +105,7 @@ def mark_task_as_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_as_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     response_body = {}
     if task.completed_at != None:
