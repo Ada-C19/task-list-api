@@ -23,12 +23,23 @@ def assign_tasks_to_goal(goal_id):
     for task_id in request_body["task_ids"]:
         task = validate_item(Task, task_id)
         # for each valid task, add it to the goal
-        db.session.add(task)
+        goal.tasks.append(task)
         response.append(task.task_id)
 
     db.session.commit()
 
     return make_response({"id": goal.goal_id, "task_ids": response}, 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_of_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    tasks = Task.query.filter_by(goal_id = int(goal_id)).all()
+    response = []
+
+    for task in tasks:
+        response.append(task.to_dict())
+    
+    return make_response({"id": int(goal_id), "title": goal.title, "tasks": response}, 200)
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
