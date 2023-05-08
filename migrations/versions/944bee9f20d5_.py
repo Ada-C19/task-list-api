@@ -1,4 +1,4 @@
-"""empty message
+"""Created Goal model
 
 Revision ID: 944bee9f20d5
 Revises: 3ffd5e80b180
