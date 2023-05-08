@@ -157,28 +157,29 @@ def create_goal():
     return {"goal": new_goal.to_dict()}, 201
 
 
-# @tasks_bp.route("", methods=["GET"])
-# def get_all_tasks():
-#     """Get all tasks and sort by title if specifed."""
-#     sort_query = request.args.get("sort")
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    """Get all goals."""
+    # sort_query = request.args.get("sort")
 
-#     # Retrieve all tasks, and order by asc or desc if specifed
-#     if sort_query == "asc":
-#         all_tasks = Task.query.order_by(Task.title.asc()).all()
-#     elif sort_query == "desc":
-#         all_tasks = Task.query.order_by(Task.title.desc()).all()
-#     else:
-#         all_tasks = Task.query.all()
+    # Retrieve all tasks, and order by asc or desc if specifed
+    # if sort_query == "asc":
+    #     all_tasks = Task.query.order_by(Task.title.asc()).all()
+    # elif sort_query == "desc":
+    #     all_tasks = Task.query.order_by(Task.title.desc()).all()
+    # else:
+    #     all_tasks = Task.query.all()
+    all_goals = Goal.query.all()
 
-#     response = [task.to_dict() for task in all_tasks]
+    response = [goal.to_dict() for goal in all_goals]
 
-#     return jsonify(response), 200
+    return jsonify(response), 200
 
 
-# @tasks_bp.route("/<task_id>", methods=["GET"])
-# def get_one_task(task_id):
-#     """Get one task by id."""
-#     return {"task": validate_model(Task, task_id).to_dict()}, 200
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    """Get one goal by id."""
+    return {"goal": validate_goal(Goal, goal_id).to_dict()}, 200
 
 
 # @tasks_bp.route("/<task_id>", methods=["PUT"])
