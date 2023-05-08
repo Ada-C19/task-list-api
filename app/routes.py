@@ -1,6 +1,7 @@
 from flask import abort, Blueprint, jsonify, make_response, request
 from app import db
 from app.models.task import Task
+from datetime import datetime, date
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -72,3 +73,19 @@ def validate_task_id(task_id):
     
     return Task.query.get_or_404(valid_task_id)
 #passes wave one
+
+@task_bp.route("/<task_id>/mark_complete", methods = ["PATCH"])
+def mark_task_complete(task_id):
+    updated_task = validate_task_id(task_id)
+
+    updated_task.completed_at = datetime.now()
+    db.session.commit()
+    return {"task": updated_task.to_dict()}, 200
+
+@task_bp.route("/<task_id>/mark_incomplete", methods = ["PATCH"])
+def mark_task_incomplete(task_id):
+    updated_task = validate_task_id(task_id)
+
+    updated_task.completed_at = None
+    db.session.commit()
+    return {"task": updated_task.to_dict()}, 200
