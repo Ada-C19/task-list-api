@@ -30,11 +30,13 @@ def get_tasks():
     sort = request.args.get("sort")
 
     if sort == "asc":
-        task = Task.query.order_by(Task.title.asc()).all()
+        all_tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort == "desc":
+        all_tasks = Task.query.order_by(Task.title.desc()).all()
     else:
-        task = Task.query.order_by(Task.title.desc()).all()
-    
-    all_tasks = Task.query.all()
+        all_tasks = Task.query.all()
+
+    # all_tasks = Task.query.all()
 
     response = []
     for task in all_tasks:
