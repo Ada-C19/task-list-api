@@ -2,8 +2,12 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 from sqlalchemy import asc, desc
-from datetime import datetime
-from pytz import timezone
+from datetime import timezone, datetime
+from pytz import utc
+
+tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
+
+NOWTIME = datetime.now(timezone.utc)
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
@@ -20,12 +24,12 @@ def validate_task_id(task_id):
         task_id = int(task_id)
     except:
         abort(make_response({"message": f"Invalid task ID: {task_id}"}, 400))
-
+    print(f"{task_id = }")
     return task_id
 
 def get_task_by_id(task_id):
     task_id = validate_task_id(task_id)
-    task = Task.query.get(task_id)
+    task = db.session.get(Task, task_id)
 
     if not task:
         abort(make_response({'message': f'Task {task_id} was not found.'}, 404))
@@ -134,144 +138,49 @@ def delete_task(task_id):
     return make_response({"details" : message}), 200
 
 
+
+
+
+# def update_task_from_request(task, request):
+#     task_info = request.get_json()
+
+#     if 'title' in task_info:
+#         task.title = task_info['title']
+#     if 'description' in task_info:
+#         task.description = task_info['description']
+#     if 'completed_at' in task_info:
+#         task.completed_at = datetime.fromisoformat(task_info['completed_at'])
+
+#     return task
+
 @tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
 def mark_task_completed(task_id):
     task = get_task_by_id(task_id)
-    if task.completed_at:
-        return make_response(jsonify({"message": f"Task {task_id} is already completed."}), 400)
-    task.completed_at = datetime.now(timezone.utc)
+
+    task.completed_at = NOWTIME
+
     db.session.commit()
+
     task = task.to_json()
     task["is_complete"] = True
-    return make_response(jsonify({"task": task}), 200)
+
+    return make_response(jsonify(task=task)), 200
 
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
 def mark_task_incomplete(task_id):
     task = get_task_by_id(task_id)
-    if not task.completed_at:
-        return make_response(jsonify({"message": f"Task {task_id} is already incomplete."}), 400)
+
     task.completed_at = None
+
     db.session.commit()
+
     task = task.to_json()
     task["is_complete"] = False
-    return make_response(jsonify({"task": task}), 200)
+
+    return make_response(jsonify(task=task)), 200
 
 
 # @tasks_bp.errorhandler(404)
 # def handle_task_not_found(error):
-#     return make_response(jsonify({"message": "Task not found."}), 404)
-
-
-
-
-
-# ### Mark Complete on an Incompleted Task
-
-# Given a task that has:
-
-# - An id `1`
-# - A `completed_at` attribute with a `null` value
-
-# when I send a `PATCH` request to `/tasks/1/mark_complete`,
-
-# then the task is updated, so that its `completed_at` value is the current date, and I get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "Go on my daily walk 🏞",
-#     "description": "Notice something new every day",
-#     "is_complete": true
-#   }
-# }
-# ```
-
-# ### Mark Incomplete on a Completed Task
-
-# Given a task that has:
-
-# - An id `1`
-# - A `completed_at` attribute with a datetime value
-
-# when I send a `PATCH` request to `/tasks/1/mark_incomplete`,
-
-# then the task is updated, so that its `completed_at` value is `null`/`None`, and I get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "Go on my daily walk 🏞",
-#     "description": "Notice something new every day",
-#     "is_complete": false
-#   }
-# }
-# ```
-
-# ### Mark Complete on a Completed Task
-
-# Given a task that has:
-
-# - An id `1`
-# - A `completed_at` attribute with a datetime value
-
-# when I send a `PATCH` request to `/tasks/1/mark_complete`,
-
-# then I want this to behave exactly like `/tasks/1/mark_complete` for an incomplete task. The task is updated, so that its `completed_at` value is the current date, and I get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "Go on my daily walk 🏞",
-#     "description": "Notice something new every day",
-#     "is_complete": true
-#   }
-# }
-# ```
-
-# ### Mark Incomplete on an Incompleted Task
-
-# Given a task that has:
-
-# - An id `1`
-# - A `completed_at` attribute with a `null` value
-
-# when I send a `PATCH` request to `/tasks/1/mark_incomplete`,
-
-# then I want this to behave exactly like `/tasks/1/mark_incomplete` for a complete task. Its `completed_at` value remains as `null`/`None`, and I get this response:
-
-# `200 OK`
-
-# ```json
-# {
-#   "task": {
-#     "id": 1,
-#     "title": "Go on my daily walk 🏞",
-#     "description": "Notice something new every day",
-#     "is_complete": false
-#   }
-# }
-# ```
-
-# ## Mark Complete and Mark Incomplete for Missing Tasks
-
-# Given that there are no tasks with the ID `1`,
-
-# When I send a `PATCH` request to `/tasks/1/mark_complete` or a `PATCH` request to `/tasks/1/mark_incomplete`,
-
-# Then I get a `404 Not Found`.
-
-# You may choose the response body.
-
-# Make sure to complete the tests for non-existing tasks to check that the correct response body is returned.
-
-# _________
+#     return make_response(jsonify({"message": "Task not found."})), 404

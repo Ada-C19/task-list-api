@@ -1,7 +1,7 @@
 from app.models.task import Task
 import pytest
 import sys
-sys.path.append('/Users/jessica/Ada/Unit_2/Personal_Forks/task-list-api/app')
+from app import db
 
 # 200 Tests
 
@@ -86,7 +86,7 @@ def test_update_task_200(client, one_task):
             "is_complete": False
         }
     }
-    task = Task.query.get(1)
+    task = db.session.get(Task, 1)
     assert task.title == "Updated Task Title"
     assert task.description == "Updated Test Description"
     assert task.completed_at == None
@@ -104,7 +104,7 @@ def test_delete_task_200(client, one_task):
     assert response_body == {
         "details": 'Task 1 "Go on my daily walk 🏞" successfully deleted'
     }
-    assert Task.query.get(1) == None
+    assert db.session.get(Task, 1) is None
 
 
 
@@ -134,7 +134,7 @@ def test_create_task_201(client):
             "is_complete": False
         }
     }
-    new_task = Task.query.get(1)
+    new_task = db.session.get(Task, 1)
     assert new_task
     assert new_task.title == "A Brand New Task"
     assert new_task.description == "Test Description"
@@ -206,7 +206,7 @@ def test_get_invalid_task_returns_400(client):
     assert response_body == {'message': 'Invalid task ID: mystery'}
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_update_task_not_found_400(client):
+def test_update_task_not_valid_400(client):
     # Act
     response = client.put("/tasks/mystery", json={
         "title": "Updated Task Title",
@@ -219,7 +219,7 @@ def test_update_task_not_found_400(client):
     assert response_body == {'message': 'Invalid task ID: mystery'}
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_delete_task_not_found_400(client):
+def test_delete_task_not_valid_400(client):
     # Act
     response = client.delete("/tasks/mystery")
     response_body = response.get_json()
