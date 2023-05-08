@@ -47,14 +47,28 @@ def create_task():
 @task_bp.route("/<int:task_id>", methods = ["GET"])
 def get_one_task(task_id):
     tasks = validate_task(Task,task_id)
+    # goal_id = tasks.goal.goal_id # to access the id attribute of the Goal object associated with the Task.
+    # if goal_id == tasks.goal_id:
+    if tasks:
+        if getattr(tasks, 'goal_id'):
+            response_body = {"task":
+                {"id": tasks.task_id,
+                "goal_id":tasks.goal_id,
+                "title":tasks.title,
+                "description":tasks.description,
+                "is_complete":False
+                }
+                }
+            return jsonify(response_body), 200
 
-    return jsonify({"task":{
-            "id": tasks.task_id,
-            "title": tasks.title,
-            "description": tasks.description,
-            "is_complete": False
-            }
-            }), 200
+    return jsonify({"task":tasks.to_dict()}),200
+            # {
+            # "id": tasks.task_id,
+            # "title": tasks.title,
+            # "description": tasks.description,
+            # "is_complete": False
+            # }
+            # }), 200
 
 
 # get update
@@ -292,17 +306,17 @@ def get_tasks_with_one_goal(goal_id):
     return jsonify(response_body), 200
 
 
-@task_bp.route("/<int:task_id>", methods = ["GET"])
-def get_task_includes_goal_id(task_id):
-    task = validate_goal(Task,task_id)
-    goal_id = task.goal.goal_id # to access the id attribute of the Goal object associated with the Task.
-    if goal_id == task.goal_id:
-        response_body = {"task":
-                {"id": task.task_id,
-                "goal_id":goal_id,
-                "title":task.title,
-                "description":task.description,
-                "is_complete":False
-                }
-                }
-    return jsonify(response_body), 200
+# @task_bp.route("/<int:task_id>", methods = ["GET"])
+# def get_task_includes_goal_id(task_id):
+#     task = validate_goal(Task,task_id)
+#     goal_id = task.goal.goal_id # to access the id attribute of the Goal object associated with the Task.
+#     if goal_id == task.goal_id:
+#         response_body = {"task":
+#                 {"id": task.task_id,
+#                 "goal_id":goal_id,
+#                 "title":task.title,
+#                 "description":task.description,
+#                 "is_complete":False
+#                 }
+#                 }
+#     return jsonify(response_body), 200
