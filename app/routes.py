@@ -9,7 +9,7 @@ def validate_task(task_id):
     try:
         task_id = int(task_id)
     except:
-        abort(make_response({"message": f"Sorry, {task_id} is not a valid type ({type(task_id)}). Must be an integer)"}, 400))
+        abort(make_response({"details": f"Invalid data"}, 400))
 
     task = Task.query.get(task_id)
 
@@ -24,10 +24,13 @@ def validate_task(task_id):
 def create_task():
     request_body = request.get_json()
 
-    new_task = Task(
-        title = request_body["title"],
-        description = request_body["description"],
-    )
+    try:
+        new_task = Task(
+            title = request_body["title"],
+            description = request_body["description"],
+        )
+    except:
+        abort(make_response({"details": f"Invalid data"}, 400))
 
     db.session.add(new_task)
     db.session.commit()
