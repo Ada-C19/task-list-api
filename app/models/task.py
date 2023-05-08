@@ -29,3 +29,9 @@ class Task(db.Model):
             "description": self.description,
             "is_complete": self.is_complete()
         }
+    
+    # use this function for PATCH method
+    def update_fields(self, update_dict):
+        self.title = update_dict.get("title", self.title)
+        self.description = update_dict.get("description", self.description)
+        self.completed_at = update_dict.get("completed_at", self.completed_at)
