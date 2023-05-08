@@ -5,6 +5,18 @@ from flask import Blueprint, jsonify, make_response, request, abort
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
+def validate_model(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({"message": f"Task {task_id} is invalid"}, 400))
+
+    task = Task.query.get(task_id)
+
+    if not task:
+        abort(make_response({"message": f"Task {task_id} not found"}, 404))
+
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
