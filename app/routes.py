@@ -2,6 +2,9 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from datetime import datetime
+import os
+import requests
+from slack_sdk import WebClient
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -113,4 +116,18 @@ def mark_task_complete(task_id):
     
     task.completed_at = datetime.utcnow()
     db.session.commit()
+
+    slack_token = os.environ["SLACK_TOKEN"]
+
+    client = WebClient(token=slack_token)
+
+    result = client.chat_postMessage(
+        channel="task-notifications",
+        text=f"Someone just completed the task{task.title}"
+    )
+
+    task_response = task.to_dict()
+
+
+
     return {"task": task.to_dict()}, 200
