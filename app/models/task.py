@@ -10,24 +10,20 @@ class Task(db.Model):
     
 
     def task_to_dict(self):
-        return{
+        task_dict = {
             "id": self.task_id,
             "title": self.title, 
             "description": self.description,
             "is_complete": self.completed_at is not None,
       
         }
-    
-    def task_to_dict_to_goal(self):
-        return{
-            "id": self.task_id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": self.completed_at is not None,
-            "goal_id": self.goal_id
+        if self.goal_id is not None:
+            task_dict["goal_id"] = self.goal_id
 
-        }
+        return task_dict
+
     
+  
 
     
 

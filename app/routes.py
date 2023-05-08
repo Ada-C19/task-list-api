@@ -79,7 +79,7 @@ def get_one_task(task_id):
 #check if task_id exists
     task = validate_task(Task, task_id)
 
-    return jsonify({"task": task.task_to_dict_to_goal()}), 200
+    return jsonify({"task": task.task_to_dict()}), 200
 
 #Update
 @task_bp.route("/<id>", methods=["PUT"])
@@ -297,7 +297,7 @@ def get_tasks_for_specific_goal(goal_id):
   
     task_list = []
     for each_task in tasks_obj_list:
-        task_list.append(each_task.task_to_dict_to_goal())
+        task_list.append(each_task.task_to_dict())
         
     return jsonify(
         {
@@ -306,7 +306,7 @@ def get_tasks_for_specific_goal(goal_id):
             "tasks": task_list
         }
     ), 200
-#reminder - update get/task to use the task_to_dict_to_goal() instead -  last test
+
 #comment out when passing second to last
     # for each_task in tasks_obj_list:
     #     return jsonify(
