@@ -1,7 +1,20 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort, make_response
 from app.models.task import Task
 from app import db
 
+def handle_valid_id(model, task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({'Error':f'Invalid id "{task_id}"'}, 400))
+
+    task = model.query.get(task_id)
+
+    return task if task else abort(make_response(
+        {'Error':f'No {model.__name__} with id {task_id}'}, 404
+        ))    
+
+#Blueprint for tasks, all routes have url prefix (/tasks)
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 @tasks_bp.route("", methods=["POST"])
@@ -35,7 +48,7 @@ def read_all_tasks():
 
 @tasks_bp.route("<task_id>", methods=["GET"])
 def get_task(task_id):
-    task = Task.query.get(task_id)
+    task = handle_valid_id(Task, task_id)
 
     return {"task": task.to_dict()}, 200
 
@@ -47,7 +60,7 @@ def update_task(task_id):
     # if 'title' and 'description' not in request_body:
     #     return {'Error': ""}
     
-    task_to_update = Task.query.get(task_id)
+    task_to_update = handle_valid_id(Task, task_id)
     task_to_update.title = request_body["title"]
     task_to_update.description = request_body["description"]
 
@@ -57,10 +70,10 @@ def update_task(task_id):
 
 @tasks_bp.route("<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task_to_delete = Task.query.get(task_id)
+    task_to_delete = handle_valid_id(Task, task_id)
     db.session.delete(task_to_delete)
     db.session.commit()
 
-    return jsonify({
+    return {
         "details": f'Task {task_id} "{task_to_delete.title}" successfully deleted'
-    }), 200
+    }, 200
