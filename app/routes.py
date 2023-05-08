@@ -55,15 +55,19 @@ def read_all_tasks():
 
     if title_query:
         tasks = Tasks.query.filter_by(title=title_query)
+    
     elif description_query:
         tasks = Task.query.filter_by(description=description_query)
+    
     elif completed_at_query:
         tasks = Task.query.filter_by(completed_at=completed_at_query)
+    
     elif sort_query:
         if sort_query == 'asc':
             tasks = Task.query.order_by(Task.title).all()
         elif sort_query == 'desc':
             tasks = Task.query.order_by(Task.title.desc()).all()
+    
     else:
         tasks = Task.query.all()
 
