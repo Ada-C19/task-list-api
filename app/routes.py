@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
+import copy
 
 tasks_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -39,13 +40,18 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    """Get all tasks or a task by title."""
-    task_query = request.args.get("title")
+    """Get all tasks or a task by param."""
+    sort_query = request.args.get("sort")
 
-    # Retrieve all tasks, or a task specified by title
-    all_tasks = Task.query.all() if not task_query else Task.query.filter_by(title=task_query)
+    # Retrieve all tasks, or a task specified by certain criteria
+    all_tasks = Task.query.all()
 
-    # Add each task in all_tasks to response as a dictionary
+    all_tasks_copy = copy.deepcopy(all_tasks)
+    if sort_query == "asc":
+        all_tasks = sorted(all_tasks_copy, key=lambda t: t.title)
+    elif sort_query == "desc":
+        all_tasks = sorted(all_tasks_copy, key=lambda t: t.title, reverse=True)
+
     response = [task.to_dict() for task in all_tasks]
 
     return jsonify(response), 200
