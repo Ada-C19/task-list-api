@@ -13,6 +13,7 @@ load_dotenv()
 
 
 def create_app(test_config=None):
+
     app = Flask(__name__)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -25,10 +26,6 @@ def create_app(test_config=None):
             "SQLALCHEMY_TEST_DATABASE_URI")
         
     
-    
-    
-        
-    SLACK_SIGNING_SECRET = os.environ['SLACK_SIGNING_SECRET']
 
 
     # Import models here for Alembic setup
@@ -40,7 +37,8 @@ def create_app(test_config=None):
 
      # Register Blueprints here
 
-    from .routes import tasks_bp, goals_bp
+    from .routes.routes import goals_bp
+    from .routes.tasks_routes import tasks_bp
     app.register_blueprint(tasks_bp)
     app.register_blueprint(goals_bp)   
 
