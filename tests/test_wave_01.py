@@ -19,7 +19,8 @@ def test_get_tasks_no_saved_tasks_200(client):
 def test_get_all_tasks_returns_array_of_tasks_and_200(client, three_tasks):
     response = client.get("/tasks")
     response_body = response.get_json()
-
+    print(response)
+    print(response_body)
     assert response.status_code == 200
     assert response.status == "200 OK"
     assert len(response_body) == 3
@@ -153,8 +154,7 @@ def test_create_task_must_contain_title_400(client):
         "description": "Test Description"
     })
     response_body = response.get_json()
-    print(response)
-    print(response_body)
+
     # Assert
     assert response.status_code == 400
     assert "details" in response_body
@@ -170,8 +170,7 @@ def test_create_task_must_contain_description_400(client):
         "title": "A Brand New Task"
     })
     response_body = response.get_json()
-    print(response)
-    print(response_body)
+
     # Assert
     assert response.status_code == 400
     assert "details" in response_body

@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 from sqlalchemy import asc, desc
+from datetime import datetime
+from pytz import timezone
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
@@ -10,7 +12,7 @@ def get_task_instance(request):
         return Task(
                 title = task_info["title"],
                 description = task_info["description"],
-                completed_at = None
+                completed_at = task_info["completed_at"]
     )
 
 def validate_task_id(task_id):
@@ -33,8 +35,17 @@ def get_task_by_id(task_id):
 def update_task_from_request(task, request):
     task_info = request.get_json()
 
-    task.title = task_info["title"],
-    task.description = task_info["description"],
+        # now = datetime.now(timezone.utc)
+
+    if 'title' in task_info:
+        task.title = task_info['title']
+    if 'description' in task_info:
+        task.description = task_info['description']
+    # if 'completed_at' in task_info:
+    #     task.completed_at = task_info['completed_at']
+
+    # task.title = task_info["title"],
+    # task.description = task_info["description"],
     task.completed_at = None
 
     return task
@@ -76,7 +87,7 @@ def create_task():
 
 @tasks_bp.route("", methods=['GET'])
 def get_tasks():
-    sort_order = request.args.get("sort", "asc")
+    sort_order = request.args.get("sort", None)
 
     tasks = Task.query
 
@@ -94,8 +105,6 @@ def get_tasks():
     task_list = [task.to_json() for task in tasks]
 
     return jsonify(task_list), 200
-
-
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def get_one_task(task_id):
@@ -125,55 +134,144 @@ def delete_task(task_id):
     return make_response({"details" : message}), 200
 
 
+@tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
+def mark_task_completed(task_id):
+    task = get_task_by_id(task_id)
+    if task.completed_at:
+        return make_response(jsonify({"message": f"Task {task_id} is already completed."}), 400)
+    task.completed_at = datetime.now(timezone.utc)
+    db.session.commit()
+    task = task.to_json()
+    task["is_complete"] = True
+    return make_response(jsonify({"task": task}), 200)
 
 
-# ### Create a Task: Invalid Task With Missing Data
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
+def mark_task_incomplete(task_id):
+    task = get_task_by_id(task_id)
+    if not task.completed_at:
+        return make_response(jsonify({"message": f"Task {task_id} is already incomplete."}), 400)
+    task.completed_at = None
+    db.session.commit()
+    task = task.to_json()
+    task["is_complete"] = False
+    return make_response(jsonify({"task": task}), 200)
 
-# #### Missing `title`
 
-# As a client, I want to be able to make a `POST` request to `/tasks` with the following HTTP request body
+# @tasks_bp.errorhandler(404)
+# def handle_task_not_found(error):
+#     return make_response(jsonify({"message": "Task not found."}), 404)
+
+
+
+
+
+# ### Mark Complete on an Incompleted Task
+
+# Given a task that has:
+
+# - An id `1`
+# - A `completed_at` attribute with a `null` value
+
+# when I send a `PATCH` request to `/tasks/1/mark_complete`,
+
+# then the task is updated, so that its `completed_at` value is the current date, and I get this response:
+
+# `200 OK`
 
 # ```json
 # {
-#   "description": "Test Description",
-#   "completed_at": null
+#   "task": {
+#     "id": 1,
+#     "title": "Go on my daily walk 🏞",
+#     "description": "Notice something new every day",
+#     "is_complete": true
+#   }
 # }
 # ```
 
-# and get this response:
+# ### Mark Incomplete on a Completed Task
 
-# `400 Bad Request`
+# Given a task that has:
+
+# - An id `1`
+# - A `completed_at` attribute with a datetime value
+
+# when I send a `PATCH` request to `/tasks/1/mark_incomplete`,
+
+# then the task is updated, so that its `completed_at` value is `null`/`None`, and I get this response:
+
+# `200 OK`
 
 # ```json
 # {
-#   "details": "Invalid data"
+#   "task": {
+#     "id": 1,
+#     "title": "Go on my daily walk 🏞",
+#     "description": "Notice something new every day",
+#     "is_complete": false
+#   }
 # }
 # ```
 
-# so that I know I did not create a Task that is saved in the database.
+# ### Mark Complete on a Completed Task
 
-# #### Missing `description`
+# Given a task that has:
 
-# If the HTTP request is missing `description`, we should also get this response:
+# - An id `1`
+# - A `completed_at` attribute with a datetime value
 
-# `400 Bad Request`
+# when I send a `PATCH` request to `/tasks/1/mark_complete`,
+
+# then I want this to behave exactly like `/tasks/1/mark_complete` for an incomplete task. The task is updated, so that its `completed_at` value is the current date, and I get this response:
+
+# `200 OK`
 
 # ```json
 # {
-#   "details": "Invalid data"
+#   "task": {
+#     "id": 1,
+#     "title": "Go on my daily walk 🏞",
+#     "description": "Notice something new every day",
+#     "is_complete": true
+#   }
 # }
 # ```
 
-# #### Missing `completed_at`
+# ### Mark Incomplete on an Incompleted Task
 
-# If the HTTP request is missing `completed_at`, we should also get this response:
+# Given a task that has:
 
-# `400 Bad Request`
+# - An id `1`
+# - A `completed_at` attribute with a `null` value
+
+# when I send a `PATCH` request to `/tasks/1/mark_incomplete`,
+
+# then I want this to behave exactly like `/tasks/1/mark_incomplete` for a complete task. Its `completed_at` value remains as `null`/`None`, and I get this response:
+
+# `200 OK`
 
 # ```json
 # {
-#   "details": "Invalid data"
+#   "task": {
+#     "id": 1,
+#     "title": "Go on my daily walk 🏞",
+#     "description": "Notice something new every day",
+#     "is_complete": false
+#   }
 # }
 # ```
 
-# __________
+# ## Mark Complete and Mark Incomplete for Missing Tasks
+
+# Given that there are no tasks with the ID `1`,
+
+# When I send a `PATCH` request to `/tasks/1/mark_complete` or a `PATCH` request to `/tasks/1/mark_incomplete`,
+
+# Then I get a `404 Not Found`.
+
+# You may choose the response body.
+
+# Make sure to complete the tests for non-existing tasks to check that the correct response body is returned.
+
+# _________

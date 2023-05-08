@@ -1,6 +1,3 @@
-
-
-
 ### Edge Cases
 
 Many waves are missing many edge case considerations. Consider different edge cases in each wave, make decisions for what should happen, and then implement it!
@@ -37,10 +34,6 @@ Consider places in your code that deal with one model at a time. Is there any re
     - Converts JSON into a new instance of `Task`
     - Takes in a dictionary in the shape of the JSON our API receives in the create and update routes
     - Returns an instance of `Task` 
-
-
-
-
 
 ### More Query Params
 
