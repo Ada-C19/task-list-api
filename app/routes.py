@@ -132,7 +132,7 @@ def validate_item(task_id):
     return task
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def mark_complete_task(task_id):
+def mark_complete_on_incomplete_task(task_id):
     task = validate_item(task_id)
 
     task.completed_at = datetime.now()
