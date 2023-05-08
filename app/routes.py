@@ -37,6 +37,4 @@ def read_all_tasks():
 def get_task(task_id):
     task = Task.query.get(task_id)
 
-    return {
-        "task": task.to_dict()
-    }
+    return {"task": task.to_dict()}, 200
