@@ -97,7 +97,7 @@ def delete_one_task(task_id):
 def mark_complete(task_id):
     slack_api = os.environ.get("SLACK_BOT_TOKEN")
     task = validate_task(task_id)
-    task.is_complete = True
+    # task.is_complete = True
     task.completed_at = datetime.now()
     db.session.commit()
     # url = 'https://slack.com/api/chat.postMessage'
