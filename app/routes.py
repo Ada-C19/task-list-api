@@ -32,3 +32,47 @@ def add_task():
 
     return {"msg": f"Task {new_task.title} successfully created"}, 201
 
+@task_bp.route("", methods=["GET"])
+def add_task():
+    response = []
+
+    title_query = request.args.get("title")
+
+    if title_query is None:
+        all_tasks = Task.query.all()
+    else:
+        all_tasks = Task.query.filter_by(title=title_query)
+
+    for task in all_tasks:
+        response.append(task.to_dict())
+
+    return (jsonify(response), 200)
+
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_task(task_id)
+
+    return task.to_dict(), 200
+
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+    task.completed_at = request_body["completed_at"]
+
+    db.session.commit()
+
+    return make_response({"msg": f"Task {task_id} was successfully updated"}, 200)
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_task(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"msg": f"Task {task_id} was deleted"}, 200)
