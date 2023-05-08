@@ -24,6 +24,7 @@ class Task(db.Model):
                     title=task.title,
                     description=task.description,
                     is_complete=True)
+            
         if task.goal_id:
             task_dict['goal_id'] = task.goal_id
         return task_dict
