@@ -46,9 +46,9 @@ def get_all_tasks():
 
     # Retrieve all tasks, and order by asc or desc if specifed
     if sort_query == "asc":
-        all_tasks = Task.query.order_by(Task.title.asc())
+        all_tasks = Task.query.order_by(Task.title.asc()).all()
     elif sort_query == "desc":
-        all_tasks = Task.query.order_by(Task.title.desc())
+        all_tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         all_tasks = Task.query.all()
 
