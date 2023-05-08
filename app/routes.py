@@ -39,9 +39,15 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    #Retrieve a list of all the task objects in database
-    all_tasks = Task.query.all()
-    
+    #/tasks?sort=asc
+    query_param = request.args.get("sort")
+    if query_param == "asc":
+        all_tasks = Task.query.order_by(Task.title.asc())
+    elif query_param == 'desc':
+        all_tasks = Task.query.order_by(Task.title.desc())
+    else:
+        all_tasks = Task.query.all() #Retrieve a list of all the task objects in database
+
     tasks_response = []
     for task in all_tasks:
         tasks_response.append(task.to_dict())
