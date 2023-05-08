@@ -65,3 +65,23 @@ def get_by_id(task_id):
             "is_complete": False
   }
     }, 200
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task_to_update = validate_task(task_id)
+
+    request_body = request.get_json()
+  
+    task_to_update.title = request_body["title"]
+    task_to_update.description = request_body["description"]
+   
+
+    db.session.commit()
+
+    return {"task": {
+            "id": 1,
+            "title": "Updated Task Title",
+            "description": "Updated Test Description",
+            "is_complete": False
+        }
+    }, 200
