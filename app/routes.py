@@ -2,9 +2,14 @@ from app import db
 from app.models.task import Task 
 from flask import Blueprint, make_response, abort, request, jsonify
 from datetime import datetime
+import os
+import requests
+from dotenv import load_dotenv
+load_dotenv()
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+API_KEY = os.environ.get("API_KEY")
 
 #helper function
 def validate_model(cls, model_id):
@@ -22,28 +27,33 @@ def validate_model(cls, model_id):
     return model 
 
 
+def post_to_slack(task_title):
+    slack_url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": f"Bearer {API_KEY}"
+    }
+    data = {
+        "channel": "task-notification",
+        "text": f"Someone just completed the task {task_title}"
+    }
+
+    response = requests.post(slack_url, headers=headers, data=data)
+    return response
+
+
+
 #routes
 
 @task_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-
-    if "title" not in request_body or "description" not in request_body:
-        abort(make_response({"details": "Invalid data"}, 400))
-
-    new_task = Task.from_dict(request_body)
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return make_response(jsonify({
-        "task": {
-            "id" : new_task.task_id,
-            "title" : new_task.title,
-            "description" : new_task.description,
-            "is_complete" : False
-        }
-    }), 201)
+    try: 
+        new_task = Task.from_dict(request_body)
+        db.session.add(new_task)
+        db.session.commit()
+        return make_response({"task": new_task.to_dict()}, 201)
+    except:
+        return make_response({"details": "Invalid data"}, 400)
 
 
 @task_bp.route("", methods=["GET"])
@@ -109,13 +119,9 @@ def mark_complete(task_id):
 
     db.session.commit()
 
-    return {"task": {
-    "id": task.task_id,
-    "title": task.title,
-    "description": task.description,
-    "is_complete": True
-    }
-}
+    post_to_slack(task.title)
+
+    return make_response({"task": task.to_dict()}, 200)
 
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
