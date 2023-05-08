@@ -110,7 +110,6 @@ def get_tasks_one_goal(goal_id):
 
     for task in goal.tasks:
         task_dict = task.to_dict()
-        task_dict["goal_id"] = int(goal_id)
         goal_dict["tasks"].append(task_dict)
 
 

@@ -8,8 +8,6 @@ from slack_sdk import WebClient
 import os
 import requests
 from slack_sdk.errors import SlackApiError
-# import ssl
-# ssl._create_default_https_context = ssl._create_unverified_context
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
