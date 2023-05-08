@@ -29,3 +29,9 @@ def read_all_tasks():
     all_tasks = [task.to_dict() for task in tasks]
 
     return jsonify(all_tasks), 200
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def read_one_task(task_id):
+    task = validate_model(Task, task_id)
+
+    return make_response({"task": task.to_dict()}, 200)
