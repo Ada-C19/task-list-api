@@ -2,9 +2,18 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 from datetime import datetime
+import requests
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
 
 task_bp = Blueprint("tasks", __name__,url_prefix="/tasks")
 
+path = "https://slack.com/api/chat.postMessage"
+KEY = os.environ.get("API_SECRET_KEY")
+    
 # helper function
 def validate_task(id):
     try:
@@ -87,9 +96,16 @@ def update_to_complete(task_id):
     response_dict = {}
     response_dict["task"] = task.to_dict()
     response_dict["task"]["is_complete"] = True
-    
-    
+    headers = {
+        'Authorization': KEY,
+    }
+    data = {
+                    "channel":"#api-test-channel",
+                    "text":f"Someone just completed the task {task.title}"    
+    }
+    requests.post(path, headers=headers, data=data ).json()
     return make_response(response_dict, 200)
+    
 
 @task_bp.route('/<task_id>/mark_incomplete', methods = ['PATCH'])
 def update_to_incomplete(task_id):
