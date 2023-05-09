@@ -10,6 +10,20 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 
+def validate_goal_by_id(id):
+    try:
+        id = int(id)
+    except:
+        abort(make_response({"message":f"Goal {id} invalid"}, 400))
+
+    goal = Goal.query.get(id)
+
+    if not goal:
+        abort(make_response({"message":f"goal {id} not found"}, 404)) 
+    
+    return goal
+
+
 def validate_task_by_id(id):
     try:
         id = int(id)
@@ -147,5 +161,5 @@ def get_all_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    goal = Goal.query.get(goal_id)
+    goal = validate_goal_by_id(goal_id)
     return {"goal": goal.to_dict()}, 200
