@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from datetime import datetime
 import os, requests
@@ -116,3 +117,18 @@ def mark_incomplete(id):
 
     db.session.commit()
     return {"task": task.to_dict()}, 200
+
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+
+    if "title" not in request_body:
+        abort(make_response({"details":"Invalid data"}, 400))
+
+    new_goal = Goal(title=request_body["title"])
+    
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_dict()}, 201
