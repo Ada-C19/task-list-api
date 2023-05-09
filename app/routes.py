@@ -27,7 +27,6 @@ def create_task():
         return {"details": "Invalid data"}, 400
     
 
-
     db.session.add(new_task)
     db.session.commit()
 
