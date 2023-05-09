@@ -50,10 +50,23 @@ def read_one_task(task_id):
     return task.to_dict()
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
-def delete_book(task_id):
+def delete_task(task_id):
     
     task = validate_task(task_id)
     db.session.delete(task)
     db.session.commit()
 
     return make_response(f"task #{task_id} successfully deleted",200)
+
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    db.session.commit()
+
+    return make_response(f"book #{task_id} successfully updated",200)
