@@ -51,8 +51,10 @@ def create_new_task():
 @task_bp.route("/<task_id>", methods = ["GET"])
 def get_task_by_id(task_id):
     task = validate_item(Task, task_id)
-
-    return {"task": task.to_dict()}, 200
+    if task.goal_id:
+        return {"task": task.to_dict_with_goal()}, 200
+    else: 
+        return {"task": task.to_dict()}, 200
 
 
 @task_bp.route("/<task_id>", methods = ["PUT"])
