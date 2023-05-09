@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
 from app.models.goal import Goal
-from app.routes import validate_model
+from app.task_routes import validate_model
 from datetime import datetime
 import requests
 import os

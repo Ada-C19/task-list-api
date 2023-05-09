@@ -45,6 +45,7 @@ def create_task():
         }
     }, 201
 
+
 @tasks_bp.route("", methods=['GET'])
 def read_all_tasks():
     task_response = []
