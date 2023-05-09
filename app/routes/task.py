@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.task import Task
+import requests
+from datetime import datetime
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -19,17 +21,28 @@ def create_one_task():
 
 
 
+# @task_bp.route("", methods=["GET"])
+# def get_tasks():
+#     response = []
+#     title_query = request.args.get("title")
+#     if title_query is None:
+#         all_tasks = Task.query.all()
+#     else:
+#         all_tasks = Task.query.filter_by(title = title_query)
+#     for task in all_tasks:
+#         response.append(task.to_dict())   
+#     return jsonify(response), 200
 @task_bp.route("", methods=["GET"])
 def get_tasks():
-    response = []
-    title_query = request.args.get("title")
-    if title_query is None:
-        all_tasks = Task.query.all()
+    sort_direction = request.args.get("sort", default="desc")
+    if sort_direction == "asc":
+        all_tasks = Task.query.order_by(Task.title.asc())
     else:
-        all_tasks = Task.query.filter_by(title = title_query)
-    for task in all_tasks:
-        response.append(task.to_dict())   
+        all_tasks = Task.query.order_by(Task.title.desc())
+    
+    response = [task.to_dict() for task in all_tasks]
     return jsonify(response), 200
+
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
