@@ -38,8 +38,6 @@ def create_task():
 
     return {"task": new_task.to_dict()}, 201
 
-@tasks_bp.route("")
-
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -85,7 +83,6 @@ def mark_task_as_complete(task_id):
     task = validate_task(Task, task_id)
 
     task.completed_at = datetime.datetime.now()
-    task.is_complete = True
 
     db.session.commit()
 
@@ -95,7 +92,7 @@ def mark_task_as_complete(task_id):
         "text": f"'{task.title}' has just been completed! 🥳"
     }
 
-    response = requests.post(url="https://slack.com/api/chat.postMessage", data=bot_data)
+    requests.post(url="https://slack.com/api/chat.postMessage", data=bot_data)
 
     return {"task": task.to_dict()}, 200
 
@@ -106,7 +103,6 @@ def mark_task_as_incomplete(task_id):
     task = validate_task(Task, task_id)
 
     task.completed_at = None
-    task.is_complete = False
 
     db.session.commit()
 
@@ -193,3 +189,14 @@ def update_goal(goal_id):
     db.session.commit()
 
     return {"goal": goal.to_dict()}, 200
+
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    """Delete goal specifed by id."""
+    goal = validate_goal(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}, 200
