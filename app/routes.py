@@ -184,5 +184,5 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {
-        "details": f"Task {goal_id} \"{goal.title}\" successfully deleted"
+        "details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"
     }, 200
