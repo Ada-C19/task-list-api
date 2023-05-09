@@ -11,18 +11,14 @@ class Task(db.Model):
         nullable=True)
 
     def to_dict(self):
-        return {"id": self.task_id,
+        new_dict = {"id": self.task_id,
                 "title": self.title,
                 "description": self.description,
                 "is_complete": (self.completed_at!=None)} 
-    
-    def to_dict_with_goal(self):
-        return {"id": self.task_id,
-                "title": self.title,
-                "goal_id": self.goal_id,
-                "description": self.description,
-                "is_complete": (self.completed_at!=None)} 
-    
+        if self.goal_id:
+            new_dict["goal_id"] = self.goal_id
+        return new_dict
+        
     @classmethod
     def from_dict(cls, task_data):
         new_task = cls(title=task_data["title"],
