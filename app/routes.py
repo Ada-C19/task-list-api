@@ -205,3 +205,8 @@ def mark_incomplete_task(task_id):
     }
     }, 200
 
+# CRUD for Goals
+# @goals_bp.route("", methods=["POST"])
+# def add_goal():
+#     request_body = request.get_json()
+#     new_goal = 

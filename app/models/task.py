@@ -24,7 +24,8 @@ class Task(db.Model):
     # Will take in a dict and return a new Task instance
     @classmethod
     def from_dict(cls, task_data):
-        new_task = Task(
+        new_task = cls(
+        # new_task = Task(
         title= task_data["title"],
         description= task_data['description'],
         completed_at= task_data['completed_at'])
