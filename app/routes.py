@@ -39,7 +39,7 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    tasks = Task.query.all()
+    tasks = Task.query.order_by(Task.title.asc()).all()
     tasks_response = []
 
     for task in tasks:
