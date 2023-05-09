@@ -18,10 +18,9 @@ class Task(db.Model):
             "is_complete": self.completed_at is not None
         }
         if self.goal:
-            task_dict["goal"] = self.goal.name
+            task_dict["goal"] = self.goal.title
 
         return task_dict
-
 
 
     @classmethod
