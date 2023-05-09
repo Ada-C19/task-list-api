@@ -9,8 +9,9 @@ class Task(db.Model):
     
     @classmethod 
     def from_dict(cls, data_dict):
-        return cls(name = data_dict["name"],
-                description = data_dict["description"])
+        return cls(title = data_dict["title"],
+                description = data_dict["description"],
+                completed_at = data_dict["completed_at"])
 
     def to_dict(self):
         return dict(
