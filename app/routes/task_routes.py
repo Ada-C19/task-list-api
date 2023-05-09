@@ -1,6 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
 from app import db
+from .routes_helpers import validate_model
 from datetime import date
 import requests
 import os
@@ -49,7 +50,7 @@ def read_tasks():
 # GET ONE TASK ENDPOINT
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     return {"task": task.to_dict()}
 
@@ -58,7 +59,7 @@ def read_one_task(task_id):
 def update_task(task_id):
     request_body = request.get_json()
 
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     task.title = request_body["title"]
     task.description = request_body["description"]
@@ -69,7 +70,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     path = "https://slack.com/api/chat.postMessage"
 
@@ -91,7 +92,7 @@ def mark_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     task.completed_at = None
     
@@ -102,24 +103,9 @@ def mark_incomplete(task_id):
 # DELETE TASK ENDPOINT
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
 
     return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
-
-
-# HELPER FUNCTIONS
-def validate_task(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message": f"Task {task_id} invalid"}, 400))
-
-    task = Task.query.get(task_id)
-
-    if not task:
-        abort(make_response({"message": f"Task {task_id} not found"}, 404))
-
-    return task

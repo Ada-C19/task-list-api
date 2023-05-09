@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app.models.goal import Goal
 from app.models.task import Task
+from .routes_helpers import validate_model
 from app import db
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -23,7 +24,7 @@ def create_goal():
 # CREATE TASK TO GOAL ENDPOINT
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def create_task(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal,goal_id)
 
     request_body = request.get_json()
 
@@ -51,14 +52,14 @@ def read_goals():
 # GET ONE GOAL ENDPOINT
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     return {"goal": goal.to_dict()}
 
 # GET TASK BY GOAL ENDPOINT
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def read_task_by_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     tasks = Task.query.filter(Task.goal_id == goal.goal_id)
 
@@ -75,7 +76,7 @@ def read_task_by_goal(goal_id):
 def update_goal(goal_id):
     request_body = request.get_json()
 
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     goal.title = request_body["title"]
 
@@ -86,7 +87,7 @@ def update_goal(goal_id):
 # DELETE GOAL ENDPOINT
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
@@ -95,19 +96,6 @@ def delete_goal(goal_id):
 
 
 # HELPER FUNCTIONS
-def validate_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
-
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
-
-    return goal
-
 def task_dict(task):
     return {
         "id": task.task_id,
