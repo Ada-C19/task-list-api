@@ -3,6 +3,7 @@ from datetime import datetime
 import requests, os
 from app.models.goal import Goal
 from app import db
+from app.routes.routes_helper_function import handle_valid_id
 
 #Blueprint for goals, all routes have url prefix (/goals)
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -34,3 +35,9 @@ def read_all_goals():
         goals_response.append(goal.to_dict())
 
     return jsonify(goals_response), 200
+
+@goals_bp.route("<goal_id>", methods=["GET"])
+def get_goal(goal_id):
+    goal = handle_valid_id(Goal, goal_id)
+
+    return {"goal": goal.to_dict()}, 200

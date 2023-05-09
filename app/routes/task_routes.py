@@ -3,18 +3,7 @@ from datetime import datetime
 import requests, os
 from app.models.task import Task
 from app import db
-
-def handle_valid_id(model, task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({'Error':f'Invalid id "{task_id}"'}, 400))
-
-    task = model.query.get(task_id)
-
-    return task if task else abort(make_response(
-        {'Error':f'No {model.__name__} with id {task_id}'}, 404
-        ))    
+from app.routes.routes_helper_function import handle_valid_id
 
 #Blueprint for tasks, all routes have url prefix (/tasks)
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
