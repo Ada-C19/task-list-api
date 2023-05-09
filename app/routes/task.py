@@ -1,9 +1,11 @@
-from flask import Blueprint, jsonify, abort, make_response, request
-from app.models.task import Task
+from flask import Blueprint, jsonify, request
 from app import db
 from datetime import date
 import requests
 import os
+
+from app.models.task import Task
+from app.routes.routes_helper import get_valid_item_by_id
 
 
 SLACK_ENDPOINT = "https://slack.com/api/chat.postMessage"
@@ -15,24 +17,10 @@ SLACK_HEADERS = {
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
-# Helper function
-def validate_task(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"details": "Invalid data"}, 400))
-    
-    task = Task.query.get(task_id)
-    
-    return task if task else abort(make_response({'msg': f"No task with id {task_id}"}, 404))
-
-
 def send_slack_msg(new_data):
-
     slack_response = requests.post(SLACK_ENDPOINT, headers=SLACK_HEADERS, json=new_data)
 
 
-# Routes
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -69,7 +57,7 @@ def handle_tasks():
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def handle_task(task_id):
-    task = validate_task(task_id)
+    task = get_valid_item_by_id(Task, task_id)
     return {"task": task.to_dict()}, 200
 
 
@@ -77,7 +65,7 @@ def handle_task(task_id):
 def update_one_task(task_id):
     request_body = request.get_json()
 
-    task_to_update = validate_task(task_id)
+    task_to_update = get_valid_item_by_id(Task, task_id)
 
     task_to_update.title = request_body["title"]
     task_to_update.description = request_body["description"]
@@ -89,7 +77,7 @@ def update_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_one_task(task_id):
-    task_to_delete = validate_task(task_id)
+    task_to_delete = get_valid_item_by_id(Task, task_id)
 
     db.session.delete(task_to_delete)
     db.session.commit()
@@ -102,11 +90,11 @@ def delete_one_task(task_id):
 
 @tasks_bp.route("/<task_id>/<mark_status>", methods=['PATCH'])
 def mark_task(task_id, mark_status):
-    task_to_mark = validate_task(task_id)
+    task_to_mark = get_valid_item_by_id(Task, task_id)
     
     if mark_status == "mark_complete":
         task_to_mark.completed_at = date.today()
-        # Send notification in Slack
+        # Send notification to Slack
         send_slack_msg(
             {
                 "channel": "task-notifications",
