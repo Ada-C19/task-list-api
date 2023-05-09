@@ -4,9 +4,13 @@ from flask import Blueprint
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import desc, asc
 from datetime import datetime
+import requests
 import pytz
+import os
+from dotenv import load_dotenv
+# load_dotenv()
 
-
+SLACK_API_KEY = os.environ.get('SLACK_API_KEY')
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 def validate_model(cls, model_id):
@@ -94,6 +98,15 @@ def patch_task_completion(task_id, completion_marker):
 
     if completion_marker == 'mark_complete':
         task_to_update.completed_at = datetime.now()
+        path = "https://slack.com/api/chat.postMessage"
+        auth_header = {
+        "Authorization": f"Bearer {SLACK_API_KEY}"
+        }
+        request_body = {
+            "channel": "task-notifications",
+            "text": f"Someone just completed the task {task_to_update.title}"
+        }
+        requests.post(path, headers=auth_header, data=request_body)
     elif completion_marker == 'mark_incomplete':
         task_to_update.completed_at = None
 
