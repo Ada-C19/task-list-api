@@ -44,9 +44,8 @@ def get_goal(goal_id):
 
 @goals_bp.route("<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    request_body = request.get_json()
-        
     goal_to_update = handle_valid_id(Goal, goal_id)
+    request_body = request.get_json()
     goal_to_update.title = request_body["title"]
     
     db.session.commit()
