@@ -1,5 +1,6 @@
 from app import db 
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
 from datetime import datetime
@@ -7,6 +8,7 @@ import requests
 import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 #helper functions
 def validate_task(task_id):
@@ -108,6 +110,60 @@ def mark_task_incomplete(task_id):
     db.session.commit()
 
     return jsonify({"task":task.to_dict()}),200
+
+#Wave 5
+
+def validate_goal(goal_id):
+    try: 
+        goal_id = int(goal_id)
+    except: 
+        abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
+
+    goal= Goal.query.get(goal_id)
+
+    if not goal: 
+        abort(make_response({"message": f"Goal {goal_id} invalid"}, 404))
+    
+    return goal
+    
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    new_goal=Goal(title=request_body["title"])
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify({"goal":new_goal.to_dict()}),201
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    goals = Goal.query.all()
+    goals_response = [goal.to_dict() for goal in goals]
+
+    return jsonify(goals_response), 200
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal= validate_goal(goal_id)
+
+    return jsonify({"goal":goal.to_dict()}),200
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal= validate_goal(Goal, goal_id)
+    request_body= request.get_jason()
+    goal.title=request_body["title"]
+    db.session.commit()
+    
+    return jsonify({"goal":goal.to_dict()}),200
+
+
+
+
+
+
+
 
 
 
