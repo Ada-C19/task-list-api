@@ -8,6 +8,8 @@ task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 def create_task(): 
     request_body = request.get_json()
 
+    if "title" not in request_body or "description" not in request_body: 
+        return make_response({"details" : "Invalid data"}, 400)
 
     new_task = Task(
         title=request_body["title"],
@@ -31,7 +33,7 @@ def get_all_tasks():
     return jsonify(response), 200
 
 @task_bp.route("/<task_id>", methods=["GET"])
-def get_one_task(task_id): 
+def read_one_task(task_id): 
     task = validate_item(Task, task_id)
     return {"task": task.to_dict()}, 200 
 
@@ -63,4 +65,9 @@ def validate_item(model, item_id):
     except ValueError: 
         return abort(make_response({"msg": f"invalid id: {item_id}"}, 400))
     
-    return model.query.get_or_404(item_id)
+    model = model.query.get(item_id)
+
+    if not model: 
+        abort(make_response({"msg": f"{item_id} not found"}, 404))
+    
+    return model 
