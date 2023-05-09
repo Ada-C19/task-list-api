@@ -11,14 +11,12 @@ def add_task():
     request_body = request.get_json()
     new_task = Task.from_dict(request_body)
     
+    # if "title" 
 
     db.session.add(new_task)
     db.session.commit()
 
     return {"task" : new_task.to_dict()}, 201
-
-@task_bp.route("", methods=["POST"])
-def create_task():
 
 
 @task_bp.route("", methods=["GET"])

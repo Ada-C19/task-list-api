@@ -21,5 +21,5 @@ class Task(db.Model):
         return cls(
             title = task_data["title"],
             description = task_data["description"],
-            completed_at = task_data["completed_at"],
+            completed_at = task_data.get("completed_at", None)
         )
