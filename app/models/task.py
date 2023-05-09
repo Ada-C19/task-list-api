@@ -12,7 +12,7 @@ class Task(db.Model):
                 id=self.task_id,
                 title=self.title,
                 description=self.description,
-                is_complete=self.completed_at != None,  # if/else
+                is_complete=self.completed_at != None,
             )
         
     # @classmethod

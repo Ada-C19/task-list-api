@@ -40,18 +40,23 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
-    tasks = Task.query.all()
+    tasks = Task.query.order_by(Task.title.asc()).all()
+    tasks = Task.query.order_by(Task.title.desc()).all()
     tasks_list = []
     for task in tasks:
         tasks_list.append(task.to_dict())
     return jsonify(tasks_list)
+    # tasks = Task.query.all()
+    # tasks_list = []
+    # for task in tasks:
+    #     tasks_list.append(task.to_dict())
+    # return jsonify(tasks_list)
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     tasks = validate_task(id)
     task_dict = dict(task=tasks.to_dict())
     
-    # return task_dict
     return make_response(jsonify(task_dict), 200)
 
 @tasks_bp.route("/<id>", methods=["PUT"])
