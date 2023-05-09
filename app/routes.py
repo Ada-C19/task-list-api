@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, abort, make_response
-from app.models.task import Task
 from app import db
+from app.models.task import Task
+from app.routes_helper import validate_item_by_id
 from datetime import datetime
 import os
 import requests
@@ -12,13 +13,13 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 # def endpoint_name():
 #     my_beautiful_response_body = "Hello, World!"
 #     return my_beautiful_response_body
-def validate_task(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"msg": f"Invalid id '{task_id}'"}, 400))
-    task = Task.query.get(task_id)
-    return task if task else abort(make_response({"msg": f"Na task with task id '{task_id}'"}, 404))
+# def validate_id(task_id):
+#     try:
+#         task_id = int(task_id)
+#     except:
+#         abort(make_response({"msg": f"Invalid id '{task_id}'"}, 400))
+#     task = Task.query.get(task_id)
+#     return task if task else abort(make_response({"msg": f"Na task with task id '{task_id}'"}, 404))
         
 @tasks_bp.route("", methods=["POST"])
 def create_a_task():
@@ -65,7 +66,7 @@ def get_saved_tasks():
     
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item_by_id(Task, task_id)
     return {
         "task": task.to_dict()
     }, 200
@@ -73,7 +74,7 @@ def get_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
     request_body = request.get_json()
-    task = validate_task(task_id)
+    task = validate_item_by_id(Task, task_id)
     if "title" in request_body:
         task.title = request_body["title"]
     if "description" in request_body:
@@ -83,7 +84,7 @@ def update_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
-    task_to_delete = validate_task(task_id)
+    task_to_delete = validate_item_by_id(Task, task_id)
     
     db.session.delete(task_to_delete)
     db.session.commit()
@@ -95,7 +96,7 @@ def delete_one_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     slack_api = os.environ.get("SLACK_BOT_TOKEN")
-    task = validate_task(task_id)
+    task = validate_item_by_id(Task, task_id)
     task.completed_at = datetime.now()
     db.session.commit()
     data = {
@@ -110,7 +111,10 @@ def mark_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_item_by_id(Task, task_id)
     task.completed_at = None
     db.session.commit()
     return {"task": task.to_dict()},200
+
+# Blueprint for goals
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
