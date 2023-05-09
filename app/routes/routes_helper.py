@@ -1,7 +1,7 @@
 from flask import abort, make_response
 
 
-def validate_task(task_id):
+def get_valid_item_by_id(task_id):
     try:
         task_id = int(task_id)
     except:
