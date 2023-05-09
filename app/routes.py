@@ -34,7 +34,6 @@ def create_one_task():
     # except KeyError:
     #     return {"details": "Invalid data"}, 400
 
-
     if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
     else:
