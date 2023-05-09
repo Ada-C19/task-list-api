@@ -3,8 +3,8 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime 
-from slack_sdk import WebClient
-# import requests
+# from slack_sdk import WebClient
+import requests
 import os
 
 
@@ -132,6 +132,7 @@ def sort_title_asc_and_desc():
 # mark complete
 @task_bp.route("/<task_id>/mark_complete", methods = ["PATCH"])
 def mark_complete(task_id):
+
     task = Task.query.get(task_id)
     if not task:
         return jsonify({"msg": "task not found"}), 404
@@ -142,19 +143,19 @@ def mark_complete(task_id):
 
         db.session.commit()
 
-        # url = "https://slack.com/api/chat.postMessage"
-        # token = os.environ.get("SLACKBOT_TOKEN")
-        # data ={"channel": "task-notifications",
-        #        "text": f"Someone just completed a task {task.title}",
-        #        "token": token
-        #        }
-        
-        # response = requests.post(url, data = data)
+        url = "https://slack.com/api/chat.postMessage"
+        token = os.environ.get("SLACKBOT_TOKEN")
+        data ={"channel": "task-notifications",
+               "text": f"Someone just completed a task {task.title}",
+               "token": token
+               }
+        response = requests.post(url, data = data)
 
 
-        message = f"Someone just completed a task {task.title}"
-        client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
-        response = client.chat_postMessage(channel="task-notifications", text=message)
+        # this is the part with slack module:
+        # message = f"Someone just completed a task {task.title}"
+        # client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+        # response = client.chat_postMessage(channel="task-notifications", text=message)
 
          
     return jsonify({"task":task.to_dict()}), 200
