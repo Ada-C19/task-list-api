@@ -44,6 +44,15 @@ def update_one_task(task_id):
 
     return make_response(task.to_dict() , 200)
 
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task = verify_item(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"details": f"Task {task.task_id} \" {task.description} \" successfully deleted"})
+
 def verify_item(model, item_id):
     try: 
         item_id = int(item_id)
