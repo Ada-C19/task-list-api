@@ -9,6 +9,7 @@ migrate = Migrate()
 
 load_dotenv()
 
+
 def create_app(testing=None):
     app = Flask(__name__)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -17,6 +18,7 @@ def create_app(testing=None):
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI")
     else:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_TEST_DATABASE_URI")
+        app.config["SLACK_TOKEN"] = os.environ.get("SLACK_TOKEN")
 
     from app.models.task import Task
     from app.models.goal import Goal
