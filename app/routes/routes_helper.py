@@ -3,7 +3,7 @@ from flask import abort, make_response
 
 def get_valid_item_by_id(model, id):
     try:
-        task_id = int(id)
+        id = int(id)
     except:
         abort(make_response({"details": "Invalid data"}, 400))
     
