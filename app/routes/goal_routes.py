@@ -42,10 +42,7 @@ def create_task(goal_id):
 def read_goals():
     goals = Goal.query.all()
 
-    goals_response = []
-
-    for goal in goals:
-        goals_response.append(goal.to_dict())
+    goals_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goals_response)
 
