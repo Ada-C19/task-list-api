@@ -40,8 +40,3 @@ class Task(db.Model):
             abort(make_response(jsonify({"details": "Invalid data"}), 400))
 
     
-    # def update_completed_at(self, value):
-    #     try:
-    #         self.completed_at = value
-    #     except KeyError: 
-    #         abort(make_response(jsonify({"details": "Invalid data"}), 400))

@@ -67,10 +67,7 @@ def delete_task(task_id):
 def mark_task_complete(task_id):
     task = validate_model(Task, task_id)
 
-    try:
-        task.completed_at = date.today()
-    except KeyError:
-        abort(make_response(jsonify({"details": "Invalid data"}), 404))
+    task.completed_at = date.today()
 
     db.session.commit()
 
@@ -81,11 +78,7 @@ def mark_task_complete(task_id):
 def mark_task_incomplete(task_id):
     task = validate_model(Task, task_id)
 
-    try:
-        task.completed_at = None
-    except KeyError:
-        abort(make_response(jsonify({"details": "Invalid data"}), 404))
-
+    task.completed_at = None
 
     db.session.commit()
 
