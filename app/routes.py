@@ -54,6 +54,24 @@ def create_task():
     return {"task": new_task.to_dict()}, 201
 
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def send_tasks_to_goal(goal_id):
+    goal = validate_goal_by_id(goal_id)
+
+    request_body = request.get_json()
+
+    tasks = Task.query.all()
+
+    task_ids = request_body["task_ids"]
+
+    for task in tasks:
+        if task.id in task_ids:
+            task.goal_id = goal_id
+    
+    db.session.commit()
+    return {"id": goal_id, "task_ids": task_ids}, 200
+
+
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
