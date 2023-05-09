@@ -27,6 +27,7 @@ class Task(db.Model):
             
         if task.goal_id:
             task_dict['goal_id'] = task.goal_id
+            
         return task_dict
 
     @classmethod
@@ -34,7 +35,7 @@ class Task(db.Model):
         try:
             new_task = Task(title=task_data["title"],
                             description=task_data["description"],
-                            completed_at=None,)
+                            completed_at=None)
         except KeyError: 
             abort(make_response(jsonify({"details": "Invalid data"}), 400))
         

@@ -18,6 +18,7 @@ def create_tasks():
     response_body = dict(task=new_task.to_dict())
 
     return make_response(jsonify(response_body), 201)
+
 # READ
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
