@@ -8,11 +8,8 @@ class Goal(db.Model):
 
 
     def to_dict(self):
-        goal_dict = {   
+
+        return {   
         "id": self.goal_id,
-        "title": self.title
+        "title": self.title,
         }
-        if self.tasks:
-            goal_dict["tasks"] = self.tasks
-        
-        return goal_dict
