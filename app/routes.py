@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -40,17 +41,17 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
-    tasks = Task.query.order_by(Task.title.asc()).all()
-    tasks = Task.query.order_by(Task.title.desc()).all()
+    sort = request.args.get("sort")
+    
+    if sort == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    else:
+        tasks = Task.query.order_by(Task.title.desc()).all()
+        
     tasks_list = []
     for task in tasks:
         tasks_list.append(task.to_dict())
     return jsonify(tasks_list)
-    # tasks = Task.query.all()
-    # tasks_list = []
-    # for task in tasks:
-    #     tasks_list.append(task.to_dict())
-    # return jsonify(tasks_list)
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
@@ -84,3 +85,31 @@ def delete_one_task(id):
     db.session.commit()
     
     return make_response(jsonify(deleted_response), 200)
+
+@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(id):
+    task = validate_task(id)
+    
+    if not task:
+        return make_response(jsonify({"error":f"Task {id} not found"}), 404)
+    
+    task.completed_at = datetime.date.today().isoformat()
+    
+    db.session.commit()
+    
+    task_dict = dict(task=task.to_dict())
+    return make_response(jsonify(task_dict), 200)
+
+@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(id):
+    task = validate_task(id)
+    
+    if not task:
+        return make_response(jsonify({"error":f"Task {id} not found"}), 404)
+    
+    task.completed_at = None
+    
+    db.session.commit()
+    
+    task_dict = dict(task=task.to_dict())
+    return make_response(jsonify(task_dict), 200)
