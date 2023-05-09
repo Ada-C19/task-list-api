@@ -4,6 +4,8 @@ from app.models.task import Task
 from .routes_helpers import validate_model
 from sqlalchemy import asc, desc
 from datetime import date
+import requests
+import os
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -68,8 +70,18 @@ def mark_task_complete(task_id):
     task = validate_model(Task, task_id)
 
     task.completed_at = date.today()
-
     db.session.commit()
+
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": os.environ.get("SLACK_API_KEY"),
+    }
+    data = {
+        "channel": "api-test-channel",
+        "text": f"Someone just completed the task {task.title}",
+    }
+
+    requests.post(url, headers=headers, data=data)
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
