@@ -25,7 +25,7 @@ class Task(db.Model):
     @classmethod
     def from_dict(cls, task_data):
         return cls(
-            title = task_data["rating"],
-            description = task_data["name"],
-            completed_at = task_data["cuisine"],
+            title = task_data["title"],
+            description = task_data["description"],
+            completed_at = task_data["completed_at"]
         )

@@ -19,10 +19,8 @@ def assign_tasks_to_goal(goal_id):
         return {"details": "Invalid data"}, 400
     
     response = []
-    # validate each of the tasks in the request 
     for task_id in request_body["task_ids"]:
         task = validate_item(Task, task_id)
-        # for each valid task, add it to the goal
         goal.tasks.append(task)
         response.append(task.task_id)
 
@@ -103,9 +101,9 @@ def create_task():
     if "title" not in request_body or "description" not in request_body:
         return {"details": "Invalid data"}, 400
 
-    if "completed_at" in request_body and isinstance(request_body["completed_at"], datetime):
+    if "completed_at" in request_body and ((isinstance(request_body["completed_at"], datetime) or request_body["completed_at"]) == None):
         new_task = Task.from_dict(request_body)
-    elif "completed_at" in request_body and not isinstance(request_body["completed_at"], datetime):
+    elif "completed_at" in request_body and not isinstance(request_body["completed_at"], datetime) and not request_body["completed_at"] == None:
         return make_response({"details": "Completed_at must be a datetime"}, 400)
     else:
         new_task = Task(
