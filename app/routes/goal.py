@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, abort, make_response, request
+from flask import Blueprint, jsonify, request
 from app import db
 
 from app.models.goal import Goal
@@ -9,7 +9,6 @@ from app.routes.routes_helper import get_valid_item_by_id
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 
-# Routes
 @goals_bp.route("", methods=['POST'])
 def create_goal():
     request_body = request.get_json()
