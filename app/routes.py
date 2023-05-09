@@ -11,6 +11,7 @@ load_dotenv()
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
@@ -126,3 +127,5 @@ def mark_incomplete(task_id):
     db.session.commit()
 
     return make_response({"task": task.to_result()})
+
+
