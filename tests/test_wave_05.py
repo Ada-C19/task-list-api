@@ -117,7 +117,7 @@ def test_update_goal_not_found(client):
 
 # Test I finished writing
 ##### Ask about this one
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_goal(client, one_goal):
     # Act
     response = client.delete("/goals/1")
@@ -127,24 +127,25 @@ def test_delete_goal(client, one_goal):
     assert response.status_code == 200
     assert "details" in response_body
     assert response_body == {
-        "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
+        "details": 'Goal 1 \"Build a habit of going outside daily\" successfully deleted'
     }
 
     # Check that the goal was deleted
     response = client.get("/goals/1")
     assert response.status_code == 404
+    response_body = response.get_json()
+    assert response_body == {"message": "Goal 1 not found"}
 
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
-    assert response_body == {"message": "Goal 1 not found"}
 
 # Test I finished writing
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
     # Act
     # ---- Complete Act Here ----
-    response = client.post("/goals/1")
+    response = client.delete("/goals/1")
     response_body = response.get_json()
     # Assert
     # ---- Complete Assertions Here ----
@@ -153,7 +154,7 @@ def test_delete_goal_not_found(client):
     # ---- Complete Assertions Here ----
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal_missing_title(client):
     # Act
     response = client.post("/goals", json={})

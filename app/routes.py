@@ -209,6 +209,9 @@ def mark_incomplete_task(task_id):
 @goals_bp.route("", methods=["POST"])
 def add_goal():
     request_body = request.get_json()
+    if not "title" in request_body:
+        return {"details": "Invalid data"}, 400
+
     new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
@@ -247,3 +250,14 @@ def update_goal(goal_id):
         "id": goal.goal_id,
         "title": goal.title
     }}, 200
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {
+        "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
+    },200
