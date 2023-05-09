@@ -5,10 +5,7 @@ from sqlalchemy import desc, asc
 from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
-# Sort ascending or descending order
-# ascending - sorted()
-# descending - reverse_sorted()
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 # Route to get tasks
 @tasks_bp.route("", methods=["GET"])
@@ -125,10 +122,15 @@ def mark_complete(task_id):
     task.completed_at = datetime.utcnow()
 
     db.session.commit()
-
+    
+    
     return {"task": {
             "id": task.id,
             "title": task.title,
             "description": task.description,
             "is_complete": True
         }}, 200
+
+
+
+
