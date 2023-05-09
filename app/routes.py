@@ -1,10 +1,13 @@
 from flask import Blueprint,jsonify, request, make_response, abort
+import requests
 from app.models.task import Task
 from app import db
 import datetime
+import os
 
 
 task_bp = Blueprint("tasks", __name__,url_prefix="/tasks")
+goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 #post a task
 @task_bp.route("", methods=["POST"])
@@ -23,7 +26,6 @@ def add_task():
 
     return {"task" : new_task.to_dict()}, 201
 
-
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
     response = []
@@ -41,14 +43,11 @@ def get_all_tasks():
 
     return jsonify(response), 200
 
-
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_id(Task,task_id)
 
     return {"task" : task.to_dict()}, 200
-
-
 
 @task_bp.route("<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -80,6 +79,16 @@ def update_task__is_complete(task_id):
     task.completed_at = datetime.datetime.now()
     
     db.session.commit()
+
+    token = os.environ.get("TOKEN")
+    url = "https://slack.com/api/chat.postMessage"
+    channel = "task-notification"
+    text = "GOOD JOB"
+    workspace= {"token": token, "channel": channel, "text" :text}
+
+
+    requests.post(url=url,data=workspace)
+
     return {"task" : task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
@@ -90,9 +99,6 @@ def delete_task(task_id):
     db.session.commit()
 
     return {"details": f'Task {task_id} "{task.title}" successfully deleted'}
-
-
-
 
 def validate_id(model, item_id):
     try:
@@ -106,3 +112,5 @@ def validate_id(model, item_id):
     
     return task
 
+# @goal_bp.route("", methods=["POST"])
+# def add_goal():
