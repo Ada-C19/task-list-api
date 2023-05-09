@@ -76,7 +76,7 @@ def update_task(task_id):
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -84,23 +84,23 @@ def delete_task(task_id):
     return make_response({"details": f'Task {task_id} "{task.title}" successfully deleted'})
 
 
-def validate_task(task_id):
+def validate_item(model, item_id):
     try:
-        task_id= int(task_id)
+        item_id= int(item_id)
     except ValueError:
-        abort(make_response({"message": f"invalid id: {task_id}"}, 400))
+        abort(make_response({"message": f"invalid id: {item_id}"}, 400))
     
-    task = Task.query.get(task_id)
+    task = Task.query.get(item_id)
 
     if not task:
-        abort(make_response({"message": f"Task {task_id} not found."}, 404))
+        abort(make_response({"message": f"Task {item_id} not found."}, 404))
 
-    return task.query.get(task_id)
+    return task.query.get(item_id)
 
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_item(task_id)
 
     task.completed_at = datetime.datetime.now() 
 
@@ -122,7 +122,7 @@ def mark_complete(task_id):
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_task(task_id) 
+    task = validate_item(task_id) 
 
     task.completed_at = None
 
@@ -131,3 +131,18 @@ def mark_incomplete(task_id):
     return make_response({"task": task.to_result()})
 
 
+@goal_bp.route("", methods=["POST"])
+def add_goal():
+    request_body = request.get_json()
+
+    if not "title" in request_body:
+        abort(make_response({"details": "Invalid data"},400))
+
+    new_goal = Goal(
+        title = request_body["title"]
+    )
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_result()}, 201
