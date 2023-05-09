@@ -1,12 +1,11 @@
-from os import abort
 import os
 import requests
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
+from sqlalchemy.sql import func
 
-goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 def validate_model(cls, model_id):
@@ -42,13 +41,14 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    title_query = request.args.get("sort")
-    print("reading all tasks")
+    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
+
     if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    if title_query == "asc":
+        tasks = Task.query.filter(Task.title.ilike(title_query.strip()+'%'))
+    elif sort_query == "asc":
         tasks = Task.query.order_by(Task.title.asc())
-    elif title_query == "desc":
+    elif sort_query == "desc":
         tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
@@ -102,7 +102,8 @@ def mark_complete(task_id):
         if task is None:
             return make_response({"message":f"Task {task_id} not found"}, 404)
         
-        task.completed_at = datetime.today()
+        # task.completed_at = datetime.today()
+        task.completed_at = func.now()
         slack_message_complete(f"Congratulations! You've just completed the task '{task.title}'!")
 
         db.session.commit()
