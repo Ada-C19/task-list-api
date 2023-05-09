@@ -14,12 +14,11 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
-    # if len(request_body) != 3:
     # if "title" not in request_body or "description" not in request_body :
     if not "title" in request_body or not "description" in request_body:
         return make_response({"details": "Invalid data"}, 400)
         # abort(make_response({"details": "Invalid data"}, 400))
- 
+
     new_task = Task(
             title= request_body["title"],
             description= request_body['description'],
@@ -129,6 +128,7 @@ def validate_item(task_id):
         abort(make_response({"message": f"invalid task_id: {task_id}"}, 400))
     
     task = Task.query.get(task_id)
+
     if not task:
         abort(make_response({"message": f"task {task_id} not found"}, 404))
 
@@ -145,13 +145,13 @@ def mark_complete_task(task_id):
     is_complete = True
 
     # Calling the Slack API
-    data_bot = {
+    ana_bot = {
         "token": os.environ.get("SLACKBOT_TOKEN_API"),
         "channel": "task-notifications",
-        "text": f"Someone just completed the task {task.title}"
+        "text": f"Someone just completed the task {task.title} :clap:"
     }
 
-    requests.post(url="https://slack.com/api/chat.postMessage", data = data_bot)
+    requests.post(url="https://slack.com/api/chat.postMessage", data = ana_bot)
     # End of Slack API call
 
     return {"task":{
