@@ -32,7 +32,7 @@ def validate_model(cls, id):
 def create_task():
     request_body = request.get_json()
     try:
-        new_task = Task(title = request_body["title"], description = request_body["description"])
+        new_task = Task.from_dict(request_body)
         db.session.add(new_task)
         db.session.commit()
         response_dict = {}
