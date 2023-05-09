@@ -88,7 +88,6 @@ def get_tasks_of_one_goal(goal_id):
         }
 
 
-
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
@@ -104,7 +103,6 @@ def get_all_tasks():
     for task in tasks:
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response)
-
 
 
 @tasks_bp.route("/<id>", methods=["GET"])
@@ -136,6 +134,7 @@ def delete_task(id):
     return {
         "details": f"Task {id} \"{task.title}\" successfully deleted"
     }, 200
+
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_complete(id):
