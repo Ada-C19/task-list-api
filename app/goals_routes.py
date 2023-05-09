@@ -1,6 +1,7 @@
 from app import db
 import os
 from app.models.goal import Goal
+from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.routes_helper import validate_model
 
@@ -65,3 +66,39 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response({"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'})
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_tasks_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    request_body= request.get_json()
+
+    task_ids= request_body["task_ids"]
+
+    #this way we check that the tasks with those ids actually exist in the db
+    tasks = Task.query.filter(Task.task_id.in_(task_ids)).all()
+
+    #add to the attribute tasks in goal the tasks that match with the goal_id
+    for task in tasks:
+        goal.tasks.append(task)
+
+    db.session.commit()
+
+    return {"id": goal.goal_id,
+            "task_ids":task_ids
+            } 
+
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def handle_tasks_from_goal(goal_id):
+    goal= validate_model(Goal, goal_id)
+
+    tasks_response= []
+    response_body={}
+    for task in goal.tasks:
+        tasks_response.append(task.to_dict())
+
+    response_body["id"]= goal.goal_id
+    response_body["title"] = goal.title  
+    response_body["tasks"] = tasks_response
+
+    return jsonify(response_body), 200
