@@ -84,7 +84,7 @@ def send_a_list_of_task_ids_to_one_goal(goal_id):
     for task_id in request_body["task_ids"]:
         task = validate_item_by_id(Task, task_id)
         task.goal_id = goal_id
-        db.session.commit()
+    db.session.commit()
     request_body["id"] = goal.goal_id
     return jsonify(request_body), 200
 
