@@ -116,3 +116,78 @@ def test_get_task_includes_goal_id(client, one_task_belongs_to_one_goal):
             "is_complete": False
         }
     }
+
+def test_get_tasks_sorted_by_id_asc(client, three_tasks):
+    # Act
+    response = client.get("/tasks?id=asc")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "description": "",
+            "goal_id": None,
+            "id": 1,
+            "is_complete": False,
+            "title": "Water the garden 🌷"},
+        {
+            "description": "",
+            "id": 2,
+            "goal_id": None,
+            "is_complete": False,
+            "title": "Answer forgotten email 📧"},
+        {
+            "description": "",
+            "id": 3,
+            "goal_id": None,
+            "is_complete": False,
+            "title": "Pay my outstanding tickets 😭"}
+    ]
+
+def test_get_tasks_sorted_by_title(client, three_tasks):
+    # Act
+    response = client.get("/tasks?title=Water the garden 🌷")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 1
+    assert response_body == [
+        {
+            "description": "",
+            "goal_id": None,
+            "id": 1,
+            "is_complete": False,
+            "title": "Water the garden 🌷"},
+    ]
+
+def test_get_tasks_sorted_by_id_asc_and_title_desc(client, three_tasks):
+    # Act
+    response = client.get("/tasks?sort=desc&id=asc")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "description": "",
+            "goal_id": None,
+            "id": 1,
+            "is_complete": False,
+            "title": "Water the garden 🌷"},
+        {
+            "description": "",
+            "id": 3,
+            "goal_id": None,
+            "is_complete": False,
+            "title": "Pay my outstanding tickets 😭"},
+        {
+            "description": "",
+            "id": 2,
+            "goal_id": None,
+            "is_complete": False,
+            "title": "Answer forgotten email 📧"}
+    ]
