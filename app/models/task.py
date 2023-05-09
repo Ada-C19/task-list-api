@@ -1,4 +1,5 @@
 from app import db
+import pdb
 
 
 class Task(db.Model):
@@ -21,11 +22,18 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, task_data):
-        return cls(
-            title = task_data["title"],
-            description = task_data["description"],
-            is_complete = task_data["is_complete"]
-        )
+        if "completed_at" in task_data:
+            return cls(
+                title = task_data["title"],
+                description = task_data["description"],
+                completed_at = task_data["completed_at"]
+            )
+        else:
+            return cls(
+                title = task_data["title"],
+                description = task_data["description"]
+            )
+
 
     
     

@@ -8,9 +8,10 @@ goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 def add_goal():
     request_body = request.get_json()
     try:
-        new_goal = Goal(
-            title = request_body["title"]
-        )
+        new_goal = Goal.from_dict(request_body)
+        # (
+        #     title = request_body["title"]
+        # )
     except KeyError:
         return  {
             "details": "Invalid data"
@@ -19,4 +20,6 @@ def add_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    return {"goal": new_goal.to_dict()}, 201
+    return {"goal": {"id": new_goal.goal_id, "title": new_goal.title}}, 201
+            
+            # new_goal.to_dict()}, 201

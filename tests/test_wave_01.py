@@ -51,7 +51,6 @@ def test_get_task(client, one_task):
     }
 
 
-
 def test_get_task_not_found(client):
     # Act
     response = client.get("/tasks/1")

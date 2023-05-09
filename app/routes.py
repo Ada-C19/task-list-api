@@ -11,16 +11,16 @@ load_dotenv()
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-def validate_task(task_id):
+def validate_model(model, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except ValueError:
-        abort(make_response({"msg": f"Task {task_id} invalid"}, 400))
+        abort(make_response({"msg": f"Task {model_id} invalid"}, 400))
     
-    task = Task.query.get(task_id)
+    task = Task.query.get(model_id)
 
     if not task:
-        abort(make_response({"msg": f"Task {task_id} not found"}, 404))
+        abort(make_response({"msg": f"Task {model_id} not found"}, 404))
 
     return task
 
@@ -28,11 +28,12 @@ def validate_task(task_id):
 def add_task():
     request_body = request.get_json()
     try:
-        new_task = Task(
-            title = request_body["title"],
-            description = request_body["description"],
-            completed_at = None
-        )
+        new_task = Task.from_dict(request_body)
+        # (
+        #     title = request_body["title"],
+        #     description = request_body["description"],
+        #     completed_at = None
+        # )
     except KeyError:
         return {
             "details": "Invalid data"
@@ -51,29 +52,32 @@ def get_task():
     sort_query = request.args.get("sort")
 
     if title_query:
-        tasks = Task.query.all()
+        tasks = Task.query.filter_by(title=title_query)
     elif sort_query == "asc":
         tasks = Task.query.order_by(Task.title)
     elif sort_query == "desc":
         tasks = Task.query.order_by(Task.title.desc())
     else:
-        tasks = Task.query.filter_by(title=title_query)
+        tasks = Task.query.all()
     
     #refactor to do list comprehension
     for task in tasks: 
         response.append(task.to_dict())
 
+    
+    print(tasks)
+
     return (jsonify(response), 200)
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     return {"task":task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task,task_id)
 
     request_body = request.get_json()
 
@@ -86,7 +90,7 @@ def update_task(task_id):
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -95,7 +99,7 @@ def delete_task(task_id):
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task,task_id)
 
     task.completed_at = datetime.datetime.now()
 
@@ -113,7 +117,7 @@ def mark_complete(task_id):
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task,task_id)
 
     task.completed_at = None
 
