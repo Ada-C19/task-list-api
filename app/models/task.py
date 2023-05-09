@@ -15,13 +15,9 @@ class Task(db.Model):
                 id=task.task_id,
                 title=task.title,
                 description=task.description,
+                is_complete=task.completed_at != None,
                 )
         
-        if not task.completed_at:
-            task_dict['is_complete'] = False
-        else:
-            task_dict['is_complete'] = True
-            
         if task.goal_id:
             task_dict['goal_id'] = task.goal_id
             

@@ -32,22 +32,22 @@ def handle_tasks():
     sort_by = request.args.get('sort')
     title_param = request.args.get('title')
     
-    if title_param: # filter tasks by search parameter
-        tasks = Task.query.filter(Task.title.ilike(f'%{title_param}%'))
+    if title_param: 
+        task_query = Task.query.filter(Task.title.ilike(f'%{title_param}%'))
     else: 
-        tasks = Task.query
+        task_query = Task.query
         
-    if sort_by: # sort tasks by sort parameter
+    if sort_by:
         if 'asc' in sort_by:
             if not 'id' in sort_by:
-                tasks = Task.query.order_by(Task.title.asc())
-            else: tasks = Task.query.order_by(Task.task_id.asc())
+                task_query = task_query.order_by(Task.title.asc())
+            else: task_query = task_query.order_by(Task.task_id.asc())
         elif 'desc' in sort_by:
             if not 'id' in sort_by:
-                tasks = Task.query.order_by(Task.title.desc())
-            else: tasks = Task.query.order_by(Task.task_id.desc())
+                task_query = task_query.order_by(Task.title.desc())
+            else: task_query = task_query.order_by(Task.task_id.desc())
             
-    response_body = [Task.to_dict(task) for task in tasks]
+    response_body = [Task.to_dict(task) for task in task_query]
 
     return make_response(jsonify(response_body),200)
 
@@ -57,7 +57,7 @@ def update_task(id):
     task = validate_model(Task, id)
     request_body = request.get_json()
 
-    task.title = request_body['title'],
+    task.title = request_body['title']
     task.description = request_body['description']
     
     db.session.commit()
