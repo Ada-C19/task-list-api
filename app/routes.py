@@ -5,7 +5,6 @@ import os
 
 tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
 
-
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
@@ -18,7 +17,6 @@ def validate_model(cls, model_id):
         abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
     return model
-
 
 @tasks_bp.route("",methods=["POST"])
 def create_task():
@@ -37,7 +35,6 @@ def create_task():
             "description": new_task.description,
             "is_complete": (new_task.completed_at != None)}}, 201
 
-
 @tasks_bp.route("",methods=["GET"])
 def read_all_tasks():
 
@@ -55,7 +52,6 @@ def read_all_tasks():
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response), 200
 
-
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -69,7 +65,6 @@ def read_one_task(task_id):
 
     return result, 200
 
-
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task_to_update = validate_model(Task, task_id)
@@ -82,7 +77,6 @@ def update_task(task_id):
     db.session.commit()
 
     return jsonify({"task":task_to_update.to_dict()}), 200
-
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
