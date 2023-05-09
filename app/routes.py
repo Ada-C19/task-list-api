@@ -27,13 +27,7 @@ def validate_task(task_id):
 def create_one_task():
     request_body = request.get_json()
 
-    # tried to catch exception
-    # getting assertion error for the following assert in test_create_test
-    # assert "task" in response_body
-
-    # attempt to solve, made it fail 2 more tests
-    # if "task" in request_body:
-
+    # this try except also works!
     # try:
     #     new_task = Task(title=request_body["title"], description=request_body["description"])
 
@@ -115,7 +109,5 @@ def delete_task(task_id):
     return make_response(jsonify({
         "details": f'Task {task.task_id} "{task.title}" successfully deleted'
     }), 200)
-
-    # return jsonify(make_response(f"Task #{task.id} successfully deleted")), 200
 
 
