@@ -119,7 +119,7 @@ def update_task(task_id):
 
 # in progress
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def task_completed(task_id):
+def task_mark_complete(task_id):
     task = validate_task(task_id)
 
     request_body = request.get_json() 
@@ -137,6 +137,24 @@ def task_completed(task_id):
         }
     }, 200
 
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def task_mark_incomplete(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json() 
+
+    task.completed_at = None
+
+    db.session.commit()
+
+    return {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True if task.completed_at else False
+        }
+    }, 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
