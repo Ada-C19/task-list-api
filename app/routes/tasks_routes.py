@@ -109,3 +109,13 @@ def update_one_task(task_id):
             "is_complete": is_complete
         }
     }, 200
+
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task_to_delete = get_valid_item_by_id(Task, task_id)
+
+    db.session.delete(task_to_delete)
+    db.session.commit()
+
+    return {'details': f'Task {task_to_delete.id} "{task_to_delete.title}" successfully deleted'}, 200
