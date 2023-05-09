@@ -1,7 +1,7 @@
 from app import db
 from app.models.goal import Goal
-from app.task_routes import validate_model
-from flask import Blueprint, jsonify, make_response, request
+from app.routes.task_routes import validate_model
+from flask import Blueprint, jsonify, abort, make_response, request
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -17,7 +17,7 @@ def create_goal():
         return make_response(response_dict, 201)
     except KeyError:
         details = {"details": "Invalid data"}
-        return make_response(details, 400)
+        abort(make_response(details, 400))
 
    
 @goal_bp.route('', methods=['GET'])
@@ -45,3 +45,11 @@ def update_goal(goal_id):
     response_dict = {}
     response_dict["goal"] = goal.to_dict()
     return make_response(response_dict, 200)
+
+@goal_bp.route('/<goal_id>', methods=['DELETE'])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    db.session.delete(goal)
+    db.session.commit()
+    response_body = {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}
+    return make_response(response_body, 200)

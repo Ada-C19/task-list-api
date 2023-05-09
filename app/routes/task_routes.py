@@ -41,7 +41,7 @@ def create_task():
     except KeyError:
         details = {"details": "Invalid data"}
 
-        return make_response(details, 400)
+        abort(make_response(details, 400))
     
         
 @task_bp.route('', methods=['GET'])
