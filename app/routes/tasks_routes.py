@@ -3,8 +3,7 @@ from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import *
-import requests, json
-from slack_sdk import WebClient
+import requests
 import os
 
 
@@ -102,7 +101,7 @@ def delete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_complete_status(task_id):
     task = validate_model(Task, task_id)
-    return_response = 0
+    
     if task.completed_at is None:
         task.completed_at = datetime.utcnow()
     
@@ -119,7 +118,7 @@ def update_task_complete_status(task_id):
         return_response = response.status_code
         db.session.commit()
 
-    return jsonify({"task":task.to_dict()}), return_response
+    return jsonify({"task":task.to_dict()}), 200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_incomplete_status(task_id):
