@@ -1,10 +1,7 @@
 from app import db
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, abort, make_response, request
-from sqlalchemy import text
-from datetime import datetime
-import os
-import requests
+from app.tasks_routes import validate_task
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -24,10 +21,9 @@ def validate_goal(id):
 # WAVE 5: Create a Goal: Valid Goal
 @goals_bp.route("", methods=["POST"])
 def create_goal():
-    if request.method == "POST":
-        request_body = request.get_json()
-        if "title" not in request_body:
-            return make_response(jsonify({"details": "Invalid data"}), 400)
+    request_body = request.get_json()
+    if "title" not in request_body:
+        return make_response(jsonify({"details": "Invalid data"}), 400)
         
     new_goal = Goal(
         title = request_body["title"],
@@ -89,3 +85,41 @@ def delete_goal(id):
     db.session.commit()
 
     return make_response(jsonify(deleted_response), 200)
+
+# WAVE 6: Sending a List of Task IDs to a Goal
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def send_tasks_to_goal(goal_id):
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+
+    for id in task_ids:
+        task = validate_task(id)
+        task.goal_id = goal_id
+
+    goal_dict = dict(id=int(task.goal_id), task_ids=task_ids)
+
+    db.session.add(task)
+    db.session.commit()
+
+    return make_response(jsonify(goal_dict), 200)
+
+
+# WAVE 6: Getting Tasks of One Goal
+# WAVE 6: Getting Tasks of One Goal: No Matching Tasks
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_one_goals_tasks(goal_id):
+    goal = validate_goal(goal_id)
+    
+    tasks_response = []
+    for task in goal.tasks:
+        new_task_dict = task.make_task_dict()
+        tasks_response.append(new_task_dict)
+
+    goal_dict = goal.make_goal_dict()
+    goal_dict["tasks"] = tasks_response
+    
+    return make_response(jsonify(goal_dict), 200)
+
+
+

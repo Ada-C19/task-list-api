@@ -1,5 +1,6 @@
 from app import db
-from datetime import datetime
+
+# Task is the child
 
 
 class Task(db.Model):
@@ -8,14 +9,19 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
-    # ADDING FOR WAVE 5 ???
-    # goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
-    # goals = db.relationship("Goal", back_populates="task")
+    # ADDING FOR WAVE 6 
+    goal = db.relationship("Goal", back_populates="tasks")
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
+
+
 
     def make_task_dict(self):
-        return dict(
+        task_dict = dict(
                 id=self.task_id,
                 title=self.title,
                 description=self.description,
                 is_complete=self.completed_at != None,  # if/else
             )
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
+        return task_dict
