@@ -9,18 +9,18 @@ import os
 tasks_bp = Blueprint("task", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
-def validate_task(model, task_id):
+def validate_item(model, item_id):
     """Validate that task exists in database before using route."""
     try:
-        task_id = int(task_id)
+        item_id = int(item_id)
     except:
-        abort(make_response({"message": f"Task '{task_id}' invalid"}, 400))
+        abort(make_response({"message": f"ID '{item_id}' invalid"}, 400))
 
-    task = model.query.get(task_id)
-    if not task:
-        abort(make_response({"message": f"Task '{task_id}' not found"}, 404))
+    item = model.query.get(item_id)
+    if not item:
+        abort(make_response({"message": f"ID '{item_id}' not found"}, 404))
 
-    return task
+    return item
 
 
 @tasks_bp.route("", methods=["POST"])
@@ -60,13 +60,13 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     """Get one task by id."""
-    return {"task": validate_task(Task, task_id).to_dict()}, 200
+    return {"task": validate_item(Task, task_id).to_dict()}, 200
 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     """Updates task specifed by id."""
-    task = validate_task(Task, task_id)
+    task = validate_item(Task, task_id)
 
     request_body = request.get_json()
     task.title = request_body["title"]
@@ -80,7 +80,7 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_as_complete(task_id):
     """Mark task specifed by id as completed and send bot message on Slack."""
-    task = validate_task(Task, task_id)
+    task = validate_item(Task, task_id)
 
     task.completed_at = datetime.datetime.now()
 
@@ -100,7 +100,7 @@ def mark_task_as_complete(task_id):
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_as_incomplete(task_id):
     """Mark task specifed by id as incomplete."""
-    task = validate_task(Task, task_id)
+    task = validate_item(Task, task_id)
 
     task.completed_at = None
 
@@ -112,7 +112,7 @@ def mark_task_as_incomplete(task_id):
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     """Delete task specifed by id."""
-    task = validate_task(Task, task_id)
+    task = validate_item(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -123,18 +123,18 @@ def delete_task(task_id):
 
 
 ################# Goal Routes #################
-def validate_goal(model, goal_id):
-    """Validate that goal exists in database before using route."""
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message": f"Goal '{goal_id}' invalid"}, 400))
+# def validate_goal(model, goal_id):
+#     """Validate that goal exists in database before using route."""
+#     try:
+#         goal_id = int(goal_id)
+#     except:
+#         abort(make_response({"message": f"'{goal_id}' invalid"}, 400))
 
-    goal = model.query.get(goal_id)
-    if not goal:
-        abort(make_response({"message": f"Goal '{goal_id}' not found"}, 404))
+#     goal = model.query.get(goal_id)
+#     if not goal:
+#         abort(make_response({"message": f"'{goal_id}' not found"}, 404))
 
-    return goal
+#     return goal
 
 
 @goals_bp.route("", methods=["POST"])
@@ -175,13 +175,13 @@ def get_all_goals():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     """Get one goal by id."""
-    return {"goal": validate_goal(Goal, goal_id).to_dict()}, 200
+    return {"goal": validate_item(Goal, goal_id).to_dict()}, 200
 
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     """Updates goal specifed by id."""
-    goal = validate_goal(Goal, goal_id)
+    goal = validate_item(Goal, goal_id)
 
     request_body = request.get_json()
     goal.title = request_body["title"]
@@ -194,7 +194,7 @@ def update_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     """Delete goal specifed by id."""
-    goal = validate_goal(Goal, goal_id)
+    goal = validate_item(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
