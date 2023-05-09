@@ -54,7 +54,24 @@ def update_task_info(task_id):
     return make_response({"task": task.to_dict()})
 
 
+@tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = datetime.utcnow()
 
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()})
+
+
+@tasks_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
+
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()})
 
 
 # Delete
