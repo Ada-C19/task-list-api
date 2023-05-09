@@ -81,11 +81,12 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {"task": {
-            "id": 1,
-            "title": "Updated Task Title",
-            "description": "Updated Test Description",
-            "is_complete": False
+    return {
+        "task": {
+        "id": task_to_update.task_id,
+        "title": task_to_update.title,
+        "description": task_to_update.description,
+        "is_complete": False
         }
     }, 200
 
