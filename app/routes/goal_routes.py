@@ -1,22 +1,21 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
+from app.models.task import Task
 from app import db
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
-
-def validate_object(cls, goal_id):
-    #handle invalid goal id, return 400
+def validate_object(cls, object_id):
+    # handle invalid object id, return 400
     try:
-        goal_id = int(goal_id)
-    except: 
-        abort(make_response({"msg": f"{cls.__name__} {goal_id} is invalid."}, 400))
-    
-    goal = Goal.query.get(goal_id)
-    if goal is None:
-        abort(make_response({"msg": "goal not found."}, 404))
+        object_id = int(object_id)
+    except:
+        abort(make_response({"msg": f"{cls.__name__} {object_id} is invalid."}, 400))
 
-    return goal 
+    obj = cls.query.get(object_id)
+    if obj is None:
+        abort(make_response({"msg": f"{cls.__name__} not found."}, 404))
 
+    return obj
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
     
@@ -71,3 +70,27 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
     return {"goal":new_goal.to_dict()}, 201
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_one_goals_tasks(goal_id):
+    goal=validate_object(Goal, goal_id)
+
+    goal=validate_object(Goal, goal_id)
+    goal_response = goal.tasks_to_dict()
+
+    return make_response(goal_response,200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_tasks_to_goal(goal_id):
+    goal = validate_object(Goal, goal_id)
+    task_ids = request.json.get("task_ids", [])
+    if not goal:
+        return goal
+
+    for task_id in task_ids:
+        task = validate_object(Task, task_id)
+        task.goal_id = goal_id
+
+    db.session.commit()
+
+    return make_response({"id": goal_id, "task_ids": task_ids}, 200)
