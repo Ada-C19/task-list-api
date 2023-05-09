@@ -132,3 +132,14 @@ def create_goal():
     db.session.commit()
 
     return {"goal": new_goal.to_dict()}, 201
+
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    goals = Goal.query.all()
+
+    goals_response = []
+
+    for goal in goals:
+        goals_response.append(goal.to_dict())
+    return jsonify(goals_response)
