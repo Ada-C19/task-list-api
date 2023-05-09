@@ -20,15 +20,6 @@ def validate_entry(model, request_body):
             # abort(make_response({'Invalid Request': f'Missing {model.__name__} {atr}'}, 400))
     return request_body
 
-def create_response(entity):
-    entity_dict = entity.to_dict()
-    if not entity_dict['completed_at']:
-        entity_dict['is_complete'] = False
-        del entity_dict['completed_at']
-    # else:
-    #     task['completed_at'] = func.now() ??? return current datetime?
-    return entity_dict
-
 @tasks_bp.route('', methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -39,25 +30,35 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
-    return {'task': create_response(new_task)}, 201
+    return {'task': new_task.to_dict()}, 201
 
 @tasks_bp.route('', methods=['GET'])
 def get_tasks():
     title_query = request.args.get('title')
+    sort_query = request.args.get('sort')#sort=title/sort=-title
     
+    # Task.query.order_by(Task.count.desc()).all()
+    # Task.query.order_by(Task.count.asc()).all()
+    if sort_query:
+        if sort_query == 'asc':
+            tasks = Task.query.order_by(Task.title.asc())
+        elif sort_query == 'desc':
+            tasks = Task.query.order_by(Task.title.desc())
+            # tasks = Task.query.order_by(Task.title.desc()).all()
+
     if title_query:
-        tasks = Task.guery.filter(Task.title.ilike(title_query+'%'))
+        tasks = Task.guery.filter(Task.title.ilike(title_query.strip()+'%'))
     else:
         tasks = Task.query.all()
     
-    task_response = [create_response(task) for task in tasks]
+    task_response = [task.to_dict() for task in tasks]
     return jsonify(task_response), 200
 
 @tasks_bp.route('/<task_id>', methods=['GET'])
 def get_task_by_id(task_id):
     task = validate_id(Task, task_id)
     
-    return {'task': create_response(task)}, 200
+    return {'task': task.to_dict()}, 200
 
 @tasks_bp.route('/<task_id>', methods=['PUT'])
 def replace_task(task_id):
@@ -74,7 +75,7 @@ def replace_task(task_id):
     
     db.session.commit()
     
-    return {'task': create_response(task)}, 200
+    return {'task': task.to_dict()}, 200
 
 @tasks_bp.route('/<task_id>', methods=['PATCH'])
 def update_task(task_id):
@@ -90,7 +91,7 @@ def update_task(task_id):
     
     db.session.commit()
     
-    return {'task': create_response(task)}, 200
+    return {'task': task.to_dict()}, 200
 
 @tasks_bp.route('/<task_id>', methods=['DELETE'])
 def delete_task(task_id):

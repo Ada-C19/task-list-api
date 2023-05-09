@@ -13,12 +13,11 @@ class Task(db.Model):
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'completed_at': self.completed_at,
             'is_complete': self.is_complete
-        }
+            }
     
     @classmethod
-    def get_attributes(self):
+    def get_attributes(cls):
         return 'title', 'description'
     
     @classmethod
