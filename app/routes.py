@@ -55,14 +55,14 @@ def get_tasks():
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    one_task = validate_task(task_id)
+    one_task = validate_item(Task, task_id)
 
     return make_response({"task": one_task.to_result()})
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_item(Task, task_id)
 
     request_body = request.get_json()
 
@@ -76,7 +76,7 @@ def update_task(task_id):
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_item(task_id)
+    task = validate_item(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -100,7 +100,7 @@ def validate_item(model, item_id):
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task = validate_item(task_id)
+    task = validate_item(Task, task_id)
 
     task.completed_at = datetime.datetime.now() 
 
@@ -122,7 +122,7 @@ def mark_complete(task_id):
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_item(task_id) 
+    task = validate_item(Task, task_id) 
 
     task.completed_at = None
 
@@ -146,3 +146,15 @@ def add_goal():
     db.session.commit()
 
     return {"goal": new_goal.to_result()}, 201
+
+@goal_bp.route("", methods=["GET"])
+def get_goals():
+    all_goals = Goal.query.all()
+    
+    response = []
+
+    for goal in all_goals:
+        response.append(goal.to_result())
+    
+    return jsonify(response), 200
+
