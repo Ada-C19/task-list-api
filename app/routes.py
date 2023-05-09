@@ -53,7 +53,7 @@ def create_one_task():
 
 # read/get all tasks
 @tasks_bp.route("", methods=["GET"])
-def read_all_tasks():
+def get_all_tasks():
     tasks = Task.query.all()
     sort_request_from_user = request.args.get("sort")
     tasks_response = []
@@ -72,7 +72,7 @@ def read_all_tasks():
 
 # read/get one task
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def read_one_task(task_id):
+def get_one_task(task_id):
     task = validate_task(task_id)
     return {"task": task.to_dict()}, 200
     # returning as a dict here plus calling to_dict because it's a nested dictionary. If I updated to_dict to handle nested dictionaries it would no longer work for read_all_tasks
@@ -108,7 +108,7 @@ def update_one_task(task_id):
 
 # delete one task
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
-def delete_task(task_id):
+def delete_one_task(task_id):
     task = validate_task(task_id)
 
     db.session.delete(task)
