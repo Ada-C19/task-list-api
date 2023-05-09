@@ -65,6 +65,8 @@ def get_one_task(task_id):
     task = validate_model(Task, task_id)
     response_dict = {}
     response_dict["task"]=task.to_dict()
+    if task.goal_id:
+        response_dict["task"]["goal_id"]=task.goal_id
     return response_dict
 
     

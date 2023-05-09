@@ -14,7 +14,8 @@ class Task(db.Model):
         "id": self.task_id,
         "title": self.title,
         "description": self.description,
-        "is_complete": False
+        "is_complete": False,
+        
     }
     @classmethod
     def from_dict(cls, task_data):

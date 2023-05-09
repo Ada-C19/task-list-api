@@ -69,4 +69,19 @@ def create_task(goal_id):
     response_body = {"id": goal.goal_id,
                      "task_ids": request_body["task_ids"]}
     return make_response(response_body, 200)
-    
+
+@goal_bp.route('/<goal_id>/tasks', methods=['GET'])
+def get_tasks(goal_id):
+    goal = validate_model(Goal, goal_id)
+    goal_dict = goal.to_dict()
+    tasks = []
+    for task in goal.tasks:
+        tasks.append({
+            "id":task.task_id,
+            "goal_id":goal.goal_id,
+            "title":task.title,
+            "description":task.description,
+            "is_complete":False
+        })
+    goal_dict["tasks"] = tasks
+    return make_response(goal_dict, 200)
