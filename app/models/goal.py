@@ -2,7 +2,7 @@ from app import db
 from app.models.task import Task
 
 class Goal(db.Model):
-    
+
     goal_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     tasks = db.relationship('Task', backref='goal', lazy=True)
@@ -16,7 +16,7 @@ class Goal(db.Model):
         return goal_as_dict
     
   
-
+##### REFACTOR AND USE FUNCTION FROM ABOVE 
     def to_dict_with_tasks(self):
         goal_as_dict={}
         

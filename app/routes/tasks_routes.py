@@ -3,6 +3,7 @@ from app import db
 from app.models.task import Task
 import datetime
 import os
+from dotenv import load_dotenv
 from slack_sdk import WebClient
 from app.routes.routes import handle_id_request
 
@@ -35,7 +36,7 @@ def read_all_tasks():
     else:
         tasks = Task.query.all()
     tasks_response = []
-
+    
     for task in tasks: 
         tasks_response.append(task.to_dict())
     
@@ -62,7 +63,6 @@ def update_one_task(task_id):
 
     return make_response(jsonify ({"task":task_response}), 200)
 
-
 @tasks_bp.route("/<task_id>", methods = ["DELETE"])
 def delete_task(task_id):
 
@@ -79,6 +79,7 @@ def finished_task(task_id):
     updated_task=handle_id_request(Task, task_id)
     updated_task.completed_at = datetime.datetime.utcnow()
     db.session.commit()
+    
     slack_token = os.environ["SLACK_BOT_TOKEN"]
     client = WebClient(token=slack_token)
 
@@ -90,6 +91,7 @@ def finished_task(task_id):
     task_response = updated_task.to_dict()
 
     return make_response(jsonify ({"task":task_response}), 200)
+
 
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
