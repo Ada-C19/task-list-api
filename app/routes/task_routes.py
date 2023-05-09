@@ -92,9 +92,8 @@ def mark_complete(task_id):
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer xoxb-4680452269380-5244295323809-B89humLNpYydCqWVa2YDMVjI"
-        # "Authorization": f"Bearer {os.environ.get('SLACK_API')}"
-
+        "Authorization": f"Bearer {os.environ.get('SLACK_API')}"
+        ############ not working!!!!!!!#########################
     }
 
     slack_post_data = json.dumps({
