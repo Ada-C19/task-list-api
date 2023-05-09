@@ -4,6 +4,10 @@ from app.models.task import Task
 from app.models.goal import Goal 
 from sqlalchemy import desc, asc 
 from datetime import date 
+import os
+from dotenv import load_dotenv
+import requests 
+load_dotenv()
 
 # CRUD for Tasks
 
@@ -127,6 +131,14 @@ def mark_complete_on_incompleted(task_id):
     task.completed_at = date.today() 
     
     db.session.commit()
+    
+    data = {
+        "channel":"task-notifications",
+        "text":f"Someone just completed the task {task.title}",
+        "token":os.environ.get("BOT_API_KEY")
+    }
+    
+    requests.post("https://slack.com/api/chat.postMessage",data)
     
     return {
         "task":{
