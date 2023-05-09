@@ -1,7 +1,12 @@
 from flask import Blueprint, request, jsonify, abort, make_response
 from datetime import datetime
+# from dotenv import load_dotenv
+import requests
+import os
 from app.models.task import Task
 from app import db
+
+# load_dotenv()
 
 def handle_valid_id(model, task_id):
     try:
@@ -92,6 +97,17 @@ def mark_completed(task_id):
     task_to_mark = handle_valid_id(Task, task_id)
     task_to_mark.completed_at = datetime.today()
 
+    url = "https://slack.com/api/chat.postMessage"
+    API_KEY = os.environ.get("API_TOKEN")
+    headers = {
+        "Authorization": f"Bearer {API_KEY}"
+    }
+    payload = {
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task {task_to_mark.title}"
+    }
+    r = requests.post(url, headers=headers, json=payload)
+    
     db.session.commit()
 
     return {"task": task_to_mark.to_dict()}, 200
