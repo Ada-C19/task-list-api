@@ -382,11 +382,12 @@
       let url = baseURL + itemType + "s/" + id;
       let method = "PUT";
       titleSpan.innerText = title;
+      let task_ids = [];
+
       if (itemType === 'task') {
         descriptionSpan.innerText = description;
       } else {
         const options = Array.from(tasksSelect.selectedOptions); 
-        task_ids = [];
         method = "POST";
         url = url + "/tasks" + "?title=" + title;
         options.forEach((option) => {
