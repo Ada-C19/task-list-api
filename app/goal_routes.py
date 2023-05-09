@@ -93,7 +93,7 @@ def post_task_ids_to_goal(goal_id):
     # Get the task ids from the request body
     task_ids = request_body["task_ids"]
 
-    # Get the Task instances (task dicts) based on the task ids, using handle_task() route from task_routes.py
+    # Get the Task instances (task dicts) based on the task ids
     task_instances = [validate_task(task_id) for task_id in task_ids]
     goal.tasks.extend(task_instances)
 
@@ -105,8 +105,18 @@ def post_task_ids_to_goal(goal_id):
     }, 200
 
 
-@goals_bp.route("/goals/<goal_id>/tasks", methods=['GET'])
+@goals_bp.route("/<goal_id>/tasks", methods=['GET'])
 def get_tasks_for_one_goal(goal_id):
-    pass
+    goal = get_valid_goal_by_id(goal_id)
+    
+    # Get task dicts and append them to `tasks` list
+    tasks = [task.to_dict() for task in goal.tasks]
+
+    goal_dict = goal.to_dict()
+
+    # Add `tasks` list to the key "tasks" 
+    goal_dict["tasks"] = tasks
+
+    return goal_dict, 200
 
 
