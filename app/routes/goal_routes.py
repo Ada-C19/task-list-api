@@ -64,8 +64,6 @@ def create_goal():
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_one_goals_tasks(goal_id):
     goal=validate_object(Goal, goal_id)
-
-    goal=validate_object(Goal, goal_id)
     goal_response = goal.tasks_to_dict()
 
     return make_response(goal_response,200)
