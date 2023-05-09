@@ -3,7 +3,7 @@ from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import *
-import requests
+import requests, json
 from slack_sdk import WebClient
 import os
 
@@ -102,18 +102,24 @@ def delete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_complete_status(task_id):
     task = validate_model(Task, task_id)
-
+    return_response = 0
     if task.completed_at is None:
         task.completed_at = datetime.utcnow()
+    
+        text_str = "Someone just completed the task " + task.title  
+        
+        url = 'https://slack.com/api/chat.postMessage'
+        payload = {
+                'token': os.environ.get("SLACK_API_TOKEN"),
+                'channel': '#task-notifications',
+                'text': text_str
+            }
+        
+        response = requests.post(url, data=payload)
+        return_response = response.status_code
+        db.session.commit()
 
-    client = WebClient(token=os.environ.get("SLACK_API_POST"))
-    text_str = "Someone just completed the task " + task.title
-    client.chat_postMessage(channel="#task-notifications", 
-                            text=text_str)
-
-    db.session.commit()
-
-    return jsonify({"task":task.to_dict()}), 200
+    return jsonify({"task":task.to_dict()}), return_response
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_incomplete_status(task_id):
