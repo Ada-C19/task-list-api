@@ -59,18 +59,19 @@ def read_one_task(task_id):
     # task = Task.query.get(task_id)
     task = validate_item(task_id)
 
-    is_complete = False
-    if task.completed_at:
-        is_complete = True
+    # is_complete = False
+    # if task.completed_at:
+        # is_complete = True
 
-    return {"task":{
-        "id": task.task_id, 
-        "title": task.title,
-        "description": task.description,
-        # "is_complete": False
-        "is_complete": is_complete
-    }
-    }, 200
+    # return {"task":{
+    #     "id": task.task_id, 
+    #     "title": task.title,
+    #     "description": task.description,
+    #     # "is_complete": False
+    #     "is_complete": is_complete
+    # }
+    # }, 200
+    return {"task": task.to_dict()}, 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
