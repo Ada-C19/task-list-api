@@ -44,11 +44,11 @@ def get_all_tasks():
     """Get all tasks and sort by title if specifed."""
     sort_query = request.args.get("sort")
 
-    # Retrieve all tasks, and order by asc or desc if specifed
+    # Order by asc or desc if specifed
     if sort_query == "asc":
-        all_tasks = Task.query.order_by(Task.title.asc()).all()
+        all_tasks = Task.query.order_by(Task.title.asc())
     elif sort_query == "desc":
-        all_tasks = Task.query.order_by(Task.title.desc()).all()
+        all_tasks = Task.query.order_by(Task.title.desc())
     else:
         all_tasks = Task.query.all()
 
@@ -60,7 +60,12 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     """Get one task by id."""
-    return {"task": validate_item(Task, task_id).to_dict()}, 200
+    task = validate_item(Task, task_id)
+
+    if task.goal_id:
+        return {"task": task.to_dict_with_goal()}, 200
+
+    return {"task": task.to_dict()}, 200
 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -122,7 +127,7 @@ def delete_task(task_id):
 
 ################# Goal Routes #################
 @goals_bp.route("", methods=["POST"])
-def create_goal():
+def add_goal():
     """Create and add goal to database."""
     request_body = request.get_json()
 
@@ -175,3 +180,37 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}, 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_of_goal(goal_id):
+    """Get all tasks of a goal via goal id."""
+    goal = validate_item(Goal, goal_id)
+
+    response = [task.to_dict_with_goal() for task in goal.tasks]
+
+    return jsonify({
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": response
+    }), 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def associate_goal_to_tasks(goal_id):
+    """Associate goal to tasks."""
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    task_ids = request_body.get("task_ids")
+    for task_id in task_ids:
+        task = Task.query.get(task_id)
+        task.goal = goal
+
+    db.session.commit()
+
+    return {
+        "id": goal.goal_id,
+        "task_ids": task_ids
+    }, 200
