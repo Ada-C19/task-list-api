@@ -16,12 +16,14 @@ class Task(db.Model):
             "is_complete": is_complete
         }
 
+    def update_dict(self,request_body):
+        self.title = request_body["title"]
+        self.description = request_body["description"]
+    
     @classmethod
     def create_dict(cls,response_body):
         return cls(
-            title=response_body["title"],
-            description=response_body["description"],
-            # completed_at = response_body["completed_at"]
+            title=response_body.get("title"),
+            description=response_body.get("description"),
+            # completed_at = response_body.get("completed_at",None)
         )
-    
-    
