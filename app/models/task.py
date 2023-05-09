@@ -13,7 +13,7 @@ class Task(db.Model):
         if not self.completed_at:
             is_complete = False
 
-        return {"task_id": self.task_id, 
+        return {"id": self.task_id, 
                 "title": self.title, 
                 "description": self.description,
                 "is_complete": is_complete
@@ -21,10 +21,11 @@ class Task(db.Model):
     
     
     def to_dict(self): 
-        return {"task_id": self.task_id, 
+        return {"id": self.task_id, 
                 "title": self.title, 
                 "description": self.description,
                 "completed_at": self.completed_at
                 }
     
 
+    # TODO - from_dict method
