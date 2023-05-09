@@ -21,3 +21,11 @@ class Task(db.Model):
                 "description": self.description,
                 "is_complete": is_complete
         }
+    
+    @classmethod
+    def from_dict(cls, task_data):
+        return cls(
+            title = task_data["rating"],
+            description = task_data["name"],
+            completed_at = task_data["cuisine"],
+        )

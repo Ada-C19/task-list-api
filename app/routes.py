@@ -54,7 +54,7 @@ def create_goal():
 
 @goals_bp.route("", methods = ["GET"])
 def get_all_goals():
-    sort_query = request.get.args("sort")
+    sort_query = request.args.get("sort")
 
     if sort_query is None:
         all_goals = Goal.query.all()
@@ -104,11 +104,7 @@ def create_task():
         return {"details": "Invalid data"}, 400
 
     if "completed_at" in request_body and isinstance(request_body["completed_at"], datetime):
-        new_task = Task(
-            title = request_body["title"],
-            description = request_body["description"],
-            completed_at = request_body["completed_at"]
-        )
+        new_task = Task.from_dict(request_body)
     elif "completed_at" in request_body and not isinstance(request_body["completed_at"], datetime):
         return make_response({"details": "Completed_at must be a datetime"}, 400)
     else:
@@ -128,6 +124,13 @@ def get_all_tasks():
     id_query = request.args.get("id")
     title_query = request.args.get("title")
 
+    if alpha_sort_query is None:
+        all_tasks = Task.query.all()
+    elif alpha_sort_query == "asc":
+        all_tasks = Task.query.order_by(Task.title.asc())
+    elif alpha_sort_query == "desc":
+        all_tasks = Task.query.order_by(Task.title.desc())
+    
     if alpha_sort_query is None and id_query is None and title_query is None:
         all_tasks = Task.query.all()
     elif alpha_sort_query == "asc":
