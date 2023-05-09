@@ -48,3 +48,12 @@ def read_all_tasks():
 def read_one_task(task_id):
     task = validate_task(task_id)
     return task.to_dict()
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_book(task_id):
+    
+    task = validate_task(task_id)
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response(f"task #{task_id} successfully deleted",200)
