@@ -264,7 +264,7 @@ def get_tasks_list(goal_id):
     task_ids_list = request_data["task_ids"]  #[1,2,3]
 
     for each_task_id in task_ids_list:
-        task_obj = Task.query.get(each_task_id) #get elem in database
+        task_obj = Task.query.get(each_task_id) #get elem(task_obj) in database
         
      
         task_obj.goal_id = goal_id #set the goal_id as the task_data's goal_id
