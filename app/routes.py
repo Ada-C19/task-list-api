@@ -61,7 +61,7 @@ def get_all_tasks():
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     task = validate_task_by_id(id)
-    print("IM PRINTING", task.to_dict())
+    print("IM PRINTING", task.to_dict()) # DELETE THIS LATER
     return {"task": task.to_dict()}, 200
 
 
@@ -143,3 +143,9 @@ def get_all_goals():
     for goal in goals:
         goals_response.append(goal.to_dict())
     return jsonify(goals_response)
+
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    return {"goal": goal.to_dict()}, 200
