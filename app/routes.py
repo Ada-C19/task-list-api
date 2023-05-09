@@ -11,19 +11,18 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 #helper functions
-def validate_task(task_id):
+def validate_model(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
-        message= f"task {task_id} invalid"
-        abort(make_response({"message":message}, 400))
+        abort(make_response({"{message":f"{cls.__name__} {model_id} invalid"}, 400))
             
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
     
-    if not task: 
-        abort(make_response({"message":f"task {task_id} not found"}, 404))
+    if not model: 
+        abort(make_response({"{message":f"{cls.__name__} {model_id} not found"}, 404))
 
-    return task
+    return model
 
 #route functions 
 
@@ -66,14 +65,14 @@ def get_all_tasks():
 #GET /tasks/1
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     return jsonify({"task":task.to_dict()})
 
 #PUT /tasks/1
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     request_body=request.get_json()
     task.title=request_body["title"]
     task.description=request_body["description"]
@@ -83,7 +82,7 @@ def update_task(task_id):
 #DELETE /tasks/1
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     db.session.delete(task)
     db.session.commit()
 
@@ -92,7 +91,7 @@ def delete_task(task_id):
 #Wave 3 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = datetime.now()
     db.session.commit()
 
@@ -105,7 +104,7 @@ def mark_task_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = None 
     db.session.commit()
 
@@ -113,18 +112,18 @@ def mark_task_incomplete(task_id):
 
 #Wave 5
 
-def validate_goal(goal_id):
-    try: 
-        goal_id = int(goal_id)
-    except: 
-        abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
+# def validate_goal(goal_id):
+#     try: 
+#         goal_id = int(goal_id)
+#     except: 
+#         abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
 
-    goal= Goal.query.get(goal_id)
+#     goal= Goal.query.get(goal_id)
 
-    if not goal: 
-        abort(make_response({"message": f"Goal {goal_id} invalid"}, 404))
+#     if not goal: 
+#         abort(make_response({"message": f"Goal {goal_id} invalid"}, 404))
     
-    return goal
+#     return goal
     
 
 @goals_bp.route("", methods=["POST"])
@@ -145,18 +144,29 @@ def get_all_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    goal= validate_goal(goal_id)
+    goal= validate_model(Goal, goal_id)
 
     return jsonify({"goal":goal.to_dict()}),200
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal= validate_goal(Goal, goal_id)
-    request_body= request.get_jason()
+    goal= validate_model(Goal, goal_id)
+    request_body= request.get_json()
     goal.title=request_body["title"]
     db.session.commit()
     
     return jsonify({"goal":goal.to_dict()}),200
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal= validate_model(Goal, goal_id)
+    
+    db.session.delete(goal)
+    db.session.commit()
+
+    return jsonify({"details": f'Goal {goal_id} "{goal.title}" sucessfully deleteted'}),200
+
+
 
 
 
