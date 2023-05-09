@@ -54,11 +54,7 @@ def handle_task(task_id):
     # returned in get_valid_item_by_id
     Task.query.get(task_id)
 
-    return {"task":{
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": (task.completed_at != None)}}, 200
+    return jsonify({"task": task.to_dict()}), 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
