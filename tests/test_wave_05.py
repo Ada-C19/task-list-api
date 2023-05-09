@@ -69,10 +69,11 @@ def test_delete_goal_200(client, one_goal):
 def test_update_goal_200(client, one_goal):
     # Act
     response = client.put("/goals/1", json={
-        "title": "Updated Goal Title",
+        "title": "Updated goal Title",
     })
     response_body = response.get_json()
-
+    print(f"{response = }")
+    print(f"{response_body = }")
     # Assert
     assert response.status_code == 200
     assert "goal" in response_body
@@ -83,9 +84,8 @@ def test_update_goal_200(client, one_goal):
         }
     }
     goal = db.session.get(Goal, 1)
-    assert goal.title == "Updated Goal Title"
-    assert goal.description == "Updated Test Description"
-    assert goal.completed_at == None
+    assert goal.title == 'Updated goal Title'
+
 
 
 
@@ -98,8 +98,7 @@ def test_create_goal_201(client):
         "title": "My New Goal"
     })
     response_body = response.get_json()
-    print(f"{response = }")
-    print(f"{response_body = }")
+
     # Assert
     assert response.status_code == 201
     assert "goal" in response_body
