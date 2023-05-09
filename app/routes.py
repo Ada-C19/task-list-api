@@ -20,9 +20,13 @@ def validate_task(task_id):
 # POST request to create new task
 @tasks_bp.route("", methods=['POST'])
 def create_task():
-    request_body = request.get_json()
+    request_body = request.get_json()   
+    try: 
+        new_task = Task(title=request_body["title"], description=request_body["description"])
+    except:
+        return {"details": "Invalid data"}, 400
     
-    new_task = Task(title=request_body["title"], description=request_body["description"])
+
 
     db.session.add(new_task)
     db.session.commit()
