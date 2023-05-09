@@ -1,6 +1,7 @@
 from flask import Blueprint, request, make_response, request, abort, jsonify 
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 # from sqlalchemy import asc, desc
 from datetime import datetime
 #to call slack api?:
@@ -9,7 +10,9 @@ import requests
 import os
 load_dotenv()
 
+# Blueprints:
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods=["POST"])
 def add_task():
