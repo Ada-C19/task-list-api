@@ -24,3 +24,13 @@ def create_goal():
             "title":new_goal.title
         }
     }, 201
+
+@goals_bp.route("", methods=["GET"])
+def read_all_goals():
+    #Retrieve a list of all the goal objects in database
+    all_goals = Goal.query.all() 
+    goals_response = []
+    for goal in all_goals:
+        goals_response.append(goal.to_dict())
+
+    return jsonify(goals_response), 200

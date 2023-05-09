@@ -6,4 +6,8 @@ class Goal(db.Model):
     title = db.Column(db.String(80))
     tasks = db.relationship("Task", back_populates="goal")
 
-    
+    def to_dict(self):
+        return {
+            "id": self.goal_id,
+            "title": self.title
+        }
