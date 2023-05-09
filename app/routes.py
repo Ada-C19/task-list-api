@@ -6,6 +6,7 @@ import os, requests
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 
 def validate_task_by_id(id):
