@@ -10,7 +10,7 @@ migrate = Migrate()
 load_dotenv()
 
 
-def create_app(test_config=None):
+def create_app(test_config):
     app = Flask(__name__)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
