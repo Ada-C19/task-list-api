@@ -9,18 +9,7 @@ import requests
 # Define all routes with tasks_bp start with url_prefix (/tasks)
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-# @blueprint_name.route("/endpoint/path/here", methods=["GET"])
-# def endpoint_name():
-#     my_beautiful_response_body = "Hello, World!"
-#     return my_beautiful_response_body
-# def validate_id(task_id):
-#     try:
-#         task_id = int(task_id)
-#     except:
-#         abort(make_response({"msg": f"Invalid id '{task_id}'"}, 400))
-#     task = Task.query.get(task_id)
-#     return task if task else abort(make_response({"msg": f"Na task with task id '{task_id}'"}, 404))
-        
+
 @tasks_bp.route("", methods=["POST"])
 def create_a_task():
     
@@ -39,15 +28,6 @@ def create_a_task():
         "task": new_task.to_dict()
     }, 201
 
-# @tasks_bp.route("", methods=["GET"])
-# def get_tasks_asc_sort():
-#     sort_asc = request.args.get("sort=asc")
-#     sort_desc = request.args.get("sort=desc")
-#     if sort_asc:
-#         tasks = Task.query.order_by(Task.title.asc())
-#     if sort_desc:
-#         tasks = Task.query.order_by(Task.title.desc())
-#     return tasks
 
 @tasks_bp.route("", methods=["GET"])
 def get_saved_tasks():
@@ -82,6 +62,7 @@ def update_one_task(task_id):
     db.session.commit()
     return {"task": task.to_dict()}, 200
 
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
     task_to_delete = validate_item_by_id(Task, task_id)
@@ -92,6 +73,7 @@ def delete_one_task(task_id):
     return {
         "details": f'Task {task_to_delete.task_id} "{task_to_delete.title}" successfully deleted'
     }, 200
+    
     
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
@@ -109,6 +91,7 @@ def mark_complete(task_id):
 
     return {"task": task.to_dict()},200
 
+
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_item_by_id(Task, task_id)
@@ -116,5 +99,3 @@ def mark_incomplete(task_id):
     db.session.commit()
     return {"task": task.to_dict()},200
 
-# Blueprint for goals
-goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
