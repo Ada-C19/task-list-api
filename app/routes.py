@@ -58,9 +58,9 @@ def get_all_goals():
 
     if sort_query is None:
         all_goals = Goal.query.all()
-    elif sort_query is "asc":
+    elif sort_query == "asc":
         all_goals = Goal.query.order_by(Goal.title.asc)
-    elif sort_query is "desc":
+    elif sort_query == "desc":
         all_goals = Goal.query.order_by(Goal.title.desc)
 
     response = [goal.to_dict() for goal in all_goals]
