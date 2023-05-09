@@ -6,13 +6,11 @@ from app.helper import validate_task
 tasks_bp = Blueprint("tasks", __name__, url_prefix= "/tasks") 
 
 # GET all task - GET[READ] - /tasks
-
 @tasks_bp.route("", methods =["GET"])
 def get_all_tasks():
     title_query = request.args.get("title")
     description_query = request.args.get("description")
     completed_query = request.args.get("is_complete")
-
     if title_query:
         tasks = Task.query.filter_by(title = title_query)
     elif description_query:
@@ -21,8 +19,6 @@ def get_all_tasks():
         tasks = Task.query.filter_by(is_completed = completed_query)
     else:
         tasks = Task.query.all()
-
-
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_json())
@@ -30,11 +26,9 @@ def get_all_tasks():
     return jsonify(tasks_response), 200
 
 # GET one task - /tasks/<id>  - [READ]
-
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     task = validate_task(id)
-
     return jsonify({"task":task.to_json()}), 200
 
 #POST  - /tasks - [CREATE]
@@ -42,8 +36,40 @@ def get_one_task(id):
 def create_task():
     request_body = request.get_json()
     new_task = Task.create_dict(request_body)
-
     db.session.add(new_task)
     db.session.commit()
+    return make_response({"task":new_task.to_json()}), 200
 
-    return make_response({"task":new_task.to_json()}), 201
+#UPDATE one task- PUT /tasks/<id>  (UPDATE)
+@tasks_bp.route("/<id>",methods=["PUT"])
+def update_task(id):
+    task = validate_task(id)
+    request_body = request.get_json()
+    task.update_dict(request_body)
+    db.session.commit()
+
+    return jsonify({"task":task.to_json()}), 200
+
+#DELETE one task -DELETE /tasks/<id> (DELETE)
+@tasks_bp.route("/<id>", methods=["DELETE"])
+def delete_task(id):
+    task_to_delete = validate_task(id)
+
+    db.session.delete(task_to_delete)
+    db.session.commit()
+
+    message = {"details": f'Task 1 "{task_to_delete.title}" successfully deleted'}
+    return make_response(message, 200)
+
+
+    # message = "details": 'Task 1 "Go on my daily walk {task_to_delete.title}" successfuly deleted'
+    # return make_response(message,200)
+
+    # message = {"details": f'Task {task_to_delete.title} "{task_to_delete.description}" successfully deleted'}
+    # return make_response(message, 200)
+
+
+    #return make_response({"details": f"Task {task.title} successfully deleted"})
+
+
+# #return make_response({"task":new_task})

@@ -18,6 +18,10 @@ class Task(db.Model):
             "description": self.description,
             "is_complete": is_complete
         }
+    
+    def update_dict(self, request_body):
+        self.title = request_body["title"]
+        self.description = request_body["description"]
 
     @classmethod
     def create_dict(cls, response_body):
@@ -25,3 +29,4 @@ class Task(db.Model):
             title = response_body["title"],
             description = response_body["description"]
         )
+
