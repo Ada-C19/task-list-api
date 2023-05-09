@@ -98,11 +98,10 @@ def post_task_ids_to_goal(goal_id):
 def get_tasks_for_one_goal(goal_id):
     goal = get_valid_item_by_id(Goal, goal_id)
 
-    # Get task dicts and append them to `tasks` list
+    # Need to get task as dicts, not the whole task object
     tasks = [task.to_dict() for task in goal.tasks]
     goal_dict = goal.to_dict()
 
-    # Add `tasks` list to the key "tasks" 
     goal_dict["tasks"] = tasks
 
     return goal_dict, 200
