@@ -3,7 +3,6 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from datetime import datetime
 import os
-import requests
 from slack_sdk import WebClient
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -110,24 +109,15 @@ def mark_task_incomplete(task_id):
 def mark_task_complete(task_id):
     task = validate_model_by_id(Task, task_id)
     if task.completed_at is not None:
-
         # The task is already complete, no need to update it
         return {"task": task.to_dict()}, 200
     
     task.completed_at = datetime.utcnow()
     db.session.commit()
 
-    slack_token = os.environ["SLACK_TOKEN"]
-
+    slack_token= os.environ["SLACK_TOKEN"]
     client = WebClient(token=slack_token)
-
-    result = client.chat_postMessage(
-        channel="task-notifications",
-        text=f"Someone just completed the task{task.title}"
-    )
-
-    task_response = task.to_dict()
-
-
+    result = client.chat_postMessage(channel="task-notifications",
+        text=f"Someone just completed the task {task.title}")
 
     return {"task": task.to_dict()}, 200
