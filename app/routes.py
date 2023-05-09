@@ -1,8 +1,9 @@
 from app import db
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
 from .routes_helpers import validate_model
 from sqlalchemy import asc, desc
+from datetime import date
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -20,8 +21,6 @@ def create_task():
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
-    # tasks = Task.query.all()
-
     task_query = Task.query
 
     sort_query = request.args.get("sort")
@@ -62,3 +61,32 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response(jsonify({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"}))
+
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    task = validate_model(Task, task_id)
+
+    try:
+        task.completed_at = date.today()
+    except KeyError:
+        abort(make_response(jsonify({"details": "Invalid data"}), 404))
+
+    db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
+
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = validate_model(Task, task_id)
+
+    try:
+        task.completed_at = None
+    except KeyError:
+        abort(make_response(jsonify({"details": "Invalid data"}), 404))
+
+
+    db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
