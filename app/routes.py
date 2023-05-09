@@ -3,8 +3,8 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime 
-# from slack_sdk import WebClient
-import requests
+from slack_sdk import WebClient
+# import requests
 import os
 
 
@@ -142,16 +142,19 @@ def mark_complete(task_id):
 
         db.session.commit()
 
-        data ={"channel":"task-notifications",
-               "text":f"Someone just completed a task {task.title}",
-               "token":os.environ.get("SLACKBOT_TOKEN")
-               }
-        response = requests.post(url = "https://slack.com/api/chat.postMessage", data = data)
+        # url = "https://slack.com/api/chat.postMessage"
+        # token = os.environ.get("SLACKBOT_TOKEN")
+        # data ={"channel": "task-notifications",
+        #        "text": f"Someone just completed a task {task.title}",
+        #        "token": token
+        #        }
+        
+        # response = requests.post(url, data = data)
 
 
-        # message = f"Someone just completed a task {task.title}"
-        # client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
-        # response = client.chat_postMessage(channel="task-notifications", text=message)
+        message = f"Someone just completed a task {task.title}"
+        client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+        response = client.chat_postMessage(channel="task-notifications", text=message)
 
          
     return jsonify({"task":task.to_dict()}), 200
