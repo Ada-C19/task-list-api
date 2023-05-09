@@ -19,11 +19,14 @@ def add_task():
         return make_response({"details": "Invalid data"}, 400)
         # abort(make_response({"details": "Invalid data"}, 400))
 
-    new_task = Task(
-            title= request_body["title"],
-            description= request_body['description'],
-            completed_at= request_body['completed_at']
-        )
+    #Replacing this with the from_dict in task.py
+    # new_task = Task(
+    #         title= request_body["title"],
+    #         description= request_body['description'],
+    #         completed_at= request_body['completed_at']
+    #     )
+    new_task = Task.from_dict(request_body)
+
     
     db.session.add(new_task)
     db.session.commit()
