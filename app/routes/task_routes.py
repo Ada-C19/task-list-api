@@ -60,12 +60,21 @@ def create_task():
 def get_one_task(task_id):
     task = validate_item(Task, task_id)
     
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": is_complete_status(task.completed_at)
-    } }
+    if task.goal is None:
+            return {"task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": is_complete_status(task.completed_at)
+        } }
+    else:
+        return {"task": {
+            "id": task.task_id,
+            "goal_id": task.goal.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": is_complete_status(task.completed_at)
+        } }
     
 ### Update Task
 @task_list_bp.route("/<task_id>", methods=["PUT"])

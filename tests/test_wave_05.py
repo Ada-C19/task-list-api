@@ -130,7 +130,7 @@ def test_delete_goal(client, one_goal):
     assert response_body == {
         "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
     }
-    assert Goal.query.get(1) == None
+    assert Goal.query.get(1) is None
 
     # Check that the goal was deleted
     # response = client.get("/goals/1")
