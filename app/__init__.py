@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import os
 from dotenv import load_dotenv
+import os
 
 
 db = SQLAlchemy()
@@ -14,7 +14,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    if test_config is None:
+    if not test_config:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_DATABASE_URI")
     else:
@@ -29,6 +29,8 @@ def create_app(test_config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Register Blueprints here
+    # Register Blueprints
+    from .routes import task_list_bp
+    app.register_blueprint(task_list_bp)
 
     return app
