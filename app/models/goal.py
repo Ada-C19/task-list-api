@@ -8,12 +8,12 @@ class Goal(db.Model):
 
     def to_dict(self):
         return {
-        "id" : self.goal.id,
-        "title" : self.title
+            "id" : self.goal_id,
+            "title" : self.title
         }
-    
+
     @classmethod
-    def from_dict(cls, goal_data):
+    def from_dict(cls, dict_data):
         return cls(
-            title = goal_data["title"]
+            title = dict_data["title"],
         )
