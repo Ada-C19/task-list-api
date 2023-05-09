@@ -10,7 +10,7 @@ tasks_bp = Blueprint("task", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
 def validate_item(model, item_id):
-    """Validate that task exists in database before using route."""
+    """Validate that item of model exists in database before using route."""
     try:
         item_id = int(item_id)
     except:
