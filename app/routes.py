@@ -250,23 +250,31 @@ def validate_model(cls, model_id):
     return model
 
 # Routes for one-to-many relationship
+
+# Sending a list of task IDs to a goal
 @goals_bp.route("/<goal_id>/tasks",methods=["POST"])
 def add_tasks_to_goal(goal_id):
-    request_body = request.get_json()
-    tasks = request_body["task_ids"]
-    # try:
-    #     new_goal = Goal(title=request_body["title"])
-    # except:
-    #     abort(make_response({
-    #         "details":"Invalid data"
-    #     },400))
+    goal = validate_model(Goal,goal_id)
     
-    db.session.add(tasks)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+    
+    for id in task_ids:
+        task = Task.query.get(id)
+        goal.tasks.append(task) 
+    
     db.session.commit() 
     
     response_body = {
-        "id":"goal_id",
-        "task_ids":tasks 
+        "id":goal.goal_id,
+        "task_ids": task_ids
     }
     
     return make_response(response_body, 200)
+
+# Getting tasks of one goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_to_goal(goal_id):
+    goal = validate_model(Goal,goal_id)
+    
+    return make_response(goal.to_dict(),200)
