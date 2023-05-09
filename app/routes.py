@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
 import datetime
+import os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 def get_valid_item_by_id(model, id):
@@ -18,18 +19,19 @@ def get_valid_item_by_id(model, id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    new_task = Task.from_dict(request_body)
+    # new_task = Task.from_dict(request_body)
+
+    try:
+        new_task = Task.from_dict(request_body)
+        new_task.completed_at = None
+    except:
+        abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {"task": {
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": False
-        }}, 201
-        
+    return {"task":new_task.to_dict()}, 201
+
 
 @tasks_bp.route("", methods=['GET'])
 def handle_tasks():
@@ -62,3 +64,13 @@ def update_one_task(task_id):
     db.session.commit()
     
     return {"task":task_to_update.to_dict()}, 200
+
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_one_task(task_id):
+    task_to_delete = get_valid_item_by_id(Task, task_id)
+
+    db.session.delete(task_to_delete)
+    db.session.commit()
+
+    return {"details": f"Task {task_id} \"{task_to_delete.title}\" successfully deleted"}, 200
