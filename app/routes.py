@@ -42,6 +42,19 @@ def create_task():
 
     return make_response(jsonify(f"Task {new_task.title} successfully created"), 201)
 
+@task_list_bp.route("", methods=["GET"])
+def get_all_tasks():
+    title_query = request.args.get("title")
+    if title_query:
+        tasks = Task.query.filter_by(title=title_query)
+    else:
+        tasks = Task.query.all()
+    
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append(task.task_to_dict())
+    
+    return jsonify(tasks_response)
 
 
 # @task_list_bp.route("", methods=["GET"])
