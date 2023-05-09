@@ -25,12 +25,21 @@ def add_task():
 
     return {"task": new_task.to_result()}, 201
 
-
 # Get All Tasks Route
 @task_bp.route("", methods=["GET"])
 def get_tasks():
     response = []
-    all_tasks = Task.query.all()
+    # query params
+    sort_order = request.args.get('sort', None)
+
+    if sort_order == 'asc': 
+        all_tasks = Task.query.order_by(Task.title.asc()).all()
+
+    elif sort_order == 'desc': 
+        all_tasks = Task.query.order_by(Task.title.desc()).all()
+
+    else: 
+        all_tasks = Task.query.all()
 
     for task in all_tasks: 
         response.append(task.to_result())
