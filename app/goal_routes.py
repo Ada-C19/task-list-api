@@ -63,3 +63,5 @@ def delete_one_goal(goal_id):
     return {
         "details": f'Goal {goal_to_delete.goal_id} "{goal_to_delete.title}" successfully deleted'
     }, 200
+    
+
