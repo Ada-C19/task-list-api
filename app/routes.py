@@ -54,10 +54,43 @@ def create_one_task():
 # read/get all tasks
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    tasks_response = []
     tasks = Task.query.all()
+    sort_request_from_user = request.args.get("sort")
+    tasks_response = []
+    if sort_request_from_user: 
+
+        if sort_request_from_user == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
+        if sort_request_from_user == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
+
     for task in tasks:
         tasks_response.append(task.to_dict())
+
+
+
+    # # if len(tasks_response) > 1:
+    # # # request query for descending title
+    # title_query = Task.query.order_by(Task.title.desc())
+    # # else:
+    # #     tasks = Task.query.all()
+
+    # # tasks = Task.query.all()
+
+    # title_query = request.args.get("title")
+    # if title_query:
+    #     tasks = Task.query.filter_by(title=title_query)
+    # else:
+    #     tasks = Task.query.all()
+
+
+    # sets response to empty list and appends each task as a dict
+
+
+    # if title_query:
+    #     tasks = Task.query.filter_by(title=title_query)
+    # else:
+    #     tasks = Task.query.all()
 
     return jsonify(tasks_response), 200 
 
