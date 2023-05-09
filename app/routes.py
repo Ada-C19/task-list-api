@@ -231,5 +231,19 @@ def get_all_goals():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-
     return {"goal": goal.to_dict()}, 200
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return {"goal": {
+        "id": goal.goal_id,
+        "title": goal.title
+    }}, 200

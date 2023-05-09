@@ -80,7 +80,7 @@ def test_create_goal(client):
     }
 
 # Test I finished writing
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
     # Act
     # ---- Complete Act Here ----
@@ -101,7 +101,7 @@ def test_update_goal(client, one_goal):
     # ---- Complete Assertions Here ----
 
 # Test I finished writing
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
     # Act
     # ---- Complete Act Here ----
