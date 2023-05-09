@@ -40,6 +40,19 @@ def list_specific_task(task_id):
     return make_response({"task": task.to_dict()})
 
 
+# Update
+@tasks_bp.route("<task_id>", methods=["PUT"])
+def update_task_info(task_id):
+    task = validate_model(Task, task_id)
+    request_body = request.get_json()
+    
+    task.title = request_body["title"]
+    task.description = request_body["description"]
+
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()})
+
 
 # Helper Functions
 def validate_model(cls, model_id):
