@@ -56,7 +56,7 @@ def test_get_goal_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    assert "Goal '1' not found" in response_body["message"]
+    assert "ID '1' not found" in response_body["message"]
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -109,7 +109,7 @@ def test_update_goal_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    assert "Goal '1' not found" in response_body["message"]
+    assert "ID '1' not found" in response_body["message"]
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -129,7 +129,7 @@ def test_delete_goal(client, one_goal):
     response = client.get("/goals/1")
     response_body = response.get_json()
     assert response.status_code == 404
-    assert response_body == {"message": "Goal '1' not found"}
+    assert response_body == {"message": "ID '1' not found"}
     assert Goal.query.get(1) == None
 
 # @pytest.mark.skip(reason="test to be completed by student")
@@ -140,7 +140,7 @@ def test_delete_goal_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    assert "Goal '1' not found" in response_body["message"]
+    assert "ID '1' not found" in response_body["message"]
     assert Goal.query.all() == []
 
 
