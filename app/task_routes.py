@@ -54,6 +54,20 @@ def update_task_info(task_id):
     return make_response({"task": task.to_dict()})
 
 
+
+
+
+# Delete
+@tasks_bp.route("<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
+
+
 # Helper Functions
 def validate_model(cls, model_id):
     try:
