@@ -17,6 +17,7 @@ def create_a_task():
     
     try:
         new_task = Task(title=request_body["title"], description=request_body["description"])
+        
     except KeyError:
         return {
             "details": "Invalid data"
