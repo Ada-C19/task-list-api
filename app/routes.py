@@ -3,6 +3,9 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
 from datetime import datetime
+import requests
+import os
+
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 #helper functions
@@ -91,6 +94,11 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.now()
     db.session.commit()
 
+#Wave 4: send_slack_notification
+    HEADER = {"AUTHORIZATION":os.getenv('SLACK_BOT_TOKEN')}
+    DATA = {"channel":"task-notifications","text":"The task has been marked complete"}
+    requests.post("https://slack.com/api/chat.postMessage",headers=HEADER, data=DATA)
+    
     return jsonify({"task":task.to_dict()}),200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
