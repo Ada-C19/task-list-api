@@ -1,13 +1,13 @@
 from flask import Blueprint,jsonify, request, make_response, abort
 import requests
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 import datetime
 import os
 
 
 task_bp = Blueprint("tasks", __name__,url_prefix="/tasks")
-goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 #post a task
 @task_bp.route("", methods=["POST"])
@@ -106,11 +106,43 @@ def validate_id(model, item_id):
     except ValueError:
         return abort(make_response({"msg": "invalid endpoint"},400))
     
-    task = model.query.get(item_id)
-    if not task:
+    item = model.query.get(item_id)
+    if not item:
         return abort(make_response({"msg": "invalid endpoint"},404))
     
-    return task
+    return item
 
-# @goal_bp.route("", methods=["POST"])
-# def add_goal():
+
+
+goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
+@goal_bp.route("", methods=["POST"])
+def add_goal():
+    request_body = request.get_json()
+
+    new_goal = Goal.from_dict(request_body)
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_dict()}, 201
+
+@goal_bp.route("", methods=["GET"])
+def get_all_goals():
+    response = []
+    title_query = request.query.get("title")
+
+    if title_query == None:
+        all_goals = Goal.query.filter_by(title=title_query)
+    else:
+        all_goals = Goal.query.all()
+
+    for goal in all_goals:
+        response.append(goal.to_dict())
+
+    return jsonify(response), 200
+
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_id(Goal,goal_id)
+
+    return {"goal" : goal.to_dict()}, 200
