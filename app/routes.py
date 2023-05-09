@@ -58,11 +58,20 @@ def update_task(task_id):
     return {"task": task.to_dict()} 
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def update_incomplete_task_to_complete(task_id): 
+def update_task_as_complete(task_id): 
     task = validate_item(Task, task_id)
 
     task.completed_at = datetime.datetime.now(tz=None)
-    task.is_complete = True
+    
+    db.session.commit()
+
+    return {"task" : task.to_dict()}
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_task_as_incomplete(task_id): 
+    task = validate_item(Task, task_id)
+
+    task.completed_at = None
 
     db.session.commit()
 
