@@ -35,14 +35,14 @@ def get_saved_tasks():
     tasks = Task.query.all()
     sort_request = request.args.get("sort")
     task_response = []
-    if tasks:
-        if sort_request:
-            if sort_request == "asc":
-                tasks = Task.query.order_by(Task.title.asc())
-            elif sort_request == "desc":
-                tasks = Task.query.order_by(Task.title.desc())
-        for task in tasks:
-            task_response.append(task.to_dict())
+
+    if sort_request:
+        if sort_request == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
+        if sort_request == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
+    for task in tasks:
+        task_response.append(task.to_dict())
     return jsonify(task_response), 200
     
 @tasks_bp.route("/<task_id>", methods=["GET"])
