@@ -11,20 +11,22 @@ class Task(db.Model):
     def from_dict(cls, data_dict):
         return cls(title = data_dict["title"],
                 description = data_dict["description"],
-                completed_at = data_dict["completed_at"])
+                completed_at = None)
 
     def to_dict(self):
         return dict(
-            task_id = self.task_id,
+            id = self.task_id,
             title = self.title,
             description = self.description,
             is_complete = self.is_it_done()
         )
+
     def is_it_done(self):
-        if completed_at == None:
-            completed_at = False
+        if self.completed_at == None:
+            self.completed_at = False
         else:
-            completed_at = True 
+            self.completed_at = True 
+        return self.completed_at
     
 
 
