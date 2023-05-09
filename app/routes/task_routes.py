@@ -1,12 +1,8 @@
 from flask import Blueprint, request, jsonify, abort, make_response
 from datetime import datetime
-# from dotenv import load_dotenv
-import requests
-import os
+import requests, os
 from app.models.task import Task
 from app import db
-
-# load_dotenv()
 
 def handle_valid_id(model, task_id):
     try:
