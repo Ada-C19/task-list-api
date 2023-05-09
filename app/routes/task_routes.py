@@ -31,6 +31,19 @@ def get_one_task(task_id):
 
     return make_response(task.to_dict() , 200)
 
+@task_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):
+    task = verify_item(Task, task_id)
+
+    request_data = request.get_json()
+
+    task.title = request_data["title"]
+    task.description = request_data["description"]
+
+    db.session.commit()
+
+    return make_response(task.to_dict() , 200)
+
 def verify_item(model, item_id):
     try: 
         item_id = int(item_id)
