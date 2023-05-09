@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, Response, abort, make_response
 from app.models.task import Task
 from app import db 
+from datetime import datetime
 
 
 # create blueprint 
@@ -77,10 +78,35 @@ def delete_task(task_id):
 
     return {"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200
 
+# Mark Task as Completed Route
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def update_task_as_complete(task_id):
+    task = validate_item(Task, task_id)
+
+    request_data = request.get_json()
+    task.completed_at = datetime.now()
+
+    db.session.commit()
+
+    return {"task": task.to_result()}, 200
+
+# Mark Task as Incompleted Route
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_task_as_incomplete(task_id):
+    task = validate_item(Task, task_id)
+
+    request_data = request.get_json()
+    task.completed_at = None
+
+    db.session.commit()
+
+    return {"task": task.to_result()}, 200
+
 # VALIDATION HELPER FUNCTION
 def validate_item(model, item_id):
     try:
         item_id = int(item_id)
+
     except ValueError:
         return abort(make_response({"message": f"invalid id: {item_id}"}, 400))
     
