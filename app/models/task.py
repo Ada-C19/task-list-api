@@ -13,6 +13,12 @@ class Task(db.Model):
     def to_dict(self):
         return {"id": self.task_id,
                 "title": self.title,
+                "description": self.description,
+                "is_complete": (self.completed_at!=None)} 
+    
+    def to_dict_with_goal(self):
+        return {"id": self.task_id,
+                "title": self.title,
                 "goal_id": self.goal_id,
                 "description": self.description,
                 "is_complete": (self.completed_at!=None)} 

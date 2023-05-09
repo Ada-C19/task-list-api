@@ -1,21 +1,11 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
 from app.models.task import Task
+from app.routes.helper_routes import validate_object
 from app import db
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
-def validate_object(cls, object_id):
-    # handle invalid object id, return 400
-    try:
-        object_id = int(object_id)
-    except:
-        abort(make_response({"msg": f"{cls.__name__} {object_id} is invalid."}, 400))
 
-    obj = cls.query.get(object_id)
-    if obj is None:
-        abort(make_response({"msg": f"{cls.__name__} not found."}, 404))
-
-    return obj
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
     

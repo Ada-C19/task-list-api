@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 from datetime import datetime
+from app.routes.helper_routes import validate_object
 import os
 from slack_sdk import WebClient
 
@@ -9,19 +10,6 @@ from slack_sdk import WebClient
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-
-def validate_object(cls, task_id):
-    #handle invalid task id, return 400
-    try:
-        task_id = int(task_id)
-    except: 
-        abort(make_response({"msg": f"{cls.__name__} {task_id} is invalid."}, 400))
-    
-    task = Task.query.get(task_id)
-    if task is None:
-        abort(make_response({"msg": "Task not found."}, 404))
-
-    return task 
 
  
     
