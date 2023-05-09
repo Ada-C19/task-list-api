@@ -60,7 +60,8 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def read_one_task(task_id):
     # task = Task.query.get(task_id)
-    task = validate_item(task_id)
+    # task = validate_item(task_id)
+    task = validate_model(Task, task_id)
 
     # is_complete = False
     # if task.completed_at:
@@ -79,7 +80,8 @@ def read_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     # task = Task.query.get(task_id)
-    task = validate_item(task_id)
+    # task = validate_item(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -106,7 +108,8 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     # task = Task.query.get(task_id)
-    task = validate_item(task_id)
+    # task = validate_item(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -124,23 +127,37 @@ def delete_task(task_id):
         "details": f'Task {task_id} \"{task.title}\" successfully deleted'
     }, 200
     
-
-def validate_item(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message": f"invalid task_id: {task_id}"}, 400))
+# Working validation
+# def validate_item(task_id):
+#     try:
+#         task_id = int(task_id)
+#     except:
+#         abort(make_response({"message": f"invalid task_id: {task_id}"}, 400))
     
-    task = Task.query.get(task_id)
+#     task = Task.query.get(task_id)
 
-    if not task:
-        abort(make_response({"message": f"task {task_id} not found"}, 404))
+#     if not task:
+#         abort(make_response({"message": f"task {task_id} not found"}, 404))
 
-    return task
+#     return task
+
+def validate_model(cls, model_id):
+    try:
+        model_id = int(model_id)
+    except:
+        abort(make_response({"message": f"{cls.__name__} {model_id} invalid"}, 400))
+    
+    model = cls.query.get(model_id)
+
+    if not model:
+        abort(make_response({"message": f"{cls.__name__} {model_id} not found"}, 404))
+
+    return model
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete_task(task_id):
-    task = validate_item(task_id)
+    # task = validate_item(task_id)
+    task = validate_model(Task, task_id)
 
     task.completed_at = datetime.now()
 
@@ -168,7 +185,8 @@ def mark_complete_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete_task(task_id):
-    task = validate_item(task_id)
+    # task = validate_item(task_id)
+    task = validate_model(Task, task_id)
 
     task.completed_at = None
 
