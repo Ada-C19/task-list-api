@@ -13,3 +13,6 @@ def validate_model(cls, model_id):
         abort(make_response({"message": f"{cls.__name__} {model_id} not found"}, 404))
 
     return model
+
+def delete_message(cls, model):
+    return make_response({"details": f"{cls.__name__} {model.id} \"{model.title}\" successfully deleted"})

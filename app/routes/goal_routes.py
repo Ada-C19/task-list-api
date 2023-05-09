@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app.models.goal import Goal
 from app.models.task import Task
-from .routes_helpers import validate_model
+from .routes_helpers import validate_model, delete_message
 from app import db
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -24,17 +24,17 @@ def create_goal():
 # CREATE TASK TO GOAL ENDPOINT
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def create_task(goal_id):
-    goal = validate_model(Goal,goal_id)
+    goal = validate_model(Goal, goal_id)
 
     request_body = request.get_json()
 
     for task_id in request_body["task_ids"]:
         task = Task.query.get(task_id)
-        task.goal_id = goal.goal_id
+        task.goal_id = goal.id
 
     db.session.commit()
 
-    return make_response({"id": goal.goal_id,
+    return make_response({"id": goal.id,
                           "task_ids": request_body["task_ids"]})
 
 # GET GOALS ENDPOINT
@@ -58,12 +58,12 @@ def read_one_goal(goal_id):
 def read_task_by_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    tasks = Task.query.filter(Task.goal_id == goal.goal_id)
+    tasks = Task.query.filter(Task.goal_id == goal.id)
 
-    tasks_body = [task_dict(task) for task in tasks]
+    tasks_body = [task.to_dict() for task in tasks]
 
     return make_response(jsonify({
-        "id": goal.goal_id,
+        "id": goal.id,
         "title": goal.title,
         "tasks": tasks_body
     }))
@@ -89,15 +89,5 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
-
-
-# HELPER FUNCTIONS
-def task_dict(task):
-    return {
-        "id": task.task_id,
-        "goal_id": task.goal_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": False
-    }
+    # return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
+    return delete_message(Goal, goal)

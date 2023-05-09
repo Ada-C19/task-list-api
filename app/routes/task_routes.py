@@ -1,7 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
 from app import db
-from .routes_helpers import validate_model
+from .routes_helpers import validate_model, delete_message
 from datetime import date
 import requests
 import os
@@ -108,4 +108,5 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
+    # return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"})
+    return delete_message(Task, task)
