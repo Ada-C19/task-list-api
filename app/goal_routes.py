@@ -39,7 +39,36 @@ def read_all_goals():
 
     for goal in goals:
         goal_response.append({
+            "id": goal.goal_id,
             "title": goal.title
         })
-    
+
     return jsonify(goal_response), 200
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def read_goal_by_id(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    return {
+        "goal": {
+            "id": goal.goal_id,
+            "title": goal.title
+        }
+    }, 200
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    title = request_body["title"]
+
+    db.session.commit()
+
+    return {
+        "goal": {
+            "id": goal.goal_id,
+            "title": goal.title
+        }
+    }
+
