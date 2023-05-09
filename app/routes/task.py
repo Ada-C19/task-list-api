@@ -1,9 +1,12 @@
 from flask import Blueprint, jsonify, abort, make_response, request
-from app.models.task import Task
 from app import db
 from datetime import date
 import requests
 import os
+
+from app.models.task import Task
+from app.routes.routes_helper import get_valid_item_by_id
+
 
 
 SLACK_ENDPOINT = "https://slack.com/api/chat.postMessage"
