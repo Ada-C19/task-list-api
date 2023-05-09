@@ -3,6 +3,11 @@ from app import db
 from app.models.task import Task
 import datetime
 
+from dotenv import load_dotenv
+import requests 
+import os
+load_dotenv()
+
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -97,6 +102,17 @@ def mark_complete(task_id):
     task.completed_at = datetime.datetime.now() 
 
     db.session.commit()
+
+    slack_path = "https://slack.com/api/chat.postMessage"
+
+    bot_info = {
+        "token": os.environ.get("SLACK_PERSONAL_TOKEN"),
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task {task.title}."
+    }
+
+    requests.post(slack_path, data=bot_info)
+
 
     return make_response({"task": task.to_result()})
 
