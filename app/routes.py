@@ -15,7 +15,7 @@ def validate_task(task_id):
         abort(make_response({"message":f"task {task_id} not found"}, 404))
 
     return task
-    
+
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -31,7 +31,9 @@ def create_tasks():
     db.session.add(new_task)
     db.session.commit()
     
-    return make_response(jsonify(f"Task {new_task.title} successfully created", 201))
+    response_body = {"task": new_task.to_dict()}
+    
+    return make_response(jsonify(response_body), 201)
 
 
 @task_bp.route("", methods=["GET"])
@@ -45,24 +47,41 @@ def read_all_tasks():
     task_response = []
     for task in tasks:
         task_response.append(task.to_dict())
+
     return jsonify(task_response)
 
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_task(task_id)
-    return task.to_dict()
+    return make_response(jsonify({"task":task.to_dict()}))
+
+@task_bp.route("/<task_id>", methods=["GET"])
+def read_one_task_ascending(task_id):
+    sort_query = request.args.get('sort')
+    if sort_query:
+        tasks = Task.query.filter_by(title=sort_query)
+    else:
+        tasks = Task.query.all()
+
+    task_response = []
+    for task in tasks:
+        task_response.append(task.to_dict())
+
+    return jsonify(task_response)
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
 
-    request_body = request.get_json()
+    
     task = validate_task(task_id)
-    task.description = request_body["description"]
+    # request_body = request.get_json()
+    # task.description = request_body["description"]
+
     db.session.delete(task)
     db.session.commit()
 
-    return make_response(jsonify({"details": f"Task {task_id}: \"{task.description}\" successfully deleted"}), 200)
+    return make_response(jsonify({"details": f"Task {task_id} \"{task.title}\" successfully deleted"}), 200)
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -76,4 +95,4 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return make_response(f"book #{task_id} successfully updated",200)
+    return make_response(jsonify({"task":task.to_dict()}),200)
