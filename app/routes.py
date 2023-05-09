@@ -125,7 +125,6 @@ def delete_task(task_id):
     return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}, 200
 
 
-################# Goal Routes #################
 @goals_bp.route("", methods=["POST"])
 def add_goal():
     """Create and add goal to database."""
