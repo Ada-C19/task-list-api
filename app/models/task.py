@@ -5,7 +5,7 @@ class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, default=None)
+    completed_at = db.Column(db.DateTime, default=None, nullable=True)
 
     def to_dict(self):
         if self.completed_at:
@@ -21,8 +21,12 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, task_data):
+        if "completed_at" in task_data:
+            completed_at = task_data["completed_at"]
+        else:
+            completed_at = None
         return cls(
             title = task_data["title"],
             description = task_data["description"],
-            completed_at = task_data["completed_at"]
+            completed_at = completed_at
         )
