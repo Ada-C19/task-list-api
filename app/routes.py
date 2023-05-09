@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 import datetime
 
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ load_dotenv()
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 
 @task_bp.route("", methods=["POST"])
