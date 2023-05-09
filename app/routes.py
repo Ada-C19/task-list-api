@@ -3,6 +3,16 @@ from app.models.task import Task
 from app import db
 from sqlalchemy import asc, desc
 from datetime import datetime, date
+import requests
+import json
+
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+token=os.environ.get("SLACK_BOT_TOKEN")
+
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -121,24 +131,36 @@ def delete_one_task(task_id):
 def mark_off_complete(task_id):
     task = validate_task(task_id)
 
-    # request_body = request.get_json()
     time_now = datetime.now()
     todays_date = date.today()
-
-    # task.title = request_body["title"]
-    # if request_body["title"] else task.title
-    # task.description = request_body["description"] 
-    # if request_body["description"] else task.description
     task.completed_at = todays_date
-    # if request_body["completed_at"] else task.completed_at
 
     db.session.commit()
+
+    # Sending message to Slack (working on it)
+    url = 'https://slack.com/api/chat.postMessage'
+    text_to_send = f"Someone just completed the task {task.title}"
+    # request_body = requests.post(url, json = text_to_send, headers=headers)
+
+    headers = {"Content-Type": "application/json"}
+    data = {
+        'token': token,
+        'channels': 'task-notifications',
+        "text": text_to_send
+    }
+    res = requests.post(url=url, data=data, headers=headers)
+    if res.status_code == 200:
+        print(f'Response: {res.json()}')
+    else:
+        print(f'Fail to send: {res.json()}')
+
     return {"task": {
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
                 "is_complete": bool(task.completed_at)}
             }
+        
 
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
@@ -154,3 +176,12 @@ def mark_incomplete(task_id):
                 "is_complete": bool(task.completed_at)}
             }
 
+
+# @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+# def send_post_to_slack(task_id):
+#     task = validate_task(task_id)
+#     to_send = {
+#         "id": 1,
+#         "title": "My Beautiful Task",
+#         "completed_at": task.completed_at
+#     }
