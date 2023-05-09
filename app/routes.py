@@ -182,15 +182,14 @@ def get_one_goal(goal_id):
     return {"goal": validate_goal(Goal, goal_id).to_dict()}, 200
 
 
-# @tasks_bp.route("/<task_id>", methods=["PUT"])
-# def update_task(task_id):
-#     """Updates task specifed by id."""
-#     task = validate_model(Task, task_id)
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    """Updates goal specifed by id."""
+    goal = validate_goal(Goal, goal_id)
 
-#     request_body = request.get_json()
-#     task.title = request_body["title"]
-#     task.description = request_body["description"]
+    request_body = request.get_json()
+    goal.title = request_body["title"]
 
-#     db.session.commit()
+    db.session.commit()
 
-#     return {"task": task.to_dict()}, 200
+    return {"goal": goal.to_dict()}, 200
