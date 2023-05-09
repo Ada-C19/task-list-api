@@ -41,3 +41,14 @@ def get_goal(goal_id):
     goal = handle_valid_id(Goal, goal_id)
 
     return {"goal": goal.to_dict()}, 200
+
+@goals_bp.route("<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    request_body = request.get_json()
+        
+    goal_to_update = handle_valid_id(Goal, goal_id)
+    goal_to_update.title = request_body["title"]
+    
+    db.session.commit()
+
+    return {"goal": goal_to_update.to_dict()}, 200
