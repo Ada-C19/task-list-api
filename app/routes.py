@@ -230,4 +230,6 @@ def get_all_goals():
     
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
 
+    return {"goal": goal.to_dict()}, 200

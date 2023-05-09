@@ -30,7 +30,7 @@ def test_get_goals_one_saved_goal(client, one_goal):
     ]
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goal(client, one_goal):
     # Act
     response = client.get("/goals/1")
@@ -47,7 +47,7 @@ def test_get_goal(client, one_goal):
     }
 
 # Test I finished writing
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
     pass
     # Act
