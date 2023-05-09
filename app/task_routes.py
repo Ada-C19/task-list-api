@@ -34,6 +34,26 @@ def list_all_tasks():
     return jsonify(tasks_response)
 
 
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def list_specific_task(task_id):
+    task = validate_model(Task, task_id)
+    return make_response({"task": task.to_dict()})
+
+
+
+# Helper Functions
+def validate_model(cls, model_id):
+    try:
+        model_id = int(model_id)
+    except:
+        abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
+
+    model = cls.query.get(model_id)
+
+    if not model:
+        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
+
+    return model
 
 
 def check_task_data(request):
