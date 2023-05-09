@@ -15,18 +15,6 @@ SLACK_HEADERS = {
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
-# Helper function
-def validate_task(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"details": "Invalid data"}, 400))
-    
-    task = Task.query.get(task_id)
-    
-    return task if task else abort(make_response({'msg': f"No task with id {task_id}"}, 404))
-
-
 def send_slack_msg(new_data):
 
     slack_response = requests.post(SLACK_ENDPOINT, headers=SLACK_HEADERS, json=new_data)
