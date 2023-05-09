@@ -30,4 +30,4 @@ class Task(db.Model):
         description= task_data['description'],
         completed_at= task_data['completed_at'])
 
-        return new_task
+        return new_task()
