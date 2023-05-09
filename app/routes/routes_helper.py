@@ -1,13 +1,13 @@
 from flask import abort, make_response
 
 
-def get_valid_item_by_id(task_id):
+def get_valid_item_by_id(model, id):
     try:
-        task_id = int(task_id)
+        task_id = int(id)
     except:
         abort(make_response({"details": "Invalid data"}, 400))
     
-    task = Task.query.get(task_id)
+    item = model.query.get(id)
     
-    return task if task else abort(make_response({'msg': f"No task with id {task_id}"}, 404))
+    return item if item else abort(make_response({'msg': f"No {model.__name__.lower()} with id {id}"}, 404))
 

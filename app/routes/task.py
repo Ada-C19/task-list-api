@@ -8,7 +8,6 @@ from app.models.task import Task
 from app.routes.routes_helper import get_valid_item_by_id
 
 
-
 SLACK_ENDPOINT = "https://slack.com/api/chat.postMessage"
 SLACK_OATH_TOKEN = os.environ.get('SLACK_BOT_USER_OATH_TOKEN')
 SLACK_HEADERS = {
@@ -60,7 +59,7 @@ def handle_tasks():
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def handle_task(task_id):
-    task = validate_task(task_id)
+    task = get_valid_item_by_id(Task, task_id)
     return {"task": task.to_dict()}, 200
 
 
@@ -68,7 +67,7 @@ def handle_task(task_id):
 def update_one_task(task_id):
     request_body = request.get_json()
 
-    task_to_update = validate_task(task_id)
+    task_to_update = get_valid_item_by_id(Task, task_id)
 
     task_to_update.title = request_body["title"]
     task_to_update.description = request_body["description"]
@@ -80,7 +79,7 @@ def update_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_one_task(task_id):
-    task_to_delete = validate_task(task_id)
+    task_to_delete = get_valid_item_by_id(Task, task_id)
 
     db.session.delete(task_to_delete)
     db.session.commit()
@@ -93,7 +92,7 @@ def delete_one_task(task_id):
 
 @tasks_bp.route("/<task_id>/<mark_status>", methods=['PATCH'])
 def mark_task(task_id, mark_status):
-    task_to_mark = validate_task(task_id)
+    task_to_mark = get_valid_item_by_id(Task, task_id)
     
     if mark_status == "mark_complete":
         task_to_mark.completed_at = date.today()
