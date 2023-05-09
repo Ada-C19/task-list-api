@@ -6,12 +6,11 @@ from datetime import datetime, date
 import requests
 import json
 
-
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-token=os.environ.get("SLACK_BOT_TOKEN")
+token = os.environ.get("SLACK_BOT_TOKEN")
 
 
 
@@ -126,6 +125,23 @@ def delete_one_task(task_id):
         "details": f"Task {task.task_id} \"{task.title}\" successfully deleted"
 })
 
+# helper function to send msg to slack
+def post_message_to_slack(my_text, blocks = None):
+    url = "https://slack.com/api/chat.postMessage"
+
+    payload = json.dumps({
+    "channel": "task-notifications",
+    "text": my_text
+    })
+    headers = {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_off_complete(task_id):
@@ -137,22 +153,9 @@ def mark_off_complete(task_id):
 
     db.session.commit()
 
-    # Sending message to Slack (working on it)
-    url = 'https://slack.com/api/chat.postMessage'
+    # sending to slack???
     text_to_send = f"Someone just completed the task {task.title}"
-    # request_body = requests.post(url, json = text_to_send, headers=headers)
-
-    headers = {"Content-Type": "application/json"}
-    data = {
-        'token': token,
-        'channels': 'task-notifications',
-        "text": text_to_send
-    }
-    res = requests.post(url=url, data=data, headers=headers)
-    if res.status_code == 200:
-        print(f'Response: {res.json()}')
-    else:
-        print(f'Fail to send: {res.json()}')
+    post_message_to_slack(text_to_send)
 
     return {"task": {
                 "id": task.task_id,
@@ -177,11 +180,4 @@ def mark_incomplete(task_id):
             }
 
 
-# @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-# def send_post_to_slack(task_id):
-#     task = validate_task(task_id)
-#     to_send = {
-#         "id": 1,
-#         "title": "My Beautiful Task",
-#         "completed_at": task.completed_at
-#     }
+
