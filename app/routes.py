@@ -1,5 +1,6 @@
 from app import db
 from app.models.task import Task
+from sqlalchemy import asc, desc
 from flask import Blueprint, jsonify, make_response, abort, request
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -35,10 +36,12 @@ def create_task():
     
 @tasks_bp.route("", methods =["GET"])
 def get_tasks_data():
-    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
 
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
+    if sort_query == "asc":
+        tasks = Task.query.order_by(asc(Task.title))
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(desc(Task.title))
     else:
         tasks = Task.query.all()
 
@@ -75,4 +78,3 @@ def delete_task(task_id):
 
     message = {f"details": 'Task 1 "Go on my daily walk 🏞" successfully deleted'}
     return make_response(jsonify(message)), 200
-
