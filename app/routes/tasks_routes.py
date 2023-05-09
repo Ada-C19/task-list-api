@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
-# from app.routes.helper_functions import get_valid_item_by_id
 from app import db
 
 # All routes for tasks start with "/tasks" URL prefix
@@ -19,12 +18,23 @@ def get_valid_item_by_id(model, id):
 
 
 @tasks_bp.route("", methods=["GET"])
-def handle_get_animals_request():
+def handle_get_tasks_request():
     tasks = Task.query.all()
     task_response = []
     for task in tasks:
-        task_response.append(task.to_dict())
+        is_complete = False
+        if task.to_dict()["completed_at"]:
+            is_complete = True
+
+        task_response.append({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": is_complete
+        })
+
     return jsonify(task_response), 200
+
 
 @tasks_bp.route("", methods=['POST'])
 def create_task():
@@ -49,20 +59,21 @@ def create_task():
         }
     }, 201
 
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def handle_task(task_id):
+def handle_get_single_task(task_id):
     task = get_valid_item_by_id(Task, task_id)
-    task = task.to_dict()
+    task_dict = task.to_dict()
 
     is_complete = False
-    if task["completed_at"]:
+    if task_dict["completed_at"]:
         is_complete = True
 
-    return [
-        {
+    return {
+        "task": {
             "id": task.id,
             "title": task.title,
             "description": task.description,
             "is_complete": is_complete
         }
-    ], 200
+    }, 200
