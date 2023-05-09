@@ -41,6 +41,8 @@ def get_one_task(task_id):
 
     return {"task" : task.to_dict()}, 200
 
+
+
 @task_bp.route("<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_id(Task, task_id)
@@ -54,6 +56,19 @@ def update_task(task_id):
 
     return {"task" : task.to_dict()}, 200
 
+@task_bp.route("/<task_id>/<completed_at>", methods=["PATCH"])
+def update_task(task_id,completed_at):
+    task = validate_id(Task, task_id)
+    request_data = request.get_json()
+
+    task.completed_at = request_data["is_complete"]
+    if completed_at == "mark_complete":
+        "mark_complete" == True
+    else:
+        False 
+    db.session.commit()
+    return {"task" : task.to_dict()}, 200
+
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_id(Task,task_id)
@@ -62,7 +77,6 @@ def delete_task(task_id):
     db.session.commit()
 
     return {"details": f'Task {task_id} "{task.title}" successfully deleted'}
-
 
 
 
