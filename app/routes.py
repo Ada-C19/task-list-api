@@ -34,9 +34,9 @@ def create_tasks():
 def read_all_tasks():
     title_query = request.args.get("title")
     if title_query:
-        tasks = task.query.filter_by(title=title_query)
+        tasks = Task.query.filter_by(title=title_query)
     else:
-        tasks = task.query.all()
+        tasks = Task.query.all()
 
     task_response = []
     for task in tasks:
