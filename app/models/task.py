@@ -8,7 +8,7 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
 
     #from_dict is replacing the writing each.
-    def from_dict(self):
+    def to_dict(self):
         is_complete = False
         if self.completed_at:
             is_complete = True
