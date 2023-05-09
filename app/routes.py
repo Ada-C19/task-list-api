@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+from datetime import date
 from app import db
 from app.models.task import Task
 # from app.models.goal import Goal
@@ -115,6 +116,27 @@ def update_task(task_id):
             "is_complete": True if task.completed_at else False
         }
     }, 200
+
+# in progress
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def task_completed(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json() 
+
+    task.completed_at = date.today()
+
+    db.session.commit()
+
+    return {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True if task.completed_at else False
+        }
+    }, 200
+
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
