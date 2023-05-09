@@ -81,3 +81,31 @@ def handle_get_single_task(task_id):
             "is_complete": is_complete
         }
     }, 200
+
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):
+    request_body = request.get_json()
+    if "title" not in request_body or "description" not in request_body:
+        return {
+            "details": "Invalid data"
+        }, 400
+    task_to_update = get_valid_item_by_id(Task, task_id)
+    
+    task_to_update.title = request_body["title"]
+    task_to_update.description = request_body["description"]
+
+    db.session.commit()
+
+    is_complete = False
+    if task_to_update.to_dict()["completed_at"]:
+        is_complete = True
+    
+    return {
+        "task": {
+            "id": task_to_update.id,
+            "title": task_to_update.title,
+            "description": task_to_update.description,
+            "is_complete": is_complete
+        }
+    }, 200
