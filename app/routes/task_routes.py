@@ -20,11 +20,17 @@ def add_task():
 @task_bp.route("", methods=["GET"])
 def get_tasks():
     response_list = []
+    sort_query = request.args.get("sort")
 
     all_tasks = Task.query.all()
 
     for task in all_tasks:
         response_list.append(task.to_dict())
+
+    if sort_query == "asc":
+        response_list.sort(key=get_title)
+    elif sort_query == "desc":
+        response_list.sort(reverse=True, key=get_title)
 
     return jsonify(response_list), 200
 
@@ -78,3 +84,6 @@ def verify_task_inputs(request_body):
 
 def message_for_only_one_task(task):
     return {"task": task.to_dict()}
+
+def get_title(task):
+    return task["title"]
