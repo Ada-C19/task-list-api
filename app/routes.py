@@ -51,6 +51,7 @@ def create_new_task():
 @task_bp.route("/<task_id>", methods = ["GET"])
 def get_task_by_id(task_id):
     task = validate_item(Task, task_id)
+
     return {"task": task.to_dict()}, 200
 
 
@@ -157,3 +158,30 @@ def delete_one_goal(goal_id):
     db.session.commit()
 
     return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods= ["POST"])
+def post_tasks_under_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+    try:
+        new_tasks_for_goal = request_body["task_ids"]
+        tasks = []
+        for task_id in new_tasks_for_goal:
+            tasks.append(validate_item(Task, task_id))
+
+        goal.tasks = tasks
+            
+        db.session.commit()
+
+        return {"id": goal.goal_id, "task_ids": new_tasks_for_goal}, 200
+    except:
+        return abort(make_response({"details": "Invalid data"}, 400))
+# #RETURN TO THIS ROUTE LATER
+
+@goal_bp.route("/<goal_id>/tasks", methods = ["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    tasks = [task.to_dict_with_goal() for task in goal.tasks]
+    return jsonify(goal.to_dict_with_tasks()), 200
