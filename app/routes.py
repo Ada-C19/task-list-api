@@ -185,18 +185,15 @@ goal_bp = Blueprint("goal", __name__,url_prefix = "/goals")
 # create a goal
 @goal_bp.route("", methods = ["POST"])
 def create_goal():
-    print("goal 1")
+    
     response_body = request.get_json()
-    print("goal 2")
     if "title" not in response_body:
         return jsonify({"details": "Invalid data"}), 400
-    print("goal 3")
     new_goal = Goal.from_goal_dict(response_body)
-    print("goal 4")
+    
     db.session.add(new_goal)
-    print("goal 5")
     db.session.commit()
-    print("goal 6")
+  
     return jsonify({
                     "goal":{
                     "id":new_goal.goal_id,
