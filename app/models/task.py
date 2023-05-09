@@ -1,11 +1,12 @@
 from app import db
+from datetime import datetime
 
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
-    completed_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.Date, nullable=True)
 
     def to_dict(self):
         if not self.completed_at:
@@ -26,8 +27,7 @@ class Task(db.Model):
                     "is_complete": True
                 }
             }
-  
-         
+     
     @classmethod
     def from_dict(cls, task_dict):
         try:
