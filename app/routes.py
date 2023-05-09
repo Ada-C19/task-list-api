@@ -27,6 +27,20 @@ def validate_task(task_id):
 def create_one_task():
     request_body = request.get_json()
 
+    # tried to catch exception
+    # getting assertion error for the following assert in test_create_test
+    # assert "task" in response_body
+
+    # attempt to solve, made it fail 2 more tests
+    # if "task" in request_body:
+
+    # try:
+    #     new_task = Task(title=request_body["title"], description=request_body["description"])
+
+    # except KeyError:
+    #     return {"details": "Invalid data"}, 400
+
+
     if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
     else:
@@ -36,7 +50,11 @@ def create_one_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(jsonify(f"Task {new_task.title} successfully created"), 201)
+    response_body = {
+        "task": new_task.to_dict()
+    }
+
+    return response_body, 201
 
 
 # read/get all tasks
@@ -65,15 +83,25 @@ def update_one_task(task_id):
 
     request_body = request.get_json()
 
-    task.id = request_body["task_id"]
-    task.title = request_body["title"]
-    task.description = request_body["description"]
-    task.completed_at = request_body["completed_at"]
-    task.is_completed = request_body["is_completed"]
+    if request_body["title"]:
+        task.title = request_body["title"]
 
+    if request_body["description"]:
+        task.description = request_body["description"]
+
+    # come back to this!
+    # eventually you will need this b/c you will need the option to update this attribute 
+    # if request_body["completed_at"]:
+    #     task.completed_at = request_body["completed_at"]
+
+    db.session.add(task)
     db.session.commit()
 
-    return jsonify(make_response(f"Task #{task.task_id} successfully updated")), 200 
+    response_body = {
+        "task": task.to_dict()
+    }
+
+    return response_body, 200 
 
 
 # delete one task
