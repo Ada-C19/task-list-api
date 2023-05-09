@@ -4,12 +4,17 @@ from app import db
 from helper import validate_model
 from sqlalchemy import asc, desc
 from datetime import datetime
+import requests
+import json
+import os
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+SLACK_POST_ENDPOINT = "https://slack.com/api/chat.postMessage"
+# SLACK_API = os.environ.get("SLACK_API")
+
 
 # POST
-
-
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     book_data = request.get_json()
@@ -80,21 +85,37 @@ def delete_task(task_id):
 # PATCH
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task_to_mark = validate_model(Task, task_id)
+    task = validate_model(Task, task_id)
 
-    task_to_mark.completed_at = datetime.now()
+    task.completed_at = datetime.now()
     db.session.commit()
 
-    message = {"task": task_to_mark.to_dict()}
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer xoxb-4680452269380-5244295323809-B89humLNpYydCqWVa2YDMVjI"
+        # "Authorization": f"Bearer {os.environ.get('SLACK_API')}"
+
+    }
+
+    slack_post_data = json.dumps({
+        "text": f"Someone just completed the task {task.title}",
+        "channel": "C05769EL4RF",
+    })
+
+    slack_response = requests.post(
+        url=SLACK_POST_ENDPOINT, headers=headers, data=slack_post_data)
+
+    print(slack_response.text)
+    message = {"task": task.to_dict()}
     return make_response(jsonify(message), 200)
 
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task_to_mark = validate_model(Task, task_id)
+    task = validate_model(Task, task_id)
 
-    task_to_mark.completed_at = None
+    task.completed_at = None
     db.session.commit()
 
-    message = {"task": task_to_mark.to_dict()}
+    message = {"task": task.to_dict()}
     return make_response(jsonify(message), 200)
