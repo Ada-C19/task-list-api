@@ -26,8 +26,18 @@ def validate_task(task_id):
 @tasks_bp.route("", methods=["POST"])
 def create_one_task():
     request_body = request.get_json()
+
+    if "title" not in request_body.get_json():
+        abort(make_response({"message": "title not found"}), 400)
+    if "description" not in request_body.get_json():
+        abort(make_response({"message": "description not found"}), 400)
+    if "completed_at" not in request_body.get_json():
+        abort(make_response({"message": "completed_at not found"}), 400)
+
+    # Idk if I need completed_at bc it's nullable in task.py 
     new_task = Task(title=request_body["title"], 
-                    description=request_body["description"])
+                    description=request_body["description"],
+                    completed_at=request_body["completed_at"])
 
     db.session.add(new_task)
     db.session.commit()
