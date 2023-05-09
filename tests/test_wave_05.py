@@ -54,6 +54,7 @@ def test_get_goal_not_found(client):
     response_body = response.get_json()
 
     assert response_body == {"msg": "invalid endpoint"}
+    assert response.status_code == 404
     # Assert
     # ---- Complete Test ----
     # assertion 1 goes here
