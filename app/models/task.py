@@ -20,6 +20,10 @@ class Task(db.Model):
     
 
     def to_dict(self):
+        is_complete = False
+        if self.completed_at:
+            is_complete = True 
+
         return {
             "id": self.task_id,
             "title": self.title,

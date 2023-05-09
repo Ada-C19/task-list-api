@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
+from datetime import datetime
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -21,9 +22,9 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    is_complete = False
-    if new_task.completed_at:
-        is_complete = True 
+    # is_complete = False
+    # if new_task.completed_at:
+    #     is_complete = True 
 
     return {
     "task": {
@@ -34,6 +35,13 @@ def add_task():
             }
             }, 201
 
+def validate_item(model, id):
+    try: 
+        id = int(id)
+    except ValueError:
+        return abort(make_response({"msg": f"Invalid id: {id}"}, 400))
+    
+    return model.query.get_or_404(id, {"msg":"id not found"})
 
 # @task_bp.route("", methods=["GET"])
 # def get_at_least_one_task():
@@ -62,17 +70,13 @@ def get_at_least_one_task():
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = Task.query.get(task_id)
-    if task is None: 
-        return {"msg": f"id {task_id} not found"}, 404
+    task = validate_item(Task, task_id)
 
     return task.to_dict(), 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = Task.query.get(task_id)
-    if task is None: 
-        return {"msg": f"id {task_id} not found"}, 404
+    task = validate_item(Task, task_id)
     
     request_data = request.get_json()
 
@@ -83,13 +87,52 @@ def update_task(task_id):
     return jsonify({"task": task.to_dict()}), 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
-def delete_planet(task_id):
-    task = Task.query.get(task_id)
-    if task is None: 
-        return {"msg": f"id {task_id} not found"}, 404
+def delete_task(task_id):
+    task = validate_item(Task, task_id)
     
     db.session.delete(task)
     db.session.commit()
 
-    return jsonify ({"details": f"Task {task_id} \"Go on my daily walk 🏞\" successfully deleted"}), 200
+    return {"details": f'Task {task_id} "{task.title}" successfully deleted'}, 200
 
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def task_complete(task_id):
+    
+    task = validate_item(Task, task_id)
+    task.completed_at = datetime.now()
+
+    db.session.commit()
+
+
+    import requests
+
+    slack_path = "https://slack.com/api/chat.postMessage"
+    SLACK_TOKEN = "xoxb-5224912425430-5231539166514-Ji4vLdkA1f8A1wzVDzu0du5s"
+    # SLACK_TOKEN = os.environ.get('SLACKBOT_TOKEN')
+    slack_channel = "task_notifications"
+    slack_message = (f"Someone just completed the task {task.title}.")
+    slack_header = {"Authorization": "Bearer" + SLACK_TOKEN}
+
+    query_params = {
+        "channel": slack_channel,
+        "text": slack_message,
+        # "completed_at": 
+    }
+
+    requests.get(slack_path, params=query_params, headers=slack_header)
+
+    return {"task": task.to_dict()}, 200
+
+    
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def task_incomplete(task_id):
+    
+    task = validate_item(Task, task_id)
+    task.completed_at = None
+
+    db.session.commit()
+
+    return {"task": task.to_dict()}, 200
+
+
+    
