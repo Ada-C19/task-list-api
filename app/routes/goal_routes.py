@@ -72,7 +72,7 @@ def create_goal():
     return {"goal":new_goal.to_dict()}, 201
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def read_one_goals_tasks(goal_id):
+def get_one_goals_tasks(goal_id):
     goal=validate_object(Goal, goal_id)
 
     goal=validate_object(Goal, goal_id)
@@ -84,8 +84,7 @@ def read_one_goals_tasks(goal_id):
 def post_tasks_to_goal(goal_id):
     goal = validate_object(Goal, goal_id)
     task_ids = request.json.get("task_ids", [])
-    if not goal:
-        return goal
+ 
 
     for task_id in task_ids:
         task = validate_object(Task, task_id)
@@ -93,4 +92,4 @@ def post_tasks_to_goal(goal_id):
 
     db.session.commit()
 
-    return make_response({"id": goal_id, "task_ids": task_ids}, 200)
+    return make_response({"id": int(goal_id), "task_ids": task_ids}, 200)
