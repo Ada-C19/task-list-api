@@ -120,23 +120,7 @@ def delete_task(task_id):
     return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}, 200
 
 
-
-
 ################# Goal Routes #################
-# def validate_goal(model, goal_id):
-#     """Validate that goal exists in database before using route."""
-#     try:
-#         goal_id = int(goal_id)
-#     except:
-#         abort(make_response({"message": f"'{goal_id}' invalid"}, 400))
-
-#     goal = model.query.get(goal_id)
-#     if not goal:
-#         abort(make_response({"message": f"'{goal_id}' not found"}, 404))
-
-#     return goal
-
-
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     """Create and add goal to database."""
@@ -156,15 +140,6 @@ def create_goal():
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
     """Get all goals."""
-    # sort_query = request.args.get("sort")
-
-    # Retrieve all tasks, and order by asc or desc if specifed
-    # if sort_query == "asc":
-    #     all_tasks = Task.query.order_by(Task.title.asc()).all()
-    # elif sort_query == "desc":
-    #     all_tasks = Task.query.order_by(Task.title.desc()).all()
-    # else:
-    #     all_tasks = Task.query.all()
     all_goals = Goal.query.all()
 
     response = [goal.to_dict() for goal in all_goals]
