@@ -23,12 +23,7 @@ def create_goal():
 # READ
 @goals_bp.route("", methods=["GET"])
 def handle_goals():
-    if request.args.get("sort") == "asc":
-        goals = Goal.query.order_by(Goal.title.asc()).all
-    elif request.args.get("sort") == "desc":
-        goals = Goal.query.order_by(Goal.title.asc()).all
-    else:
-        goals = Goal.query.all()
+    goals = Goal.query.all()
 
     response_body = [Goal.to_dict(goal) for goal in goals]
 
