@@ -4,3 +4,4 @@ from app import db
 
 # All routes for tasks start with "/tasks" URL prefix
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+
