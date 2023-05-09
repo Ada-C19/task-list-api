@@ -11,14 +11,14 @@ class Task(db.Model):
     def from_dict(cls, dict_data):
         return cls(title = dict_data["title"],
                 description = dict_data["description"],
-                ) # completed_at = dict_data["completed_at"]
+                 completed_at = True if dict_data.get("completed_at") else None) #None)# dict_data["completed_at"]
         
     
     def to_dict(self):
         return dict(id=self.task_id,
                     title=self.title,
                     description=self.description,
-                    is_complete=False) #task.completed_at
+                    is_complete=  True if self.completed_at else False)#False) #task.completed_at
         # return {"task":dict(id=self.task_id,
         #             title=self.title,
         #             description=self.description,

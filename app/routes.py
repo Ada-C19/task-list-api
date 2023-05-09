@@ -1,6 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify, abort
 from .models.task import Task
 from app import db
+from datetime import datetime
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -46,9 +47,9 @@ def create_task():
     except(KeyError):
         return make_response({"details": "Invalid data"}, 400)
     
-# Update a task
+# Replace a task
 @task_bp.route("/<task_id>", methods=["PUT"])
-def update_task(task_id):
+def replace_task(task_id):
     task_object = validate_model(Task, task_id)
     task_request_body_dict = request.get_json()
 
@@ -70,6 +71,22 @@ def delete_task(task_id):
     return make_response({
         'details': f'Task {response_object.task_id} "{response_object.title}" successfully deleted'}, 200)
 
+# Update a task, mark complete
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def update_task_complete(task_id):
+    task_object = validate_model(Task, task_id)
+    task_object.completed_at = datetime.utcnow()
+    db.session.commit()
+    return Task.add_task_key(Task.to_dict(task_object))
+
+# Update a task, mark incomplete
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_task_incomplete(task_id):
+    task_object = validate_model(Task, task_id)
+    task_object.completed_at = None
+    db.session.commit()
+    return Task.add_task_key(Task.to_dict(task_object))
+
 
 def validate_model(cls, task_id):
     try:
@@ -83,5 +100,9 @@ def validate_model(cls, task_id):
 
 
 
-
+# - JSON's value of `true` is similar to Python's value of `True`,
+# and `false` is similar to Python's `False`.
+# - SQL's value of `null` is similar to Python's value of `None`.
+# - Python has a [datetime library]
+# (https://docs.python.org/3/library/datetime.html#module-datetime) which we recommend using to represent dates in model attributes.
 
