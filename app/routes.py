@@ -1,42 +1,56 @@
 from flask import Blueprint,make_response,request,jsonify,abort
 from app import db
 from app.models.task import Task
+from app.helper import validate_task
 
 #CREATE BP/ENDPOINT
-tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
+tasks_bp = Blueprint("tasks",__name__, url_prefix="/tasks")
 
-def validate_task(id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({"message": f"Task {id} is invalid"},400))
-
-    task =  Task.query.get(id)
-
-    if not task:
-        abort(make_response({"message":f"Task {id} not found."},404))
+# GET all Tasks - /tasks - (CREATE)
+@tasks_bp.route("",methods=["GET"])
+def get_all_tasks():
+    title_query = request.args.get("title")
+    description_query = request.args.get("description")
+    completed_query = request.args.get("is_completed")
     
-    return task
+    if title_query:
+        tasks = Task.query.filter_by(title=title_query)
+    elif description_query:
+        tasks = Task.query.filter_by(description=description_query)
+    elif completed_query: 
+        tasks = Task.query.filter_by(is_completed = completed_query)
+    else:
+        tasks = Task.query.all()
+
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append(task.to_dict())
+
+    return jsonify(tasks_response),200
 
 
-#ROUTE FUNCTIONS
+# GET one Tasks - /tasks/<id> - (CREATE)
 @tasks_bp.route("/<id>",methods=["GET"])
-def read_one_task(id):
+def get_one_task(id):
     task = validate_task(id)
 
-    return jsonify(task.make_dict()),200
+    return jsonify({'task':task.to_dict()}),200
 
-
+#create one task -POST /tasks/<id> - (CREATE)
 @tasks_bp.route("",methods=["POST"])
-def create_a_task():
-    if request.method == "POST":
-        request_body = request.get_json()
-        if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
-            return make_response("Invalid Request",400)
+def create_task():
+    request_body = request.get_json()
+        # if "title" not in request_body or "decription" not in request_body or "completed_at" not in request_body:
+        #     return make_response("Invalid Request",400)
         
-        new_task = Task.from_dict(request_body)
+    new_task = Task.create_dict(request_body)
 
-        db.session.add(new_task)
-        db.session.commit()
+    db.session.add(new_task)
+    db.session.commit()
 
-        return make_response(f"Task {new_task.title} successfully created",201)
+    return make_response({"task":new_task.to_dict()}), 201
+
+
+
+
+
