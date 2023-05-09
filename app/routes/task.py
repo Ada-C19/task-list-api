@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, abort, make_response, request
+from flask import Blueprint, jsonify, request
 from app import db
 from datetime import date
 import requests
@@ -18,11 +18,9 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
 def send_slack_msg(new_data):
-
     slack_response = requests.post(SLACK_ENDPOINT, headers=SLACK_HEADERS, json=new_data)
 
 
-# Routes
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -96,7 +94,7 @@ def mark_task(task_id, mark_status):
     
     if mark_status == "mark_complete":
         task_to_mark.completed_at = date.today()
-        # Send notification in Slack
+        # Send notification to Slack
         send_slack_msg(
             {
                 "channel": "task-notifications",
