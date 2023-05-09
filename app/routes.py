@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.task import Task
 from app.models.goal import Goal
 from app import db
-# import pdb
+import pdb
 import datetime
 import os
 from slack_sdk import WebClient
@@ -11,7 +11,7 @@ from slack_sdk import WebClient
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
-def get_valid_task_by_id(model, id):
+def get_valid_model_by_id(model, id):
     try:
         id = int(id)
     except:
@@ -62,7 +62,7 @@ def get_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_one_task(task_id):
     
-    task = get_valid_task_by_id(Task, task_id)
+    task = get_valid_model_by_id(Task, task_id)
 
     return {"task": task.to_dict()}, 200
 
@@ -70,7 +70,7 @@ def handle_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
     request_body = request.get_json()
-    task_to_update = get_valid_task_by_id(Task,task_id)
+    task_to_update = get_valid_model_by_id(Task,task_id)
     
     task_to_update.title = request_body["title"]
     task_to_update.description = request_body["description"]
@@ -81,7 +81,7 @@ def update_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
-    task_to_delete = get_valid_task_by_id(Task,task_id)
+    task_to_delete = get_valid_model_by_id(Task,task_id)
     
     if task_to_delete is None:
         return {"error": f"Task with ID {task_id} not found"}, 404
@@ -95,7 +95,7 @@ def delete_one_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def completed_task(task_id):
-    updated_task=get_valid_task_by_id(Task, task_id)
+    updated_task=get_valid_model_by_id(Task, task_id)
     
     updated_task.completed_at = datetime.datetime.utcnow()
     db.session.commit()
@@ -114,7 +114,7 @@ def completed_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def incomplete_task(task_id):
-    updated_task=get_valid_task_by_id(Task, task_id)
+    updated_task=get_valid_model_by_id(Task, task_id)
     
     updated_task.completed_at = None
     db.session.commit()
@@ -166,13 +166,13 @@ def get_goals():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def handle_one_goal(goal_id):
     
-    goal = get_valid_task_by_id(Goal, goal_id)
+    goal = get_valid_model_by_id(Goal, goal_id)
 
     return {"goal": goal.to_dict()}, 200
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_one_goal(goal_id):
-    goal_to_delete = get_valid_task_by_id(Goal,goal_id)
+    goal_to_delete = get_valid_model_by_id(Goal,goal_id)
     
     if goal_to_delete is None:
         return {"error": f"Goal with ID {goal_id} not found"}, 404
@@ -187,7 +187,8 @@ def delete_one_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_one_goal(goal_id):
     request_body = request.get_json()
-    goal_to_update = get_valid_task_by_id(Task,goal_id)
+    
+    goal_to_update = get_valid_model_by_id(Goal, goal_id)
     
     goal_to_update.title = request_body["title"]
     

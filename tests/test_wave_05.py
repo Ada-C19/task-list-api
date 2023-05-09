@@ -1,5 +1,6 @@
 import pytest
 from app.models.goal import Goal
+import pdb
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -90,12 +91,14 @@ def test_update_goal(client, one_goal):
         "title": "Updated Goal Title"
     })
     response_body = response.get_json()
+    
     # Assert
     # ---- Complete Assertions Here ----
     assert response.status_code == 200
     assert "goal" in response_body
     assert response_body == {
         "goal": {
+            "id": 1,
             "title": "Updated Goal Title"
         }
     }
@@ -169,6 +172,3 @@ def test_create_goal_missing_title(client):
     assert response_body == {
         "details": "Invalid data"
     }
-
-{'details': 'Task 1 "Build a habit of going outside daily" successfully deleted'}
-{'details': 'Goal 1 "Build a habit of going outside daily"'}
