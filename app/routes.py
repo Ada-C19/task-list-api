@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify, request, make_response, abort
 from app.models.task import Task
 from app import db
+import datetime
 
 
 task_bp = Blueprint("tasks", __name__,url_prefix="/tasks")
@@ -9,9 +10,13 @@ task_bp = Blueprint("tasks", __name__,url_prefix="/tasks")
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
+
+    if "title" not in request_body or "description" not in request_body:
+        return {"details": "Invalid data"}, 400
+    
     new_task = Task.from_dict(request_body)
     
-    # if "title" 
+
 
     db.session.add(new_task)
     db.session.commit()
@@ -22,12 +27,14 @@ def add_task():
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
     response = []
-    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
 
-    if title_query is None:
-        all_tasks = Task.query.all()
+    if sort_query == "asc":
+        all_tasks = Task.query.order_by(Task.title.asc())
+    elif sort_query == "desc":
+        all_tasks = Task.query.order_by(Task.title.desc())
     else:
-        all_tasks = Task.query.filter_by(title=title_query)
+        all_tasks = Task.query.all()
 
     for task in all_tasks:
         response.append(task.to_dict())
@@ -56,16 +63,22 @@ def update_task(task_id):
 
     return {"task" : task.to_dict()}, 200
 
-@task_bp.route("/<task_id>/<completed_at>", methods=["PATCH"])
-def update_task(task_id,completed_at):
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_task_not_complete(task_id):
     task = validate_id(Task, task_id)
-    request_data = request.get_json()
 
-    task.completed_at = request_data["is_complete"]
-    if completed_at == "mark_complete":
-        "mark_complete" == True
-    else:
-        False 
+    task.completed_at = None
+    
+    db.session.commit()
+    return {"task" : task.to_dict()}, 200
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def update_task__is_complete(task_id):
+    task = validate_id(Task, task_id)
+    # request_data = request.get_json()
+
+    task.completed_at = datetime.datetime.now()
+    
     db.session.commit()
     return {"task" : task.to_dict()}, 200
 
