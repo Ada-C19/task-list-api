@@ -22,30 +22,42 @@ def validate_model(cls, model_id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
         request_body = request.get_json()
-        new_task = Task.from_dict(request_body)
-
+        try:
+            new_task = Task.from_dict(request_body)
+        except KeyError:
+            return {
+                "details": "Invalid data"
+            }, 400
         db.session.add(new_task)
         db.session.commit()
 
-        return make_response(jsonify(f"Made a new task: {new_task.title}"), 201)
+        return {f"task": new_task.to_dict()}, 201
 
 #GET THE TASKS
 @tasks_bp.route("", methods=["GET"])
-def get_tasks():
-    tasks = Task.query.all()
-    task_force = [task.to_dict for task in tasks]
-    return make_response(jsonify(task_force), 200)
+def get_all_tasks():
+    sort = request.args.get("sort")
+
+    if sort == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif sort == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+        
+    task_force = [task.to_dict() for task in tasks]
+    return jsonify(task_force), 200
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_tasks(task_id):
-    task = validate_model(task_id)
+    task = validate_model(Task, task_id)
     
-    return task.to_dict(), 200
+    return {f"task":task.to_dict()}, 200
 
 #Update a task
 @tasks_bp.route("/<task_id>", methods=["PUT"])
-def update_task(model_id):
-    task = validate_model(model_id)
+def update_task(task_id):
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
     task.title = request_body["title"]
@@ -53,14 +65,14 @@ def update_task(model_id):
 
     db.session.commit()
 
-    return make_response(f"The task {task.id} was updated!!")
+    return {"task": task.to_dict()}
 
 #DELETES A TASK
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
-def delete_task(model_id):
-    task = validate_model(model_id)
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
 
-    return make_response(f"The task {task.title} was deleted!")
+    return make_response({'details': f'Task {task.task_id} "{task.title}" successfully deleted'}, 200)

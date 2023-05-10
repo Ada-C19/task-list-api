@@ -20,6 +20,6 @@ class Task(db.Model):
         new_task = Task(
             title = task_data["title"],
             description= task_data["description"],
-            is_complete = task_data["is_complete"]
+            completed_at = task_data.get("completed_at")
         )
         return new_task
