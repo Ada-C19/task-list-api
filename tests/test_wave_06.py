@@ -41,7 +41,7 @@ def test_post_task_ids_to_goal_already_with_goals(client, one_task_belongs_to_on
     }
     assert len(Goal.query.get(1).tasks) == 2
 
-
+# A test we finished writing the asserts for
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_for_specific_goal_no_goal(client):
     # Act
@@ -53,11 +53,6 @@ def test_get_tasks_for_specific_goal_no_goal(client):
     assert response_body == {
         "message": "Goal 1 not found"
     }
-
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")

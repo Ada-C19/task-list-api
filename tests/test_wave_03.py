@@ -118,7 +118,7 @@ def test_mark_incomplete_on_incomplete_task(client, one_task):
     }
     assert Task.query.get(1).completed_at == None
 
-### This is a test we finished writing
+# A test we finished writing the asserts for
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_complete_missing_task(client):
     # Act
@@ -130,7 +130,7 @@ def test_mark_complete_missing_task(client):
     # My assert:
     assert response_body == {"message": "Task 1 not found"}
 
-### This is a test we finished writing
+# A test we finished writing the asserts for
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_missing_task(client):
     # Act
