@@ -12,6 +12,14 @@ class Task(db.Model):
             id = self.task_id,
             title = self.title,
             description = self.description,
-            is_complete = self.completed_at is not None
+            is_complete = bool(self.completed_at) #is not None
         )
 
+    @classmethod
+    def from_dict(cls,task_data):
+        new_task = Task(
+            title = task_data["title"],
+            description= task_data["description"],
+            is_complete = task_data["is_complete"]
+        )
+        return new_task
