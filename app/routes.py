@@ -8,15 +8,10 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix= "/tasks")
 # GET all task - GET[READ] - /tasks
 @tasks_bp.route("", methods =["GET"])
 def get_all_tasks():
-    title_query = request.args.get("title")
-    description_query = request.args.get("description")
-    completed_query = request.args.get("is_complete")
-    if title_query:
-        tasks = Task.query.filter_by(title = title_query)
-    elif description_query:
-        tasks = Task.query.filter_by(description = description_query)
-    elif completed_query:
-        tasks = Task.query.filter_by(is_completed = completed_query)
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
     tasks_response = []
