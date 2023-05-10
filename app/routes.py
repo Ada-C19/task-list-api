@@ -2,11 +2,10 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
 from app.models.goal import Goal
-from datetime import datetime
-import os
+import os, datetime, requests
 
-task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
+task_bp = Blueprint("task", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
 # Helper Functions 
 
@@ -16,19 +15,25 @@ def validate_item(model, id):
     except ValueError:
         return abort(make_response({"msg": f"Invalid id: {id}"}, 400))
     
-    return model.query.get_or_404(id, {"msg": f"{id} not found"})
+    item = model.query.get(id)
+
+    if not item:
+        return abort(make_response({"message": f"id {id} not found"}, 404))
+    
+    return item
+
 
 # Task routes 
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
-    if "title" not in request_body or "description" not in request_body: #or "completed_at" not in request_body:
+    if "title" not in request_body or "description" not in request_body:
         return {"details": "Invalid data"}, 400
     
     new_task = Task(
         title=request_body["title"],
         description=request_body["description"],
-        # completed_at=request_body["completed_at"]
+        completed_at=request_body.get("completed_at", None)
     )
 
     db.session.add(new_task)
@@ -84,26 +89,21 @@ def delete_task(task_id):
 def task_complete(task_id):
     
     task = validate_item(Task, task_id)
-    task.completed_at = datetime.now()
+    task.completed_at = datetime.datetime.now()
 
     db.session.commit()
 
-
-    import requests
-
     slack_path = "https://slack.com/api/chat.postMessage"
     slack_channel = "task-notifications"
-    slack_message = (f"Someone just completed the task {task.title}.")
-    # slack_header = {"Authorization": "Bearer" + SLACK_TOKEN}
+    slack_message = f"Someone just completed the task {task.title}."
 
     query_params = {
         "token": os.environ.get("SLACK_TOKEN"),
         "channel": slack_channel,
-        "text": slack_message,
-        # "completed_at": 
+        "text": slack_message
     }
 
-    requests.post(slack_path, data=query_params)
+    requests.post(url=slack_path, data=query_params)
 
     return {"task": task.to_dict()}, 200
 
@@ -130,7 +130,7 @@ def add_goal():
     
     new_goal = Goal(
         title=request_body["title"]
-        )
+    )
 
     db.session.add(new_goal)
     db.session.commit()
@@ -174,4 +174,36 @@ def delete_goal(goal_id):
     # return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
     return {
         "details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"
-        }, 200
+    }, 200
+
+#One goal to many tasks
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def task_ids_to_a_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    
+    request_data = request.get_json()
+
+    for task_id in request_data["task_ids"]:
+        task = validate_item(Task, task_id)
+        task.goal = goal
+        
+    db.session.commit()
+
+    return {
+        "id": goal.goal_id,
+        "task_ids": request_data["task_ids"]
+    }, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def tasks_of_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    response = []
+
+    for task in goal.tasks: 
+        response.append(task.to_dict())
+
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": response
+    }, 200
