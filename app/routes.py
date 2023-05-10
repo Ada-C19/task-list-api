@@ -130,12 +130,12 @@ def add_goal():
 @goal_bp.route("", methods=["GET"])
 def get_all_goals():
     response = []
-    title_query = request.query.get("title")
+    title_query = request.args.get("title")
 
-    if title_query == None:
-        all_goals = Goal.query.filter_by(title=title_query)
-    else:
+    if title_query is None:
         all_goals = Goal.query.all()
+    else:
+        all_goals = Goal.query.filter_by(title=title_query)
 
     for goal in all_goals:
         response.append(goal.to_dict())
@@ -150,6 +150,7 @@ def get_one_goal(goal_id):
 
 @goal_bp.route("<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
+
     goal = validate_id(Goal, goal_id)
 
     request_data = request.get_json()
@@ -159,3 +160,12 @@ def update_goal(goal_id):
     db.session.commit()
 
     return {"goal" : goal.to_dict()}, 200
+
+@goal_bp.route("/<goal_id>",methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_id(Goal,goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}
