@@ -15,12 +15,20 @@ class Task(db.Model):
             description = task_data["description"],
             completed_at = None
         )
-
         return task
     
     def to_dict(self):
         return {
             "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": False if self.completed_at == None else True
+        }
+    
+    def to_dict_with_goal_id(self):
+        return {
+            "id": self.id,
+            "goal_id": self.goal.goal_id,
             "title": self.title,
             "description": self.description,
             "is_complete": False if self.completed_at == None else True

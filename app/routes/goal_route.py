@@ -4,6 +4,7 @@ from app.models.task import Task
 from app import db
 from app.routes.task_route import validate_model
 
+
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 # route to get all goals
@@ -74,9 +75,9 @@ def delete_goal(goal_id):
 
     return jsonify({"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}), 200
 
-# route to post tasks to post
+# route to post task ids to goal
 @goals_bp.route("/<goal_id>/tasks", methods = ["POST"])
-def create_task(goal_id):
+def post_task_ids_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
 
@@ -90,4 +91,21 @@ def create_task(goal_id):
 
     return jsonify({"id": goal.goal_id, "task_ids": new_task_list}), 200
 
+# route to get tasks for specific goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_specific_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    task_list = []
+
+    for task in goal.tasks: 
+        task_list.append(task.to_dict_with_goal_id())
+
+    response_body = {
+        "id": goal.goal_id,
+        "title": f"{goal.title}",
+        "tasks": task_list
+    }
+    print(task_list)
+    return jsonify(response_body), 200
 

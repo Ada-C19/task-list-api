@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from datetime import date
 
@@ -23,7 +24,7 @@ def validate_model(cls, model_id):
 # route to get all tasks
 
 @tasks_bp.route("", methods=["GET"])
-def read_all_tasks():
+def get_all_tasks():
     sort_query = request.args.get("sort")
 
     if sort_query == "asc":
@@ -58,10 +59,19 @@ def create_task():
 # route to get a task by id
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def read_one_task(task_id):
+def get_task(task_id):
+    task = validate_model(Task, task_id)
+    if task.goal: 
+        return jsonify({"task": task.to_dict_with_goal_id()}), 200
+    
+    return jsonify({"task": task.to_dict()}), 200
+
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_task_includes_goal_id(task_id):
     task = validate_model(Task, task_id)
 
-    return jsonify({"task": task.to_dict()}), 200
+    return jsonify({"task": task.to_dict_with_goal_id()}), 200
 
 # route to update a task by id
 
