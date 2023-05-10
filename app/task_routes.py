@@ -26,7 +26,7 @@ def get_tasks():
     sort_query = request.args.get('sort')
     
     if title_query:
-        tasks = Task.query.filter(Task.title.ilike(title_query.strip()+'%'))
+        tasks = Task.query.filter(Task.title.ilike('%'+title_query.strip()+'%'))
     elif sort_query == 'asc':
         tasks = Task.query.order_by(Task.title.asc())
     elif sort_query == 'desc':

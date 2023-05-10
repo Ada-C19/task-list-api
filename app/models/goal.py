@@ -17,8 +17,9 @@ class Goal(db.Model):
         goal = cls(
                     title=request_body['title']
                     )
+        return goal
         
     #returns all the attributes that must be passed in order to create a record. All not nullable instance variables accept id.'
     @classmethod
     def get_attributes(cls):
-        return 'title'
+        return ['title']
