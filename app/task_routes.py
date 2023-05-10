@@ -52,9 +52,4 @@ def get_tasks():
 def get_one_task(task_id):
     task = validate_task(task_id)
     
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": task.is_complete
-    }}
+    return task.to_dict()
