@@ -64,7 +64,7 @@ def handle_one_task(task_id):
     
     task = get_valid_model_by_id(Task, task_id)
 
-    return {"task": task.to_dict()}, 200
+    return {"task": task.to_dict_with_goal_id()}, 200
 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -195,3 +195,47 @@ def update_one_goal(goal_id):
     db.session.commit()
     
     return {"goal": goal_to_update.to_dict()}, 200
+
+@goals_bp.route("/<goal_id>/tasks", methods=['POST'])
+def link_goal_to_tasks(goal_id):
+    goal = get_valid_model_by_id(Goal, goal_id)
+    request_body = request.get_json()
+    task_ids = request_body.get("task_ids")
+    list_of_ids = []
+    for id in task_ids:
+        task_from_db = Task.query.get(id)
+        task_from_db.goal = goal
+        list_of_ids.append(task_from_db.task_id)
+    db.session.commit()
+    
+    return jsonify({
+        "id": goal.goal_id,
+        "task_ids": list_of_ids
+    })
+
+@goals_bp.route("/<goal_id>/tasks", methods=['GET'])
+def handle_all_tasks_from_one_goal(goal_id):
+    task_response = []
+    
+    goal = get_valid_model_by_id(Goal, goal_id)
+    
+    task_by_goal = Task.query.get(goal_id)
+    
+    if task_by_goal is None:
+        return jsonify({
+            "id": goal.goal_id,
+            "title": goal.title,
+            "tasks": task_response
+        })
+    else:
+    
+        task_by_goal.goal = goal
+        for task in goal.tasks:
+            task_response.append(task.to_dict_with_goal_id())
+
+
+    return jsonify({
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": task_response
+        }), 200

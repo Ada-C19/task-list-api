@@ -75,10 +75,8 @@ def completed_task(app):
 # This fixture creates a goal and saves it in the database
 @pytest.fixture
 def one_goal(app):
-    print("HEY HEY HELLO")
     new_goal = Goal(title="Build a habit of going outside daily")
     db.session.add(new_goal)
-    print(new_goal)
     db.session.commit()
 
 

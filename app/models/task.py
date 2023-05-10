@@ -14,15 +14,20 @@ class Task(db.Model):
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": (self.completed_at != None),
-            "goal_id": self.goal_id
+            "is_complete": (self.completed_at != None)
         }
-
+        
+    def to_dict_with_goal_id(self):
+        task_dict = self.to_dict()
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
+        return task_dict
+            
     @classmethod
     def from_dict(cls, task_details):
         new_task = cls(
             title=task_details["title"],
-            description=task_details["description"],
-            goal_id=task_details["goal_id"]
+            description=task_details["description"]
         )
         return new_task
+    
