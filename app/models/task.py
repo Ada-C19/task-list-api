@@ -1,5 +1,7 @@
 from app import db
 from datetime import datetime 
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class Task(db.Model):
@@ -7,6 +9,10 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable = True)
+    go_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
+    
+    goal = db.relationship("Goal", back_populates="tasks", lazy= True)
+
 
     def to_result(self):
         is_complete = True
@@ -16,7 +22,8 @@ class Task(db.Model):
             "id":self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": is_complete
+            "is_complete": is_complete,
+            "go_id": self.go_id
         }
 # def to_dict(self):
 #         task_as_dict = {}

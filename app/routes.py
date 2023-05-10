@@ -175,3 +175,18 @@ def delete_goal(goal_id):
     # return {"details": goal.to_result()}, 200 
 
     return make_response({"details":f'Goal {goal_id} "{goal_to_delete.title}" successfully deleted'})
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_goal_task(goal_id):
+
+    goal = validate_goal(goal_id)
+
+    request_body = request.get_json()
+    new_task = Task(
+        title=request_body["title"],
+        description=request_body["description"],
+        goal=goal
+    )
+    db.session.add(new_task)
+    db.session.commit()
+    return make_response(jsonify(f"Book {new_task.title} by {new_task.goal.title} successfully created"), 201)
