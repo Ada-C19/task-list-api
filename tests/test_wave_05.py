@@ -1,5 +1,5 @@
 import pytest
-
+from app.models.goal import Goal
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goals_no_saved_goals(client):
@@ -93,6 +93,7 @@ def test_update_goal(client, one_goal):
     # Assert
     # ---- Complete Assertions Here ----
     assert response.status_code == 200
+    assert "goal" in response_body
     assert response_body == {
         "goal": {
             "id": 1,
@@ -100,7 +101,7 @@ def test_update_goal(client, one_goal):
         }
     }
     # Why do we need this assert statement if we're checking the dict?
-    goal = goal.query.get(1)
+    goal = Goal.query.get(1)
     assert goal.title == "Updated Goal Title"
     # ---- Complete Assertions Here ----
 
@@ -138,9 +139,11 @@ def test_delete_goal(client, one_goal):
     # Check that the goal was deleted
     response = client.get("/goals/1")
     assert response.status_code == 404
-    response_body == response.get_json()
-    assert response_body == {"message": "Goal 1 not found"} 
+    assert Goal.query.get(1) == None
 
+    response_body = response.get_json()
+    assert response_body == {"message": "Goal 1 not found"}
+    
     # raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************

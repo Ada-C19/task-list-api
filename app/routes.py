@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, Response, abort, make_response
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db 
 from datetime import datetime
 from dotenv import load_dotenv
@@ -9,7 +10,7 @@ import os
 
 # create blueprint 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
-
+goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
 # Create Task Route
 @task_bp.route("", methods=["POST"])
@@ -38,10 +39,8 @@ def get_tasks():
 
     if sort_order == 'asc': 
         all_tasks = Task.query.order_by(Task.title.asc()).all()
-
     elif sort_order == 'desc': 
         all_tasks = Task.query.order_by(Task.title.desc()).all()
-
     else: 
         all_tasks = Task.query.all()
 
@@ -124,6 +123,62 @@ def validate_item(model, item_id):
     item = model.query.get(item_id)
     
     if not item: 
-        return abort(make_response({"message": f"Task {item_id} not found"}, 404))
+        return abort(make_response({"message": f"{model.__name__} {item_id} not found"}, 404))
     
     return item
+
+
+# Create Goal Route
+@goal_bp.route("", methods=["POST"])
+def add_goal(): 
+    response_body = request.get_json()
+
+    # TODO - from_dict method
+    try:
+        new_goal = Goal(title=response_body["title"])
+    except KeyError: 
+        return {"details": "Invalid data"}, 400
+    
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_dict()}, 201
+
+# Get Goal Route
+@goal_bp.route("", methods=["GET"])
+def get_goals(): 
+    response = [] 
+    all_goals = Goal.query.all()
+
+    for goal in all_goals: 
+        response.append(goal.to_dict())
+    
+    return jsonify(response), 200
+
+# Get One Goal Route
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id): 
+    goal = validate_item(Goal, goal_id)
+
+    return {"goal": goal.to_dict()}, 200
+
+# Update a Task Route
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    request_data = request.get_json()
+    goal.title = request_data["title"]
+
+    db.session.commit()
+
+    return {"goal": goal.to_dict()}, 200
+
+# Delete a Task Route 
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {"details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"}, 200
