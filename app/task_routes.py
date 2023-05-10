@@ -4,10 +4,10 @@ from app import db
 from app.models.goal import Goal
 from app.models.task import Task
 from datetime import datetime
-from slack_sdk import WebClient
 import os
 import requests
-from slack_sdk.errors import SlackApiError
+# from slack_sdk.errors import SlackApiError
+# from slack_sdk import WebClient
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -109,16 +109,24 @@ def delete_task(task_id):
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_item(Task, task_id)
-
     task.completed_at = datetime.utcnow()
 
     db.session.commit()
 
-    message = f"Someone just completed a task {task.title}"
+    url = "https://slack.com/api/chat.postMessage"
+    token = os.environ.get("SLACKBOT_TOKEN")
+    data ={
+        "channel": "task-notifications",
+        "text": f"Someone just completed a task {task.title}",
+        "token": token
+    }
+    response = requests.post(url, data=data)
 
-    client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+    # message = f"Someone just completed a task {task.title}"
 
-    client.chat_postMessage(channel="task-notifications", text=message)
+    # client = WebClient(token=os.environ.get("SLACKBOT_TOKEN"))
+
+    # client.chat_postMessage(channel="task-notifications", text=message)
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
     
