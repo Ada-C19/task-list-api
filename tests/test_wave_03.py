@@ -129,11 +129,6 @@ def test_mark_complete_missing_task(client):
     assert response.status_code == 404
     assert not response_body
 
-    #raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
-
 
 #@pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_missing_task(client):
@@ -144,8 +139,3 @@ def test_mark_incomplete_missing_task(client):
     # Assert
     assert response.status_code == 404
     assert not response_body
-
-    #raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
