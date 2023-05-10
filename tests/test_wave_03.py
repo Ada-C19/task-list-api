@@ -129,7 +129,7 @@ def test_mark_complete_missing_task(client):
     assert response.status_code == 404
 
     
-    assert response_body == {"message": f"Task {id} is invalid"}, 404))
+    assert {"message": f"Task {id} is invalid"}, 404
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
@@ -144,7 +144,7 @@ def test_mark_incomplete_missing_task(client):
     # Assert
     assert response.status_code == 404
 
-    assert "message" in response_body
+    assert {"message": f"Task {id} is invalid"}, 404
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************

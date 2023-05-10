@@ -2,6 +2,8 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 import datetime
+import requests
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -90,22 +92,19 @@ def delete_one_task(id):
 def mark_task_complete(id):
     task = validate_task(id)
     
-    # if not task:
-    #     return make_response(jsonify({"error":f"Task {id} not found"}), 404)
     
     task.completed_at = datetime.date.today().isoformat()
     
     db.session.commit()
+    send_slack_message()
     
     task_dict = dict(task=task.to_dict())
     return make_response(jsonify(task_dict), 200)
 
+
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(id):
     task = validate_task(id)
-    
-    # if not task:
-    #     return make_response(jsonify({"error":f"Task {id} not found"}), 404)
     
     task.completed_at = None
     
@@ -113,3 +112,20 @@ def mark_task_incomplete(id):
     
     task_dict = dict(task=task.to_dict())
     return make_response(jsonify(task_dict), 200)
+
+
+def send_slack_message():
+    api_url = "https://slack.com/api/chat.postMessage"
+
+    payload = {
+        "channel": "api-test-channel",
+        "text": "Someone just completed the task My Beautiful Task"
+    }
+    headers = {
+        'Authorization': 'Bearer xoxb-4680452269380-5238717880866-WruhcGV5ObIA7yt4SDq6Z6Ns'
+    }
+
+    response = requests.post(api_url, headers=headers, data=payload)
+
+    print(response.text)
+
