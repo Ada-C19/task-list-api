@@ -119,7 +119,10 @@ def verify_task_inputs(request_body):
     abort(make_response({"details": "Invalid data"}, 400))
 
 def message_for_only_one_task(task):
-    return {"task": task.to_dict()}
+    if not task.goal_id:
+        return {"task": task.to_dict()}
+    else:
+        return {"task": task.to_dict_with_goal()}
 
 def get_title(task):
     return task["title"]
