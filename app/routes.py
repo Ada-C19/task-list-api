@@ -24,9 +24,20 @@ def get_all_tasks():
 
     return jsonify(results)
 
-# @tasks_bp.route("/<task_id>", methods=["GET"])
-# def get_one_task():
-#     tasks = Task.query.all()
-#     results = [task.to_dict() for task in tasks]
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_model(Task, task_id)
+    response = {"task": task.to_dict()}
 
-#     return jsonify(results)
+    return jsonify(response)
+
+# @tasks_bp.route("", methods=["POST"])
+# def create_task():
+#     request_body = request.get_json()
+#     new_planet = Planet.from_dict(request_body)
+#     db.session.add(new_planet)
+#     db.session.commit()
+
+#     request_body = request.get_json()
+
+#     return make_response(jsonify(f"Planet {new_planet.name} created successfully."), 201)
