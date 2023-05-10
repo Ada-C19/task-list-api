@@ -4,6 +4,33 @@ from flask import Blueprint, jsonify, make_response, abort, request
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix = "/tasks")
 
+@tasks_bp.route("", methods=["POST"])
+def create_task():
+    request_body = request.get_json()
+
+    task = Task(
+        title = request_body["title"],
+        description = request_body["description"],
+    )
+
+    db.session.add(task)
+    db.session.commit()
+
+    return make_response(
+        {
+            "task": {
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": False
+            }
+        }, 201
+    )
+
+
+
+
+
 @tasks_bp.route("", methods=["GET"])
 def read_task():
     tasks_response = []
