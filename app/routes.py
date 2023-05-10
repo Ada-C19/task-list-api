@@ -4,6 +4,9 @@ from .routes_helpers import validate_model
 from sqlalchemy import asc, desc
 from app import db
 from datetime import datetime
+import requests
+import json
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -75,6 +78,8 @@ def complete_task(id):
 
     db.session.commit()
 
+    post_message_to_slack(task)
+
     return jsonify({"task": task.to_dict()}), 200
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
@@ -86,4 +91,23 @@ def incomplete_task(id):
     db.session.commit()
 
     return jsonify({"task": task.to_dict()}), 200
+
+def post_message_to_slack(task):
+    url = "https://slack.com/api/chat.postMessage"
+    message = f"Someone just completed the task {task.title}"
+
+    payload = json.dumps(
+        {
+        "channel": "U0574FB59PS",
+        "text": message
+        }
+    )
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {os.environ.get("BOT_TOKEN")}'
+        }
+
+    response = requests.post(url, headers=headers, data=payload)
+    print(response.text)
 
