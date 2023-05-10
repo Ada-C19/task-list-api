@@ -1,6 +1,4 @@
-from flask import Blueprint, request, jsonify, abort, make_response
-from datetime import datetime
-import requests, os
+from flask import Blueprint, request, jsonify
 from app.models.goal import Goal
 from app import db
 from app.routes.routes_helper_function import handle_valid_id
@@ -70,15 +68,17 @@ def get_all_tasks_from_one_goal(goal_id):
     
     for task_id in request_body["task_ids"]:
         task_to_add = handle_valid_id(Task, task_id)
-        goal.tasks.append(task_to_add)
+        if task_to_add not in goal.tasks:
+            goal.tasks.append(task_to_add)
 
+    response_task_ids = [task.task_id for task in goal.tasks]
+    
     db.session.add(goal)
     db.session.commit()
 
-    task_ids = [task.task_id for task in goal.tasks]
     return {
         "id": int(goal_id),
-        "task_ids": task_ids
+        "task_ids": response_task_ids
         }, 200
 
 @goals_bp.route("<goal_id>/tasks", methods=["GET"])

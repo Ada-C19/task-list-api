@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort, make_response
+from flask import Blueprint, request, jsonify
 from datetime import datetime
 import requests, os
 from app.models.task import Task
@@ -54,10 +54,6 @@ def get_task(task_id):
 @tasks_bp.route("<task_id>", methods=["PUT"])
 def update_task(task_id):
     request_body = request.get_json()
-    
-    #optionally, to only accept a put request if all attributes in task are being updated
-    # if 'title' and 'description' not in request_body:
-    #     return {'Error': ""}
     
     task_to_update = handle_valid_id(Task, task_id)
     task_to_update.title = request_body["title"]

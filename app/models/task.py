@@ -25,16 +25,12 @@ class Task(db.Model):
         return False
 
     def to_dict(self):
-        return {
+        to_dict = {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": self.is_complete(),
-            "goal_id": self.goal_id
         }
-    
-    # use this function for PATCH method
-    def update_fields(self, update_dict):
-        self.title = update_dict.get("title", self.title)
-        self.description = update_dict.get("description", self.description)
-        self.completed_at = update_dict.get("completed_at", self.completed_at)
+        if self.goal_id:
+            to_dict["goal_id"] = self.goal_id
+        return to_dict
