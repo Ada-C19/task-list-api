@@ -89,7 +89,7 @@ def mark_complete(task_id):
 
     requests.post(path, data=args)
 
-    return {"task": task.to_dict_complete()}
+    return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
