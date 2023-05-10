@@ -7,11 +7,11 @@ class Task(db.Model):
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
 
-
+    # powerful takeaway: you can call a function on a value in a dict!
     def to_dict(self):
         return {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": self.completed_at != None
+            "is_complete": bool(self.completed_at)
         }

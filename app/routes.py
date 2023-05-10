@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db 
+from datetime import datetime 
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -118,3 +119,35 @@ def delete_one_task(task_id):
     }), 200)
 
 
+# wave 4
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def patch_task_as_complete(task_id):
+    task = validate_task(task_id) 
+
+    # updated boolean completed_at for the value associated with is_complete to True by providing a return for current local datetime. This forces it to evaluate to True
+    task.completed_at = datetime.today()
+
+    db.session.commit()
+
+    response_body = {
+        "task": task.to_dict()
+    }
+
+    return response_body, 200
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def patch_task_as_incomplete(task_id):
+    task = validate_task(task_id) 
+
+    # updated boolean completed_at for the value associated with is_complete to False by assigning None. This forces it to evaluate to False
+    task.completed_at = None
+
+    db.session.commit()
+
+    response_body = {
+        "task": task.to_dict()
+    }
+
+    return response_body, 200
