@@ -65,7 +65,7 @@ def update_task(task_id):
     
     request_body = request.get_json()
     
-    if "title" not in request_body or "description" not in request_body or "completed at" not in request_body:
+    if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": f"Invalid data"}, 400))
     
     task.title = request_body["title"]
@@ -73,7 +73,7 @@ def update_task(task_id):
     
     db.session.commit()
     
-    return task.to_dict()
+    return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
