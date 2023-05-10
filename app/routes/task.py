@@ -3,6 +3,7 @@ from app import db
 from app.models.task import Task
 import requests
 from datetime import datetime
+import os
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -83,9 +84,9 @@ def mark_complete(task_id, complete_status):
     task = validate_item(Task, task_id)
     if complete_status == "mark_complete":
         task.completed_at = datetime.now()
-        # requests.post("https://slack.com/api/chat.postMessage", json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": os.environ.get("SLACK_BOT_TOKEN")})
+        requests.post("https://slack.com/api/chat.postMessage", 
+                      json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"})
     elif complete_status == "mark_incomplete":
         task.completed_at = None
-
     db.session.commit()
     return make_response({"task": task.to_dict()}, 200)
