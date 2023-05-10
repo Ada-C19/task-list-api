@@ -35,7 +35,7 @@ def test_get_tasks_one_saved_tasks(client, one_task):
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task(client, one_task):
     # Act
-    response = client.get("/tasks/19")
+    response = client.get("/tasks/1")
     response_body = response.get_json()
 
     # Assert
@@ -43,7 +43,7 @@ def test_get_task(client, one_task):
     assert "task" in response_body
     assert response_body == {
         "task": {
-            "id": 19,
+            "id": 1,
             "title": "Go on my daily walk 🏞",
             "description": "Notice something new every day",
             "is_complete": False

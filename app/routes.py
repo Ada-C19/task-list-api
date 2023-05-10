@@ -21,6 +21,10 @@ def validate_model_task(cls, model_id):
 @task_list_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+    is_valid_task = "title" in request_body and "description" in request_body
+    if not is_valid_task:
+        abort(make_response({"details": "Invalid data"}, 400))
+
     new_task = Task.task_from_dict(request_body)
 
     db.session.add(new_task)
@@ -29,7 +33,8 @@ def create_task():
     response_body = {
         "task": new_task.task_to_dict()
     }
-    return response_body, 201
+    return make_response(jsonify(response_body), 201)
+
 
 @task_list_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -67,7 +72,7 @@ def update_task(task_id):
 def delete_task(task_id):
     task = validate_model_task(Task, task_id)
     response_body = {
-        "details": f"Task {task.task_id} \{task.title}\ succussfully deleted"
+        "details": f'Task {task.task_id} \"{task.title}\" successfully deleted'
     }
 
     db.session.delete(task)

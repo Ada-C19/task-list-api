@@ -12,6 +12,9 @@ class Task(db.Model):
     def task_from_dict(cls, task_data):
         """Input task as a dictionary. Assumes None/null for completed_at"""
 
+        if not "completed_at" in task_data:
+            task_data["completed_at"] = None
+
         new_task = Task(title=task_data["title"],
                         description=task_data["description"],
                         completed_at=task_data["completed_at"])
