@@ -66,8 +66,12 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
+    response_body= task.to_dict()
     
-    return jsonify({"task":task.to_dict()})
+    if task.goal_id:
+        response_body["goal_id"] = task.goal_id
+    
+    return jsonify({"task":response_body}),200
 
 #PUT /tasks/1
 @tasks_bp.route("/<task_id>", methods=["PUT"])
