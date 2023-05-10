@@ -24,5 +24,16 @@ class Task(db.Model):
             "is_complete":is_complete
         }
 
+#create function for title  & description
+    @classmethod
+    def create(cls, request_body):
+        return cls(
+            title = request_body["title"], 
+            description = request_body["description"]
+            )
+    
 
-
+    def update(self, request_body):
+        self.title=request_body["title"]
+        self.description=request_body["description"]
+        
