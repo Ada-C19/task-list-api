@@ -11,10 +11,13 @@ class Task(db.Model):
         nullable=True)
 
     def to_dict(self):
-        return { "id": self.task_id,
+        dictionary = { "id": self.task_id,
                 "title": self.title,
                 "description": self.description,
                 "is_complete": self.completed_at != None}
+        if self.goal_id: 
+            dictionary["goal_id"] = self.goal_id
+        return dictionary
     
     @classmethod
     def from_dict(cls, task_data):

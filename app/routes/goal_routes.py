@@ -24,7 +24,7 @@ def get_all_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def single_goal(goal_id):
-    goal = validate_object(Goal,goal_id)
+    goal = validate_object(Goal, goal_id)
     return jsonify({"goal": goal.to_dict()}), 200
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
