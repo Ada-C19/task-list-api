@@ -31,7 +31,6 @@ def create_task():
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
 
-    #WAVE 2: Sorting Tasks: By Title, Ascending
     if request.args.get("sort") == "asc":
         tasks = Task.query.order_by(text("title asc"))
     elif request.args.get("sort") == "desc":
