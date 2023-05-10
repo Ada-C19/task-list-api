@@ -7,9 +7,20 @@ class Goal(db.Model):
     tasks = db.relationship("Task", back_populates='goal')
 
     def to_dict(self):
-        return {"id": self.goal_id,
-                "title": self.title}
+        goal_dict = {"id": self.goal_id,
+                    "title": self.title}
+        return goal_dict
+
 
     @classmethod
     def from_dict(cls, dict):
         return Goal(title=dict['title'])
+    
+    def to_dict_with_tasks(self):
+        tasks = []
+        for task in self.tasks:
+            tasks.append(task.to_dict())
+        return {"id": self.goal_id,
+                "title": self.title,
+                "tasks": tasks}
+    
