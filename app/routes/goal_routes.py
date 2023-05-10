@@ -47,3 +47,16 @@ def delete_goal(id):
     db.session.commit()
 
     return jsonify({"details": f'Goal {goal.id} "{goal.title}" successfully deleted'}), 200
+
+# update goal endpoint
+@goals_bp.route("/<id>", methods=["PUT"])
+def update_task(id):
+    goal = validate_model(Goal, id)
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return jsonify({"goal": goal.to_dict()}), 200
