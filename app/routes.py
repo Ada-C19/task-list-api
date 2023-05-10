@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, request, make_response, abort
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -22,7 +23,7 @@ def validate_task(task_id):
 def create_task():
     request_body = request.get_json()   
     try: 
-        new_task = Task(title=request_body["title"], description=request_body["description"])
+        new_task = Task(title=request_body["title"], description=request_body["description"], completed_at=None)
     except:
         return {"details": "Invalid data"}, 400
     
@@ -112,3 +113,59 @@ def delete_task(task_id):
         "details": f"Task {task_id} \"{task.title}\" successfully deleted"
     }, 200
 
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_as_complete(task_id):
+    task = validate_task(task_id)
+
+    if task.completed_at is not None:
+        return {
+            "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True
+            }
+    }, 200
+
+    else:
+        task.completed_at = datetime.utcnow()
+
+    db.session.commit()
+
+    return {
+            "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True
+            }
+    }, 200
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+
+def mark_as_incomplete(task_id):
+    task = validate_task(task_id)
+
+    if task.completed_at is None:
+        return {
+            "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+            }
+    }, 200 
+
+    else:
+        task.completed_at = None
+
+    db.session.commit()
+
+    return {
+            "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+            }
+    }, 200
