@@ -6,19 +6,6 @@ from app.helper import validate_model
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-# def validate_goal(id):
-#     try:
-#         id = int(id)
-#     except:
-#         abort(make_response({"message": f"Goal {id} is invalid"}, 400))
-
-#     goal = Goal.query.get(id)
-
-#     if not goal:
-#         abort(make_response({"message": f"Goal {id} not found"}, 404))
-
-#     return goal
-
 # WAVE 5: Create a Goal: Valid Goal
 @goals_bp.route("", methods=["POST"])
 def create_goal():
