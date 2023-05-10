@@ -10,6 +10,7 @@ def test_get_goals_no_saved_goals(client):
     # Assert
     assert response.status_code == 200
     assert response_body == []
+    assert Goal.query.all() == []
 
 
 # 
@@ -56,7 +57,7 @@ def test_get_goal_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Goal 1 not found"}
-
+    assert not Goal.query.get(1)
 
 # 
 def test_create_goal(client):
@@ -75,7 +76,7 @@ def test_create_goal(client):
             "title": "My New Goal"
         }
     }
-
+    assert Goal.query.get(1).title == "My New Goal"
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
@@ -139,7 +140,7 @@ def test_delete_goal_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Goal 1 not found"}
-    assert Goal.query.all() == []
+    assert Goal.query.get(1) == None
 
 
 # 

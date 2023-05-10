@@ -2,7 +2,7 @@ from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.task import Task
 from .routes_helpers import validate_model, slack_call
-from datetime import datetime
+from datetime import date
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -71,7 +71,7 @@ def update_task(id):
 def mark_complete(id):
     task = validate_model(Task, id)
 
-    task.completed_at=datetime.utcnow()
+    task.completed_at=date.today()
     
     db.session.commit()
 

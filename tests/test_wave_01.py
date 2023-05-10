@@ -118,7 +118,7 @@ def test_update_task_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Task 1 not found"}
-
+    assert Task.query.get(1) == None
 
 def test_delete_task(client, one_task):
     # Act
@@ -128,10 +128,10 @@ def test_delete_task(client, one_task):
     # Assert
     assert response.status_code == 200
     assert "details" in response_body
+    assert Task.query.get(1) == None
     assert response_body == {
         "details": 'Task 1 "Go on my daily walk 🏞" successfully deleted'
     }
-    assert Task.query.get(1) == None
 
 
 def test_delete_task_not_found(client):
@@ -142,7 +142,7 @@ def test_delete_task_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Task 1 not found"}
-    assert Task.query.all() == []
+    assert not Task.query.get(1)
 
 
 def test_create_task_must_contain_title(client):
