@@ -1,4 +1,4 @@
-"""empty message
+"""Past changes did not work, made changes to connect one goal to many tasks
 
 Revision ID: d9114478ac94
 Revises: 037bf8604f70

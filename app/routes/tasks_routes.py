@@ -15,9 +15,11 @@ tasks_bp = Blueprint ("tasks", __name__, url_prefix="/tasks")
 def create_task():
 
     request_body = request.get_json()
-    if "title" not in request_body or "description" not in request_body:
+    try:
+        new_task = Task.from_dict(request_body)
+    except: 
         return make_response({"details": "Invalid data"},400)
-    new_task = Task.from_dict(request_body)
+    
     db.session.add(new_task)
     db.session.commit()
     task_response = new_task.to_dict()

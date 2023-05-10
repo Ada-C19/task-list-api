@@ -91,6 +91,7 @@ def post_one_goals_tasks(goal_id):
     
     goal = handle_id_request(Goal, goal_id)
     request_body = request.get_json()
+    
     if "task_ids" not in request_body:
         return make_response({"details": "Invalid data"},400)
     

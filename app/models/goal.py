@@ -15,14 +15,9 @@ class Goal(db.Model):
         goal_as_dict["title"] = self.title
         return goal_as_dict
     
-  
-##### REFACTOR AND USE FUNCTION FROM ABOVE 
     def to_dict_with_tasks(self):
-        goal_as_dict={}
-        
-        goal_as_dict["id"] = self.goal_id
-        goal_as_dict["title"] = self.title
 
+        goal_as_dict = self.to_dict()
         tasks_dicts = []
         for task in self.tasks:
             tasks_dicts.append(task.to_dict())

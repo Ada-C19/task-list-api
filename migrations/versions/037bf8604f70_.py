@@ -1,4 +1,4 @@
-"""empty message
+"""Added column to connect goal_id to a task
 
 Revision ID: 037bf8604f70
 Revises: 09e19ef4dba2

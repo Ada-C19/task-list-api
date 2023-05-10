@@ -1,4 +1,4 @@
-"""empty message
+"""Created columns that correspond with the task atributes
 
 Revision ID: 09e19ef4dba2
 Revises: 
