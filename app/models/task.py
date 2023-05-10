@@ -23,7 +23,7 @@ class Task(db.Model):
     @classmethod
     def create_dict(cls,response_body):
         return cls(
-            title=response_body.get("title"),
-            description=response_body.get("description"),
+            title=response_body["title"],
+            description=response_body["description"]
             # completed_at = response_body.get("completed_at",None)
         )
