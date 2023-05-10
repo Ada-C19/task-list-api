@@ -7,7 +7,7 @@ import requests, os
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
 
 ### Get Tasks: No Saved Tasks
-### Get Tasks: Getting Saved Tasks
+### Get Tasks: All Saved Tasks
 ### Sorting Tasks: By Title, Ascending
 ### Sorting Tasks: By Title, Descending
 @task_list_bp.route("", methods=["GET"])
@@ -23,12 +23,7 @@ def get_tasks():
             tasks = Task.query.order_by(Task.title.desc())
             
         for task in tasks:
-            tasks_response.append( {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": is_complete_status(task.completed_at)
-                } )
+            tasks_response.append(task.to_dict())
         
     return jsonify(tasks_response)
 
@@ -48,33 +43,19 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
-    return {"task": {
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": False    
-    } }, 201
+    return {"task": new_task.to_dict()}, 201
             
-### Get One Task: One Saved Task
+### Get One Task
 @task_list_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_item(Task, task_id)
     
     if task.goal is None:
-            return {"task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete_status(task.completed_at)
-        } }
+            return {"task": task.to_dict() }
     else:
-        return {"task": {
-            "id": task.task_id,
-            "goal_id": task.goal.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete_status(task.completed_at)
-        } }
+        task_with_goal = task.to_dict()
+        task_with_goal["goal_id"] = task.goal.goal_id
+        return {"task": task_with_goal}
     
 ### Update Task
 @task_list_bp.route("/<task_id>", methods=["PUT"])
@@ -88,14 +69,9 @@ def update_task(task_id):
     
     db.session.commit()
     
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": False    
-    } }
+    return {"task": task.to_dict()}
 
-### Delete Task: Deleting a Task
+### Delete Task
 @task_list_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_item(Task, task_id)
@@ -119,22 +95,17 @@ def mark_comp_or_incomp(task_id, mark_status):
         path = "https://slack.com/api/chat.postMessage"
         slack_api_token = os.environ.get("SLACK_API_TOKEN")
 
-        response = requests.patch(path, data = {"channel": "task-notifications",
+        requests.patch(path, data = {"channel": "task-notifications",
                                         "text": f"Someone just completed the task {task.title}"}, 
                                         headers = {"Authorization": f"Bearer {slack_api_token}"})
-        # response is an object
+        # above is an object
                 
     else:
         task.completed_at = None
 
     db.session.commit()
     
-    return {"task": {
-        "id": task.task_id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": is_complete_status(task.completed_at)
-    } } 
+    return {"task": task.to_dict()} 
     
 ### No matching Task or Goal: Get, Update, and Delete
 ## Mark Complete and Mark Incomplete for Missing Tasks
@@ -152,12 +123,7 @@ def validate_item (model, item_id):
     
     return item    
     
-# Helper function
-def is_complete_status(completed_at):
-    if completed_at is None:
-        return False
-    else:
-        return True
+
     
 
     
