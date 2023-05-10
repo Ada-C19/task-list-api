@@ -46,7 +46,7 @@ def read_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_saved_task(task_id):
-    task = validate_task(task_id)
+    task = validate_task_id(task_id)
 
     return {
         "task": {
@@ -59,7 +59,7 @@ def read_one_saved_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_task_id(task_id)
 
     request_body = request.get_json()
 
@@ -81,7 +81,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_task_id(task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -92,13 +92,13 @@ def delete_task(task_id):
         }, 200
     )
 
-def validate_task(task_id):
+def validate_task_id(task_id):
     task = Task.query.get(task_id)
 
     if not task:
         abort(make_response(
             {
-                "details": "Invalid data"
+                "details": "Task ID not found"
             }, 404
         ))
     return task
