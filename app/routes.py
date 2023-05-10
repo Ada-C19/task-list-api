@@ -21,34 +21,6 @@ def validate_item_by_id(model, id):
     return item if item else abort(make_response({"message":f"{model.__name__} {id} not found"}, 404))
 
 
-def validate_goal_by_id(id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({"message":f"Goal {id} invalid"}, 400))
-
-    goal = Goal.query.get(id)
-
-    if not goal:
-        abort(make_response({"message":f"goal {id} not found"}, 404)) 
-    
-    return goal
-
-
-def validate_task_by_id(id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({"message":f"task {id} invalid"}, 400))
-
-    task = Task.query.get(id)
-
-    if not task:
-        abort(make_response({"message":f"task {id} not found"}, 404)) 
-    
-    return task
-    
-
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
