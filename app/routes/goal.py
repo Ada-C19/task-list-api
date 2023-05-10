@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 import requests
 from datetime import datetime
 import os
@@ -84,3 +85,26 @@ def mark_complete(goal_id, complete_status):
         goal.completed_at = None
     db.session.commit()
     return make_response({"goal": goal.to_dict()}, 200)
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_tasks_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    request_body = request.get_json()
+
+    task_ids = request_body["task_ids"]
+    goal.tasks = [Task.query.get(id) for id in task_ids]
+
+    db.session.commit()
+
+    return jsonify(id=goal.goal_id, task_ids=task_ids), 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+
+    goal = validate_item(Goal, goal_id)
+    tasks = goal.tasks
+
+    tasks_to_dict = []
+    tasks_to_dict = [task.to_dict() for task in tasks]
+
+    return jsonify(id=goal.goal_id, title=goal.title, tasks=tasks_to_dict), 200
