@@ -11,8 +11,6 @@ goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
 def create_goal():
     request_body = request.get_json()
     valid_request = valid.validate_entry(Goal, request_body)
-    # if 'title' not in request_body:
-    #     abort(make_response({'details': 'Invalid data'}, 400))
 
     new_goal = Goal.from_dict(valid_request)
     

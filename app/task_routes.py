@@ -54,9 +54,6 @@ def replace_task(task_id):
     
     task.title = valid_request['title']
     task.description = valid_request['description']
-    # if 'completed_at' in valid_request:
-    #     task.completed_at = valid_request['completed_at']
-    #     task.is_complete = True
     
     db.session.commit()
     return {'task': task.to_dict()}, 200
@@ -70,9 +67,6 @@ def update_task(task_id):
 
     task.title = request_body.get('title', task.title)
     task.description = request_body.get('description', task.description)
-    # if 'completed_at' in request_body:
-    #     task.completed_at = request_body['completed_at']
-    #     task.is_complete = True
     
     db.session.commit()
     return {'task': task.to_dict()}, 200
