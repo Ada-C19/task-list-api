@@ -6,8 +6,7 @@ from datetime import datetime
 import os
 import requests
 from dotenv import load_dotenv
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
+
 
 
 load_dotenv()
@@ -175,14 +174,6 @@ def mark_complete_task(task_id):
         "token": slack_token
     }
     response = requests.post(url, data = data)
-
-    # try:
-    #     response = slack_client.chat_postMessage(
-    #         channel = "task-notifications", #where to send
-    #         text=slack_message #what to send
-    #     )
-    # except SlackApiError as error:
-    #     print(f"error {error}")
 
     return jsonify({
         "task": task.task_to_dict()
