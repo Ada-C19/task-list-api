@@ -112,21 +112,10 @@ def update_task_as_incomplete(task_id):
 
     return {"task": task.to_result()}, 200
 
-# VALIDATION HELPER FUNCTION
-def validate_item(model, item_id):
-    try:
-        item_id = int(item_id)
 
-    except ValueError:
-        return abort(make_response({"message": f"invalid id: {item_id}"}, 400))
-    
-    item = model.query.get(item_id)
-    
-    if not item: 
-        return abort(make_response({"message": f"{model.__name__} {item_id} not found"}, 404))
-    
-    return item
-
+# *****************************************************************
+# **********************Goal Routes********************************
+# *****************************************************************
 
 # Create Goal Route
 @goal_bp.route("", methods=["POST"])
@@ -162,7 +151,7 @@ def get_one_goal(goal_id):
 
     return {"goal": goal.to_dict()}, 200
 
-# Update a Task Route
+# Update a Goal Route
 @goal_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_item(Goal, goal_id)
@@ -173,7 +162,7 @@ def update_goal(goal_id):
 
     return {"goal": goal.to_dict()}, 200
 
-# Delete a Task Route 
+# Delete a Goal Route 
 @goal_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     goal = validate_item(Goal, goal_id)
@@ -182,3 +171,49 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {"details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"}, 200
+
+
+# Adding Tasks to a Goal
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    request_body = request.get_json()
+    all_tasks = request_body["task_ids"]
+
+    for task_id in all_tasks: 
+        task = validate_item(Task, task_id)
+        task.goal = goal
+    
+    db.session.commit()
+
+    return jsonify({"id": goal.goal_id, 
+                    "task_ids": all_tasks}), 200
+
+# Get Tasks of One Goal
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_of_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    tasks = []
+
+    for task in goal.tasks:
+        tasks.append(task.to_result())
+    
+    return jsonify({"id": goal.goal_id,
+            "title": goal.title, 
+            "tasks": tasks}), 200
+
+
+# VALIDATION HELPER FUNCTION
+def validate_item(model, item_id):
+    try:
+        item_id = int(item_id)
+
+    except ValueError:
+        return abort(make_response({"message": f"invalid id: {item_id}"}, 400))
+    
+    item = model.query.get(item_id)
+    
+    if not item: 
+        return abort(make_response({"message": f"{model.__name__} {item_id} not found"}, 404))
+    
+    return item
