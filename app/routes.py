@@ -195,15 +195,11 @@ def add_task_to_goal(goal_id):
 @goal_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_task_of_goal(goal_id):
     goal = validate_id(Goal,goal_id)
-
     
-    
+    try:
+        response = [goal.tasks[0].to_dict()]
+    except IndexError:
+        response = []
 
-    print("LKJSALDFJSADLF**********")
-    print('goal.tasks, do you exist? what do you return?', goal.tasks)
-    print(goal.tasks[0])
-    print(goal.tasks[0].to_dict())
-    print("******")
+    return ({"id": goal.goal_id,"title": goal.title, "tasks": response}), 200
 
-
-    return ({"id": goal.goal_id,"title": goal.title, "tasks": [] }), 200
