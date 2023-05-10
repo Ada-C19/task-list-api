@@ -2,11 +2,11 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal 
 import datetime
 import os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-
 
 
 def get_valid_item_by_id(model, id):
@@ -19,11 +19,11 @@ def get_valid_item_by_id(model, id):
 
     return item if item else abort (make_response({'msg': f'invalid data'}, 404))
 
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
     
-
     try:
         new_task = Task.from_dict(request_body)
         new_task.completed_at = None
@@ -34,7 +34,6 @@ def create_task():
     db.session.commit()
 
     return {"task":new_task.to_dict()}, 201
-
 
 @tasks_bp.route("", methods=['GET'])
 def handle_tasks():
@@ -47,20 +46,16 @@ def handle_tasks():
     else:
         tasks = Task.query.all()
 
-
     task_response = []
     for task in tasks:
         task_response.append(task.to_dict())
     return jsonify(task_response), 200
-
-
 
 @tasks_bp.route("<task_id>", methods=["GET"])
 def handle_task(task_id):
     task = get_valid_item_by_id(Task, task_id)
     return {"task": task.to_dict()}, 200
     
-
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
     request_body = request.get_json()
@@ -73,7 +68,6 @@ def update_one_task(task_id):
     db.session.commit()
     
     return {"task":task_to_update.to_dict()}, 200
-
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
@@ -102,13 +96,21 @@ def mark_incomplete(task_id):
     db.session.commit()
     return {"task": task.to_dict()}, 200
 
+
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
-# @goals_bp.route("/<goals_id>, methods=["GET"])
-# def mark_incomplete(task_id):
-#     task = get_valid_item_by_id(Task, task_id)
-#     if task.completed_at is None:
-#         return {"task": task.to_dict()}, 200
-#     task.completed_at = None
-#     db.session.commit()
-#     return {"task": task.to_dict()}, 200
+@goals_bp.route("<task_id>", methods=["GET"])
+def handle_task(task_id):
+    task = get_valid_item_by_id(Task, task_id)
+    return {"task": task.to_dict()}, 200
+    
+@goals_bp.route("", methods=["GET"])
+def handle_goal(goal_id):
+    goal = get_valid_item_by_id(Goal, goal_id)
+    goal_response = []
+    for goal in goals:
+        goal_response.append(goal.to_dict())
+    return {"goal": goal.to_dict()}, 200
+    # return jsonify(task_response), 200
+
+
