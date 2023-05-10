@@ -21,7 +21,7 @@ def create_goal():
     
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def create_tasks_for_goal(goal_id):
+def add_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_ids = request.json.get("task_ids")
     tasks = Task.query.filter(Task.id.in_(task_ids)).all()
@@ -35,7 +35,6 @@ def create_tasks_for_goal(goal_id):
                             "id": int(goal_id),
                             "task_ids": task_ids
                         })
-
 
 
 # Read
@@ -54,6 +53,19 @@ def list_specific_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     return make_response({"goal": goal.to_dict()})
 
+
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def list_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    task_list = [task.to_dict() for task in goal.tasks]
+    for task in task_list:
+        task["goal_id"] = goal.id
+    return make_response({
+                            "id": goal.id,
+                            "title": goal.title,
+                            "tasks": task_list
+                        })
+            
 
 # Update
 @goals_bp.route("<goal_id>", methods=["PUT"])
