@@ -55,11 +55,7 @@ def test_get_goal_not_found(client):
 
     assert response_body == {"msg": "invalid endpoint"}
     assert response.status_code == 404
-    # Assert
-    # ---- Complete Test ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # ---- Complete Test ----
+
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
