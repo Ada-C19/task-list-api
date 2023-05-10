@@ -154,3 +154,18 @@ def create_goal():
     return {
         "goal": new_goal.to_dict()
     }, 201
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal_to_update = validate_model(Goal, goal_id)
+
+    request_body = request.get_json()
+    for key, value in request_body.items():
+        if key == "title":
+            goal_to_update.title = value
+    
+    db.session.commit()
+
+    return {
+        "goal": goal_to_update.to_dict()
+    }, 200
