@@ -31,13 +31,12 @@ def get_one_task(task_id):
 
     return jsonify(response)
 
-# @tasks_bp.route("", methods=["POST"])
-# def create_task():
-#     request_body = request.get_json()
-#     new_planet = Planet.from_dict(request_body)
-#     db.session.add(new_planet)
-#     db.session.commit()
+@tasks_bp.route("", methods=["POST"])
+def create_task():
 
-#     request_body = request.get_json()
+    request_body = request.get_json()
+    new_task = Task.from_dict(request_body)
+    db.session.add(new_task)
+    db.session.commit()
 
-#     return make_response(jsonify(f"Planet {new_planet.name} created successfully."), 201)
+    return make_response(jsonify(f"Task {new_task.name} created successfully."), 201)
