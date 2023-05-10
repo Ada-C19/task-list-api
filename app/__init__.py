@@ -15,8 +15,14 @@ def create_app(test_config=None):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     if test_config is None:
+        # app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        #     "SQLALCHEMY_DATABASE_URI")
+        # test
+
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "SQLALCHEMY_DATABASE_URI")
+            "RENDER_TASK_LIST_DB_URI")
+
+        
     else:
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
@@ -30,5 +36,12 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
 
     # Register Blueprints here
+
+    from app.routes import task_bp
+    from app.routes import goal_bp
+    app.register_blueprint(task_bp)
+    app.register_blueprint(goal_bp)
+
+
 
     return app
