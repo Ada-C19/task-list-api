@@ -5,6 +5,8 @@ class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
 
+    tasks = db.relationship("Task", back_populates="goal", lazy=True)
+
     def to_dict(self):
         goal_as_dict = {}
         goal_as_dict["id"] = self.id

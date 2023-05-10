@@ -180,3 +180,17 @@ def delete_task(goal_id):
     return {
         "details": f'Goal {goal_to_delete.id} "{goal_to_delete.title}" successfully deleted'
     }, 200
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        task.goal = goal
+
+    db.session.commit()
+    return {
+        "id": goal.id,
+        "task_ids": [task_id for task_id in request_body["task_ids"]]
+    }, 200
