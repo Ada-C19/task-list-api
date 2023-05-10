@@ -128,13 +128,10 @@ def test_mark_complete_missing_task(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"details" : "Task #1 not found"}
-    actual_planet = Task.query.get(1)
-    assert actual_planet == None
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
-
+    actual_task = Task.query.get(1)
+    assert actual_task == None
+    response = client.get("/tasks/1")
+    assert response.status_code == 404
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_missing_task(client):
@@ -145,9 +142,8 @@ def test_mark_incomplete_missing_task(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"details" : "Task #1 not found"}
-    actual_planet = Task.query.get(1)
-    assert actual_planet == None
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
+    actual_task = Task.query.get(1)
+    assert actual_task == None
+    response = client.get("/tasks/1")
+    assert response.status_code == 404
+    
