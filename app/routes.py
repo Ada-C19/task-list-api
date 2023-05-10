@@ -21,6 +21,8 @@ def add_task():
     if not "title" in request_body or not "description" in request_body:
         return make_response({"details": "Invalid data"}, 400)
         # abort(make_response({"details": "Invalid data"}, 400))
+    if not "completed_at" in request_body:
+        request_body["completed_at"] = None
 
     #Replacing this with the from_dict in task.py
     # new_task = Task(
@@ -34,9 +36,21 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    print(f"new_task.todict {new_task.to_dict}")
+    is_complete = False
+    if new_task.completed_at:
+        is_complete = True
+
+    # print(f"new_task.todict {new_task.to_dict}")
 
     return {"task": new_task.to_dict()}, 201
+    # return {
+    #     "task": {
+    #         "id": new_task.task_id,
+    #         "title": new_task.title,
+    #         "description": new_task.description,
+    #         "is_complete": is_complete
+    #     }
+    # }
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -275,6 +289,7 @@ def post_task_ids_to_goal(goal_id):
     list_task_ids = request_body["task_ids"]
     
     for task_id in list_task_ids:
+        #instance of Task
         task = validate_model(Task, task_id)
         #instance of task. setting it's goal_id = goal_id that's being passed in
         task.goal_id = goal_id
@@ -287,4 +302,97 @@ def post_task_ids_to_goal(goal_id):
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_tasks_of_one_goal(goal_id):
-    pass
+    goal = validate_model(Goal, goal_id)
+    task_list = []
+    
+    # all_tasks = Task.query.all()
+
+    # for task_instance in all_tasks:
+    #     if task_instance.goal_id == goal.goal_id:
+    #         task_list.append(task_instance.to_dict_with_goal())
+
+    # return {
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": task_list
+    # }
+
+    print(goal.tasks)
+
+    for task in goal.tasks:
+        response =task.to_dict()
+        # response = task.to_dict_with_goal()
+        task_list.append(response)
+
+
+    return {
+        "id": goal.goal_id, 
+        "title": goal.title,
+        "tasks": task_list
+    }, 200
+
+    # tasks_response= []
+    # response_body={}
+    # for task in goal.tasks:
+    #     tasks_response.append(task.to_dict_with_goal())
+
+    # response_body["id"]= goal.goal_id
+    # response_body["title"] = goal.title  
+    # response_body["tasks"] = tasks_response
+
+    # return jsonify(response_body), 200
+
+
+
+
+
+
+
+#passing 1 test
+    # for task in goal.tasks:
+    #     is_complete = False
+    #     if task.completed_at:
+    #         is_complete = True
+    #     task_list.append({
+    #         "id": task.task_id,
+    #         "goal_id": goal.goal_id,
+    #         "title": task.title,
+    #         "description": task.description,
+    #         "is_complete": is_complete
+    #     })
+
+    # return {
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": task_list
+    # }
+
+
+    # all_tasks = goal.tasks
+
+    # for task in all_tasks:
+    #     # task_list_goal = 
+    #     task_list.append(task.to_dict_with_goal())
+    # # gives me a list of nulls....so....progress
+    # # return jsonify(task_list), 200
+    # return {
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": task_list
+    # }, 200
+
+
+    # #or can use something like this:
+    # #and inside the () we can call the goal.task_id
+    # # total_tasks = Task.query.limit(goal_id).all()
+
+    # ###ask my db that have that goal and then return in reponse
+
+    # # return({"tasks": total_tasks}), 200
+    # return make_response(goal.to_dict_with_goal(), 200)
+
+    # Goal.query.get(goal_id).tasks
+
+
+
+
