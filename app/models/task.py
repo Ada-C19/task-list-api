@@ -16,6 +16,7 @@ class Task(db.Model):
             'is_complete': self.is_complete
             }
     
+    #returns all the attributes that must be passed in order to create a record. All not nullable instance variables accept id.'
     @classmethod
     def get_attributes(cls):
         return 'title', 'description'
