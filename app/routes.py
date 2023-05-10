@@ -1,29 +1,16 @@
 from flask import Blueprint, abort, jsonify, make_response, request
 from app import db
+from app import valid
 from app.models.task import Task
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
-def validate_id(model, id):
-    if not id.isnumeric():
-        abort(make_response({'Error': f'{id} is invalid'}, 400))
-    
-    entity = model.query.get(id)
-    if not entity:
-        abort(make_response({'Not found': f'No {model.__name__} with id#{id} is found'}, 404))
-    return entity
 
-def validate_entry(model, request_body):
-    for atr in model.get_attributes():
-        if atr not in request_body:
-            abort(make_response({'details': 'Invalid data'}, 400))
-            # abort(make_response({'Invalid Request': f'Missing {model.__name__} {atr}'}, 400))
-    return request_body
 
 @tasks_bp.route('', methods=['POST'])
 def create_task():
     request_body = request.get_json()
-    valid_request = validate_entry(Task, request_body)
+    valid_request = valid.validate_entry(Task, request_body)
 
     new_task = Task.from_dict(valid_request)
     
@@ -51,16 +38,16 @@ def get_tasks():
 
 @tasks_bp.route('/<task_id>', methods=['GET'])
 def get_task_by_id(task_id):
-    task = validate_id(Task, task_id)
+    task = valid.validate_id(Task, task_id)
     
     return {'task': task.to_dict()}, 200
 
 @tasks_bp.route('/<task_id>', methods=['PUT'])
 def replace_task(task_id):
-    task = validate_id(Task, task_id)
+    task = valid.validate_id(Task, task_id)
     
     request_body = request.get_json()
-    valid_request = validate_entry(Task, request_body)
+    valid_request = valid.validate_entry(Task, request_body)
     
     task.title = valid_request['title']
     task.description = valid_request['description']
@@ -74,7 +61,7 @@ def replace_task(task_id):
 
 @tasks_bp.route('/<task_id>', methods=['PATCH'])
 def update_task(task_id):
-    task = validate_id(Task, task_id)
+    task = valid.validate_id(Task, task_id)
     
     request_body = request.get_json()
 
@@ -90,7 +77,7 @@ def update_task(task_id):
 
 @tasks_bp.route('/<task_id>', methods=['DELETE'])
 def delete_task(task_id):
-    task = validate_id(Task, task_id)
+    task = valid.validate_id(Task, task_id)
     
     task_title = task.title
     
