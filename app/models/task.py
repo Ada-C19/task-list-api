@@ -6,3 +6,16 @@ class Task(db.Model):
     title = db.Column(db.String(100))
     description = db.Column(db.String(200))
     completed_at = db.Column(db.DateTime, default=None)
+
+    def to_dict(self):
+        return{
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": bool(self.completed_at != None)
+        }
+
+    @classmethod
+    def from_dict(cls,task_details):
+        new_task = Task(title=task_details["title"], description=task_details["description"] )
+        return new_task
