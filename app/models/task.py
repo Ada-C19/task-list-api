@@ -9,7 +9,7 @@ class Task(db.Model):
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'), nullable=True)
     goal = db.relationship("Goal", back_populates="tasks")
 
-    # Converts Task model into a dict
+    # Converts Task instance into a dict
     def to_dict(self):
         is_complete = False
         if self.completed_at:

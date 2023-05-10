@@ -6,7 +6,7 @@ class Goal(db.Model):
     title = db.Column(db.String)
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
-    # Converts Goal model into a dict
+    # Converts Goal instance into a dict
     def to_dict(self):
 
         dic_data = {
