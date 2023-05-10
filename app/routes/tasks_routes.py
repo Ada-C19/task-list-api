@@ -120,3 +120,14 @@ def mark_task_as_completed(task_id):
     return {
         "task": updated_task.to_dict()
     }
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_as_incomplete(task_id):
+    updated_task=get_valid_item_by_id(Task, task_id)
+    updated_task.completed_at = None
+    db.session.commit()
+
+    return {
+        "task": updated_task.to_dict()
+    }
