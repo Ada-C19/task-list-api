@@ -31,3 +31,9 @@ class Task(db.Model):
                 "description": self.description,
                 "is_complete": True
             }
+    
+    @classmethod
+    def from_dict(cls, request_body):
+        return Task(title=request_body["title"],
+                    description=request_body["description"],
+                    completed_at=request_body.get("completed_at"))

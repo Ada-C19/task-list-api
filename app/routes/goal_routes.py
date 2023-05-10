@@ -14,7 +14,7 @@ def create_goal():
     if not request_body.get("title"):
         abort(make_response({"details": "Invalid data"}, 400))
     else:
-        new_goal = Goal(title=request_body["title"])
+        new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
     db.session.commit()
@@ -89,5 +89,4 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    # return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
     return delete_message(Goal, goal)

@@ -10,3 +10,7 @@ class Goal(db.Model):
             "id": self.id,
             "title": self.title
         }
+    
+    @classmethod
+    def from_dict(cls, request_body):
+        return Goal(title=request_body["title"])
