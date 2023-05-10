@@ -1,5 +1,6 @@
 from flask import Blueprint, make_response, request, jsonify, abort
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from sqlalchemy import asc, desc
 from datetime import datetime, date
@@ -9,27 +10,27 @@ import json
 import os
 from dotenv import load_dotenv
 load_dotenv()
-
 token = os.environ.get("SLACK_BOT_TOKEN")
 
 
-
+# Making Blueprints
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+
 
 # helper function: validate task
-def validate_task(task_id):
+def validate_model(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message": f"{type(task_id)} is not a valid type"}, 400))
+        abort(make_response({"message": f"{type(model_id)} is not a valid type"}, 400))
 
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
 
-    if not task:
-        abort(make_response({"message": f"task #{task_id} not found"}, 404))
+    if not model:
+        abort(make_response({"message": f"{cls.__name__} #{model_id} not found"}, 404))
     
-    return task
-
+    return model
 
 
 @tasks_bp.route("", methods=["POST"])
@@ -58,6 +59,7 @@ def create_task():
         abort(make_response({"details": "Invalid data"}, 400))
         # abort(make_response(f"{error.__str__()} is missing", 400))
 
+
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     # this is the query part
@@ -83,9 +85,10 @@ def get_all_tasks():
         )
     return jsonify(tasks_response)
 
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     return { "task":{
                 "id": task.task_id,
                 "title": task.title,
@@ -96,7 +99,7 @@ def get_one_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -118,14 +121,15 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     db.session.delete(task)
     db.session.commit()
     return make_response({
         "details": f"Task {task.task_id} \"{task.title}\" successfully deleted"
 })
 
-# helper function to send msg to slack
+
+# helper function to send message to Slack
 def post_message_to_slack(my_text, blocks = None):
     url = "https://slack.com/api/chat.postMessage"
 
@@ -145,7 +149,7 @@ def post_message_to_slack(my_text, blocks = None):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_off_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     time_now = datetime.now()
     todays_date = date.today()
@@ -153,7 +157,7 @@ def mark_off_complete(task_id):
 
     db.session.commit()
 
-    # sending to slack???
+    # sending message to Slack
     text_to_send = f"Someone just completed the task {task.title}"
     post_message_to_slack(text_to_send)
 
@@ -162,13 +166,12 @@ def mark_off_complete(task_id):
                 "title": task.title,
                 "description": task.description,
                 "is_complete": bool(task.completed_at)}
-            }
-        
+            }        
 
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     task.completed_at = None
 
     db.session.commit()
@@ -179,5 +182,70 @@ def mark_incomplete(task_id):
                 "is_complete": bool(task.completed_at)}
             }
 
+
+# goals routes
+@goals_bp.route("", methods=["POST"])
+def make_new_goal():
+    try:
+        request_body = request.get_json()
+        new_goal = Goal(
+            title = request_body["title"]
+        )
+        db.session.add(new_goal)
+        db.session.commit()
+
+        return make_response(
+        {"goal": {
+            "id": new_goal.goal_id,
+            "title": new_goal.title
+        }}, 201)
+
+    except KeyError:
+        return make_response({"details": "Invalid data"}, 400)
+
+
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    goals = Goal.query.all()
+    goals_response = []
+    for goal in goals:
+        goals_response.append({
+    "id": goal.goal_id,
+    "title": goal.title
+        })
+    return jsonify(goals_response)
+
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    return {
+    "goal": {
+        "id": goal.goal_id,
+        "title": goal.title
+    }}
+
+
+@goals_bp.route("<goal_id>", methods=["PUT"])
+def update_goal_title(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    goal.title = request_body["title"]
+    return {
+    "goal": {
+        "id": goal.goal_id,
+        "title": goal.title
+    }}
+
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    db.session.delete(goal)
+    db.session.commit()
+    return make_response({
+        "details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"
+})
 
 
