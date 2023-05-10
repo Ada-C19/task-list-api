@@ -62,7 +62,7 @@ def test_get_task_not_found(client):
     # added assert for response body
     assert response_body == {"details": "Task not found"}
 
-    raise Exception("Complete test with assertion about response body")
+#    raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
@@ -136,7 +136,7 @@ def test_update_task_not_found(client):
     assert response_body == {"details": "Task not found"}
 
 
-    raise Exception("Complete test with assertion about response body")
+#    raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
@@ -168,7 +168,7 @@ def test_delete_task_not_found(client):
     # added assertion
     assert response_body == {"details": "Task not found"}
 
-    raise Exception("Complete test with assertion about response body")
+#    raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
