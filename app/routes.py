@@ -2,6 +2,9 @@ from flask import Blueprint, jsonify, request, Response, abort, make_response
 from app.models.task import Task
 from app import db 
 from datetime import datetime
+from dotenv import load_dotenv
+import requests
+import os
 
 
 # create blueprint 
@@ -87,6 +90,14 @@ def update_task_as_complete(task_id):
     task.completed_at = datetime.now()
 
     db.session.commit()
+
+    kim_bot = {
+        "text": f"You completed the task {task.title} congrats!! :clap:",
+        "channel": "task-notifications",
+        "token": os.environ.get("SLACK_BOT_TOKEN")
+    }
+
+    r = requests.post(url='https://slack.com/api/chat.postMessage',data=kim_bot)
 
     return {"task": task.to_result()}, 200
 
