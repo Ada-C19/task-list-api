@@ -6,6 +6,8 @@ class Task(db.Model):
     title = db.Column(db.String, nullable = False)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable = True)
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
+    goal = db.relationship("Goal", back_populates="tasks")
 
 
     def to_dict(self):
@@ -14,6 +16,7 @@ class Task(db.Model):
         task_as_dict["title"] = self.title
         task_as_dict["description"] = self.description
         task_as_dict["is_complete"] = self.completed_at != None
+        # task_as_dict["goal"] = self.title if self.goal else None
         return task_as_dict
 
 
@@ -22,5 +25,6 @@ class Task(db.Model):
         new_task = cls(title=task_data["title"],
                     description=task_data["description"],
                     completed_at=task_data.get("completed_at"))
+                    # goal_id=task_data['goal_id'])
         return new_task
     

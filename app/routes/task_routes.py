@@ -1,7 +1,11 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
-from app.helpers import validate_model
+from app.helpers import validate_model, slack_post_message
+from datetime import datetime
+import requests
+
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -17,8 +21,8 @@ def create_new_task():
         db.session.commit()
 
         return make_response({"task":new_task.to_dict()}, 201)
-    except KeyError:
-        abort(make_response({"details": "Invalid data"}, 400))
+    except KeyError as e:
+        abort(make_response({"details": f"missing {e}"}, 400))
 
 #ROUTE 2
 @tasks_bp.route("", methods=["GET"])
@@ -31,6 +35,13 @@ def get_saved_tasks():
     
         if sort_order == "desc":
             tasks = Task.query.order_by(Task.title.desc())
+        
+        if sort_order == "idasc":
+            tasks = Task.query.order_by(Task.task_id.asc())
+
+        if sort_order == "iddesc":
+            tasks = Task.query.order_by(Task.task_id.desc())
+
     else:
         tasks = Task.query.all()
 
@@ -84,3 +95,38 @@ def delete_one_task(task_id):
     
     except KeyError:
         abort(make_response({'details': f"Task {task_id} not found"}, 404))
+
+
+#WAVE 3 ROUTE 1
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def task_mark_complete(task_id):
+    try:
+        task = validate_model(Task, task_id)
+
+        task.completed_at = datetime.utcnow()
+        db.session.commit()
+
+    
+        task.is_complete = True
+        slack_post_message(task)
+
+        return make_response({"task": task.to_dict()}, 200)
+    except KeyError:
+        abort(make_response({'details': f"Task {task_id} not found"}, 404))
+
+
+
+#WAVE 3 ROUTE 2
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def task_mark_incomplete(task_id):
+    try:
+        task = validate_model(Task, task_id)
+
+        task.completed_at = None
+        db.session.commit()
+
+        task.is_complete = False
+        return make_response({"task": task.to_dict()}, 200)
+    except KeyError:
+        abort(make_response({'details': f"Task {task_id} not found"}, 404))
+

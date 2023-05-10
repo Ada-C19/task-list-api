@@ -1,5 +1,7 @@
 from flask import jsonify, abort, make_response, request
-from app import db
+from app.models.task import Task 
+from app import db, token
+import requests
 
 
 def validate_model(cls, id):
@@ -18,3 +20,19 @@ def validate_model(cls, id):
         abort(make_response({"message": message}, 404))
 
     return model
+
+def slack_post_message(task):
+    api_url = 'https://slack.com/api/chat.postMessage'
+
+    payload = {
+        "channel": "api-test-channel",
+        "text": f"Someone just completed the task {task.title}"
+    }
+
+    headers = {
+        'Authorization': f"Bearer {token}"
+    }
+
+    response = requests.post(api_url, headers=headers, data=payload)
+
+    print(response.text)
