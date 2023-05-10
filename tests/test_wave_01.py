@@ -160,8 +160,9 @@ def test_delete_task_not_found(client):
 
     # Assert
     assert response.status_code == 404
+    assert response_body == {"message":f"task 1 not found"}
 
-    raise Exception("Complete test with assertion about response body")
+    # raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************

@@ -60,7 +60,7 @@ def validate_task(task_id):
     
     abort(make_response({"message":f"task {task_id} not found"}, 404))
 
-@task_bp.route("/tasks/<task_id>", methods=["DELETE"])
+@task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_task(task_id)
     
@@ -68,7 +68,7 @@ def delete_task(task_id):
     db.session.commit()
 
     message  = {
-            "task": f"Task {task.task_id} \"{task.title}\" successfully deleted"
+            "details": f"Task {task.task_id} \"{task.title}\" successfully deleted"
         }
 
     return make_response(message, 200)
