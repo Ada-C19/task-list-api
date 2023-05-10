@@ -28,17 +28,25 @@ def add_task():
 @task_bp.route("", methods=["GET"])
 def get_tasks():
     response_list = []
-    sort_query = request.args.get("sort")
+    sort_query = request.args.get("sort", default=None)
+    sort_by_query = request.args.get("sort_by", default="title")
 
     all_tasks = Task.query.all()
 
     for task in all_tasks:
         response_list.append(task.to_dict())
-
+    if sort_by_query == "title":
+        sort_key = get_title 
+    elif sort_by_query == "id":
+        sort_key = get_id
+    elif sort_by_query:
+        abort(make_response({"details": "sort type is not accepted"}, 400))
     if sort_query == "asc":
-        response_list.sort(key=get_title)
+        response_list.sort(key=sort_key)
     elif sort_query == "desc":
-        response_list.sort(reverse=True, key=get_title)
+        response_list.sort(reverse=True, key=sort_key)
+    elif sort_query:
+        abort(make_response({"details": "sort must be ascending or descending"}, 400))
 
     return jsonify(response_list), 200
 
@@ -126,3 +134,6 @@ def message_for_only_one_task(task):
 
 def get_title(task):
     return task["title"]
+
+def get_id(task):
+    return task["id"]
