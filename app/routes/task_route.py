@@ -63,15 +63,8 @@ def get_task(task_id):
     task = validate_model(Task, task_id)
     if task.goal: 
         return jsonify({"task": task.to_dict_with_goal_id()}), 200
-    
+        
     return jsonify({"task": task.to_dict()}), 200
-
-
-@tasks_bp.route("/<task_id>", methods=["GET"])
-def get_task_includes_goal_id(task_id):
-    task = validate_model(Task, task_id)
-
-    return jsonify({"task": task.to_dict_with_goal_id()}), 200
 
 # route to update a task by id
 
