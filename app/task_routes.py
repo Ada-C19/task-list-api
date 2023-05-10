@@ -75,3 +75,40 @@ def update_task(task_id):
     response_body = dict(task = task.to_dict())
 
     return jsonify(response_body), 200
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_task(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"}, '200 OK')
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_task(task_id)
+    if task.completed_at == None:
+        task.completed_at = datetime.utcnow()
+
+    db.session.commit()
+
+    URL = "https://slack.com/api/chat.postMessage"
+    query_param = {"channel": "api-test-channel", "text": f"Someone just completed the task {task.title}"}
+    headers = {"Authorization": os.environ.get("SLACK_BOT_TOKEN")}
+    response_bot = requests.post(URL,params=query_param, headers=headers)
+
+    response_body = dict(task = task.to_dict())
+    return jsonify(response_body), 200
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+    if task.completed_at != None:
+        task.completed_at = None
+
+        db.session.commit()
+
+    response_body = dict(task = task.to_dict())
+
+    return jsonify(response_body), 200
