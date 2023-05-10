@@ -15,7 +15,7 @@ def add_task():
     request_body = request.get_json()
 
     if "title" not in request_body or "description" not in request_body:
-        return {"details": "Invalid data"}, 400
+        return {"details": "Bad Request"}, 400
     
     new_task = Task.from_dict(request_body)
     
@@ -104,7 +104,7 @@ def validate_id(model, item_id):
     try:
         item_id = int(item_id)
     except ValueError:
-        return abort(make_response({"msg": "invalid endpoint"},400))
+        return abort(make_response({"msg": "bad request"},400))
     
     item = model.query.get(item_id)
     if not item:
@@ -118,7 +118,8 @@ goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 @goal_bp.route("", methods=["POST"])
 def add_goal():
     request_body = request.get_json()
-
+    if "title" not in request_body:
+        return {"details": "Bad Request"}, 400
     new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
@@ -144,5 +145,17 @@ def get_all_goals():
 @goal_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_id(Goal,goal_id)
+
+    return {"goal" : goal.to_dict()}, 200
+
+@goal_bp.route("<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_id(Goal, goal_id)
+
+    request_data = request.get_json()
+
+    goal.title = request_data["title"]
+
+    db.session.commit()
 
     return {"goal" : goal.to_dict()}, 200
