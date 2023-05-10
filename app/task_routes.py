@@ -14,22 +14,22 @@ bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def get_tasks():
     sort_param = request.args.get("sort")
     order_param = request.args.get("order")
-    # filter_param = 
 
     tasks = Task.query.all()
+    
     if sort_param == "title":
         column = Task.title
     elif sort_param == "id":
         column = Task.id
     else:
-        abort(make_response(jsonify(f"Tasks cannot be sorted by {sort_param}"), 400))
+        return abort(make_response(jsonify(f"Tasks cannot be sorted by {sort_param}"), 400))
     
     if order_param == "asc":
         tasks = Task.query.order_by(column.asc())
     elif order_param == "desc":
         tasks = Task.query.order_by(column.desc())
     else:
-        abort(make_response(jsonify(f"Tasks cannot be ordered by {order_param}"), 400))
+        return abort(make_response(jsonify(f"Tasks cannot be ordered by {order_param}"), 400))
     
     tasks_response = [task.to_dict() for task in tasks]
     
