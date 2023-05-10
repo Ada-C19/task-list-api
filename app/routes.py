@@ -42,3 +42,17 @@ def create_task():
     response = {"task": new_task.to_dict()}
 
     return make_response((jsonify(response)), 201)
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_one_task(task_id):    
+    task = validate_model(Task, task_id)
+    updated_data = request.get_json()
+
+    task.title = updated_data["title"]
+    task.description = updated_data["description"]
+
+    db.session.commit()
+
+    response = {"task": task.to_dict()}
+
+    return make_response(response, 200)
