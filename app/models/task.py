@@ -9,21 +9,17 @@ class Task(db.Model):
     goal = db.relationship("Goal", back_populates="tasks")
 
     def to_dict(self):
-        return {
+        task_dict = {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": self.completed_at is not None
         }
 
-    def to_dict_with_goal(self):
-        return {
-            "id": self.task_id,
-            "goal_id": self.goal_id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": self.completed_at is not None
-        }
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
+
+        return task_dict
 
     @classmethod
     def from_dict(cls, task_data):
