@@ -111,21 +111,6 @@ def mark_task_incomplete(task_id):
     return jsonify({"task":task.to_dict()}),200
 
 #Wave 5
-
-# def validate_goal(goal_id):
-#     try: 
-#         goal_id = int(goal_id)
-#     except: 
-#         abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
-
-#     goal= Goal.query.get(goal_id)
-
-#     if not goal: 
-#         abort(make_response({"message": f"Goal {goal_id} invalid"}, 404))
-    
-#     return goal
-    
-
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -168,6 +153,43 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return jsonify({"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}),200
+
+### Wave 6 
+#POST /goals/1/tasks
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    goal = validate_model(Goal, goal_id)
+    tasks_to_add = request.get_json()
+    new_tasks_to_add_goal = []
+
+    for task_id in tasks_to_add["task_ids"]:
+        new_task = validate_model(Task, task_id)
+        new_tasks_to_add_goal.append(new_task)
+    
+    goal.tasks= new_tasks_to_add_goal
+    db.session.commit()
+
+    return make_response({
+        "id": goal.goal_id,
+        "task_ids": [task.task_id for task in goal.tasks]
+    },200)
+
+
+#GET /goals/1/tasks
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_task_for_specific(goal_id): 
+        goal = validate_model(Goal, goal_id)
+        response_body=goal.to_dict()
+        response_body["tasks"] = [task.to_dict() for task in goal.tasks]
+
+        for task in response_body["tasks"]:
+            task["goal_id"] = goal.goal_id
+
+        return jsonify(response_body),200 
+
+
+
+
 
 
 
