@@ -117,4 +117,4 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return {"details": f'Task {task.task_id} "{task.title}" successfully deleted'}, 200
+    return {"details": f"Task {task.task_id} \"{task.title}\" successfully deleted"}, 200
