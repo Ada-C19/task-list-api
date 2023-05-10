@@ -6,19 +6,19 @@ from sqlalchemy import asc, desc
 from datetime import datetime, date
 import requests
 import json
-
+# For Slack Bot
 import os
 from dotenv import load_dotenv
 load_dotenv()
 token = os.environ.get("SLACK_BOT_TOKEN")
 
 
-# Making Blueprints
+# Blueprints
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 
-# helper function: validate task
+# Helper function: validate model
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
@@ -129,7 +129,7 @@ def delete_one_task(task_id):
 })
 
 
-# helper function to send message to Slack
+# Helper function to send message to Slack
 def post_message_to_slack(my_text, blocks = None):
     url = "https://slack.com/api/chat.postMessage"
 
