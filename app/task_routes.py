@@ -3,8 +3,11 @@ from app import db
 from app.models.task import Task
 from app.routes_helpers import validate_model
 from datetime import datetime
+from dotenv import load_dotenv
+import requests
+import os
 
-
+load_dotenv()
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -75,9 +78,17 @@ def delete_one_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
+  
+    url = "https://slack.com/api/chat.postMessage"
+    payload = {
+        "channel": "api-test-channel",
+        "text": f"Someone just completed the task {task.title}"
+    }
+    headers = {"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"}
 
     if not task.completed_at:
         task.completed_at = datetime.utcnow()
+        response = requests.post(url, json=payload, headers=headers)
 
     db.session.add(task)
     db.session.commit()
