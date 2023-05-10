@@ -50,7 +50,7 @@ def test_get_task(client, one_task):
         }
     }
 
-#####this one that we finished the test for
+# A test we finished writing the asserts for
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task_not_found(client):
     # Act
@@ -62,7 +62,7 @@ def test_get_task_not_found(client):
     #myassert
     assert response_body == {"message": "Task 1 not found"}
 
-######ask about this TTTEEEESSSSSSTTTT
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task(client):
     # Act
@@ -115,7 +115,7 @@ def test_update_task(client, one_task):
     assert task.description == "Updated Test Description"
     assert task.completed_at == None
 
-#####this one that we finished the test for
+# A test we finished writing the asserts for
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_update_task_not_found(client):
     # Act
@@ -145,8 +145,8 @@ def test_delete_task(client, one_task):
     }
     assert Task.query.get(1) == None
 
-######CHECK THE ORIGINAL TEST FOR THIS!!!!!
-#####this one that we finished the test for
+
+# A test we finished writing the asserts for
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_task_not_found(client):
     # Act
@@ -155,11 +155,8 @@ def test_delete_task_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    #myassert
-    # assert response == []
-    #this was already here:::: idk what the helk it does
-    assert Task.query.all() == []
     assert response_body == {"message": "Task 1 not found"}
+    assert Task.query.all() == []
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")

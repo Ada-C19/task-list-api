@@ -103,7 +103,6 @@ def validate_model(cls, model_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete_task(task_id):
-    # task = validate_item(task_id)
     task = validate_model(Task, task_id)
 
     task.completed_at = datetime.now()
@@ -167,7 +166,6 @@ def add_goal():
 def get_all_goals():
     goals_response = []
 
-    #Get all
     total_goals = Goal.query.all()
 
     for goal in total_goals:
@@ -232,26 +230,10 @@ def post_task_ids_to_goal(goal_id):
 def get_tasks_of_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_list = []
-    
-    # all_tasks = Task.query.all()
-
-    # for task_instance in all_tasks:
-    #     if task_instance.goal_id == goal.goal_id:
-    #         task_list.append(task_instance.to_dict_with_goal())
-
-    # return {
-    #     "id": goal.goal_id,
-    #     "title": goal.title,
-    #     "tasks": task_list
-    # }
-
-    print(goal.tasks)
 
     for task in goal.tasks:
         response =task.to_dict()
-        # response = task.to_dict_with_goal()
         task_list.append(response)
-
 
     return {
         "id": goal.goal_id, 
