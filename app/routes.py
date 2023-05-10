@@ -2,13 +2,23 @@ from flask import Blueprint, jsonify, make_response, request
 from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
+from sqlalchemy import asc, desc
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
-    tasks = Task.query.all()
     tasks_list = []
+
+    sort_param = request.args.get("sort")
+
+    if sort_param == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif sort_param == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+    
     for task in tasks:
         tasks_list.append(task.to_dict())
     
