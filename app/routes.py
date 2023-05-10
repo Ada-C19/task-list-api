@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify, abort, make_response
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import *
 import os
 from slack_sdk import WebClient
 
 
 tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 def validate_model(cls, model_id):
     try:
