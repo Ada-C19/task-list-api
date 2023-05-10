@@ -29,4 +29,21 @@ def get_all_goals():
 
     return jsonify(goal_list), 200
 
+# get one goal endpoint
+@goals_bp.route("/<id>", methods=["GET"])
+def get_goal(id):
+    goal = validate_model(Goal, id)
 
+    response_body = goal.to_dict()
+
+    return jsonify({"goal": response_body}), 200
+
+# delete goal endpoint
+@goals_bp.route("/<id>", methods=["DELETE"])
+def delete_goal(id):
+    goal = validate_model(Goal, id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return jsonify({"details": f'Goal {goal.id} "{goal.title}" successfully deleted'}), 200
