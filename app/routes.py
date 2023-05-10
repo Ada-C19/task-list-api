@@ -58,13 +58,20 @@ def create_task():
         abort(make_response({"details": "Invalid data"}, 400))
     else:
 
-        is_complete = request_body.get("is_complete", False) #find a way to include this in model class
+        # is_complete = request_body.get("is_complete", False) #find a way to include this in model class
+        # if "completed_at" not in request_body or not request_body["completed_at"]:
+        #     # request_body["is_complete"] = True
+        #     is_complete = False
+        # else:
+        #     # request_body["is_complete"] = False
+        #     is_complete = True
+
 
 
         new_task = Task(
             title=request_body["title"],
-            description=request_body["description"],
-            is_complete=is_complete
+            description=request_body["description"]
+            # is_complete=is_complete '''this commented out made it work
         )
 
         # new_task = Task.from_dict(request_body)
