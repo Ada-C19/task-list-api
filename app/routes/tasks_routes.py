@@ -1,21 +1,11 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 import datetime
 from app.models.task import Task
+from app.routes.helper_funcs import get_valid_item_by_id
 from app import db
 
 # All routes for tasks start with "/tasks" URL prefix
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
-
-def get_valid_item_by_id(model, id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({'msg': f"Invalid id '{id}'"}, 400))
-
-    item = model.query.get(id)
-
-    return item if item else abort(make_response({'msg': f"No {model.__name__} with id {id}"}, 404))
 
 
 @tasks_bp.route("", methods=['POST'])
@@ -48,9 +38,7 @@ def handle_get_tasks_request():
     else:
         tasks = Task.query.all()
     
-    task_response = []
-    for task in tasks:
-        task_response.append(task.to_dict())
+    task_response = [task.to_dict() for task in tasks]
 
     return jsonify(task_response), 200
 

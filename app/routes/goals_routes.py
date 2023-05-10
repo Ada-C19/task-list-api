@@ -1,21 +1,11 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
 from app.models.task import Task
+from app.routes.helper_funcs import get_valid_item_by_id
 from app import db
 
 # All routes for goals start with "/goals" URL prefix
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
-
-
-def get_valid_item_by_id(model, id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({'msg': f"Invalid id '{id}'"}, 400))
-
-    item = model.query.get(id)
-
-    return item if item else abort(make_response({'msg': f"No {model.__name__} with id {id}"}, 404))
 
 
 @goals_bp.route("", methods=['POST'])
@@ -50,9 +40,7 @@ def handle_get_goals_request():
 
     goals = Goal.query.all()
     
-    goal_response = []
-    for goal in goals:
-        goal_response.append(goal.to_dict())
+    goal_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goal_response), 200
 
@@ -118,10 +106,7 @@ def get_tasks_by_goal(goal_id):
     goal = get_valid_item_by_id(Goal, goal_id)
 
     tasks = goal.tasks
-    tasks_by_goal_response = []
-
-    for task in tasks:
-        tasks_by_goal_response.append(task.to_dict())
+    tasks_by_goal_response = [task.to_dict() for task in tasks]
 
     return {
         "id": goal.goal_id,
