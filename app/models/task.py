@@ -8,7 +8,14 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime)
     goals = db.relationship("Goal", back_populates="tasks")
     goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
-
+    
+    @classmethod
+    def from_dict(cls, task_data):
+        new_task = Task(
+        title=task_data["title"],
+        description=task_data["description"]
+    )
+        return new_task
     def to_dic(self):
         task_dic = {
             "task": {

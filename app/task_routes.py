@@ -28,27 +28,16 @@ def create_task():
     if not request_body.get("title") or not request_body.get("description"):
         return jsonify({"details": "Invalid data"}), 400
 
-    new_task = Task(
-        title=request_body["title"],
-        description=request_body["description"]
-    )
+    new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {
-        "task": {
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": True if new_task.completed_at else False
-        }
-    }, 201
+    return new_task.to_dic(), 201
 
 
 @tasks_bp.route("", methods=['GET'])
 def read_all_tasks():
-    task_response = []
     sort_query = request.args.get("sort")
 
     if sort_query == 'asc':
@@ -57,14 +46,7 @@ def read_all_tasks():
         tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
-
-    for task in tasks:
-        task_response.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description, 
-            "is_complete": True if task.completed_at else False
-        })
+    task_response = [task.to_dic()["task"] for task in tasks]
     return jsonify(task_response), 200
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
@@ -82,21 +64,11 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False
-        }
-    }, 200
+    return task.to_dic(), 200
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
 def mark_complete_task(task_id):
     task = validate_model(Task, task_id)
-
-    # if task.completed_at:
-    #     return make_response({"details":f"Task with id {task_id} is already completed"})
 
     task.completed_at = datetime.utcnow()
     db.session.commit()
@@ -111,14 +83,7 @@ def mark_complete_task(task_id):
     if response.status_code != 200:
         return make_response({"details": "Failed to send message to Slack"}, 500)
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True 
-        }
-    }, 200
+    return task.to_dic(), 200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
 def mark_incomplete_task(task_id):
@@ -127,14 +92,7 @@ def mark_incomplete_task(task_id):
     task.completed_at = None
 
     db.session.commit()
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False 
-        }
-    }, 200
+    return task.to_dic(), 200
 
 @tasks_bp.route("/<task_id>", methods=['DELETE'])
 def delete_task(task_id):
