@@ -1,21 +1,23 @@
 from app import db
 
-
+#many tasks
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, nullable=True)
-    goal_id = db.Column(db.Integer, db.ForeignKey("goal.id"))
-    goal = db.relationship("Restaurant", back_populates="tasks")
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
+    goal = db.relationship("Goal", back_populates="tasks")
 
     # Converts Task model into a dict
+    #I have commented out the new to dict attribute from updated Task schema
     def to_dict(self):
         is_complete = False
         if self.completed_at:
             is_complete = True
         dic_data = {
             "id": self.task_id,
+            # "goal_id": self.goal_id,
             "title": self.title,
             "description": self.description,
             "is_complete": is_complete

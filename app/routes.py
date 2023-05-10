@@ -261,3 +261,25 @@ def delete_goal(goal_id):
     return {
         "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
     },200
+
+
+# Nested Routes one(Goal) to many(tasks) relationships
+#have to also validate the task id's we are being given..it'l return the
+#task ids as a model. 
+# @goals_bp.route("/<goal_id>/tasks")
+# def sending_task_ids_to_goal(goal_id):
+#     goal = validate_model(Goal, goal_id)
+
+#     request_body=request.get_json()
+
+#     list_task_ids = request_body["task_ids"]
+    
+#     for task_id in list_task_ids:
+#         pass
+        #I should validate task_id..:here???
+
+
+
+
+#     db.session.add()
+#     db.session.commit

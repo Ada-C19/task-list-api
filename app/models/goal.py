@@ -1,6 +1,6 @@
 from app import db
 
-
+#one goal
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
@@ -8,6 +8,7 @@ class Goal(db.Model):
 
     # Converts Goal model into a dict
     def to_dict(self):
+
         dic_data = {
             "id": self.goal_id,
             "title": self.title
