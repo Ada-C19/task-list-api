@@ -78,3 +78,16 @@ def update_task(task_id):
             }
         }, 200
     )
+
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = Task.query.get(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response(
+        {
+            "details": f"Task {task.task_id} \"{task.title}\" successfully deleted"
+        }, 200
+    )
