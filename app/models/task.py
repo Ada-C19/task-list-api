@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 
 class Task(db.Model):
@@ -33,7 +34,17 @@ class Task(db.Model):
             )
     
 
+#update function for title & description
     def update(self, request_body):
         self.title=request_body["title"]
         self.description=request_body["description"]
         
+
+#patch function for is_completed
+    def patch_complete(self):
+        self.completed_at=datetime.utcnow()
+    
+#patch function for is_completed when incomplete
+    def patch_incomplete(self):
+        self.completed_at=None
+    

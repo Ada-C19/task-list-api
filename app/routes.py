@@ -57,9 +57,27 @@ def delete_task(id):
     task = validate_id(id)
     db.session.delete(task)
     db.session.commit()
-    return jsonify({"details": f'Task {id} "{task.to_dict()["title"]}" successfully deleted'})
+    return jsonify({"details": f'Task {id} "{task.to_dict()["title"]}" successfully deleted'}), 200
 
 
+#patch task-"tasks/1/mark_complete"-PATCH(update)
+@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+def mark_complete(id):
+    task = validate_id(id)
+    request_body = request.get_json()
+    task.patch_complete()
+    db.session.commit()
+    return jsonify({"task":task.to_dict()}), 200
+
+
+#patch task-"tasks/1/mark_incomplete"-PATCH(update)
+@tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(id):
+    task = validate_id(id)
+    request_body = request.get_json()
+    task.patch_incomplete()
+    db.session.commit()
+    return jsonify({"task":task.to_dict()}), 200
 
 
 
