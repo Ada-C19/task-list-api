@@ -163,9 +163,47 @@ def update_goal(goal_id):
 
 @goal_bp.route("/<goal_id>",methods=["DELETE"])
 def delete_goal(goal_id):
+
     goal = validate_id(Goal,goal_id)
 
     db.session.delete(goal)
     db.session.commit()
 
     return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}
+
+
+
+
+
+@goal_bp.route("<goal_id>/tasks", methods=["POST"])
+def add_task_to_goal(goal_id):
+    goal =validate_id(Goal,goal_id)
+    request_body = request.get_json()
+
+    task_ids = request_body["task_ids"]
+
+    for task_id in task_ids:
+        task = validate_id(Task,task_id)
+
+        task.goal = goal
+
+    # db.session.add(task)
+    db.session.commit()
+
+    return jsonify ({"id": goal.goal_id, "task_ids": task_ids}), 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_task_of_goal(goal_id):
+    goal = validate_id(Goal,goal_id)
+
+    
+    
+
+    print("LKJSALDFJSADLF**********")
+    print('goal.tasks, do you exist? what do you return?', goal.tasks)
+    print(goal.tasks[0])
+    print(goal.tasks[0].to_dict())
+    print("******")
+
+
+    return ({"id": goal.goal_id,"title": goal.title, "tasks": [] }), 200
