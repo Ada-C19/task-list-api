@@ -137,3 +137,20 @@ def read_all_goals():
 def get_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     return {"goal": goal.to_dict()}, 200
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal.from_dict(request_body)
+    except KeyError:
+        return {
+        "details": "Invalid data"
+        }, 400
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {
+        "goal": new_goal.to_dict()
+    }, 201
