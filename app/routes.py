@@ -3,6 +3,7 @@ from app import db
 from app.models.task import Task
 from app.helper import validate_model
 import datetime
+from app.slack_message import post_slack_message
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -71,6 +72,7 @@ def mark_complete_task(task_id):
     task.completed_at = datetime.date.today().isoformat()
 
     db.session.commit()
+    post_slack_message(task)
 
     return jsonify({"task":task.to_dict()})
 

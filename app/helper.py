@@ -1,4 +1,3 @@
-from app.models.task import Task
 from flask import abort, make_response
 
 def validate_model(cls, model_id):
