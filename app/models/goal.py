@@ -8,10 +8,15 @@ class Goal(db.Model):
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
     def to_dict(self):
-        return dict(
+        goal_dict =  dict(
             id=self.goal_id,
             title=self.title
         )
+
+        if self.tasks:
+            goal_dict["tasks"] = self.tasks
+
+        return goal_dict
     
     @classmethod
     def from_dict(cls, data):
