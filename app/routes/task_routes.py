@@ -62,7 +62,7 @@ def update_task_as_complete(task_id):
     task = validate_item(Task, task_id)
 
     task.completed_at = datetime.datetime.now(tz=None)
-
+    
     db.session.commit()
 
     path = "https://slack.com/api/chat.postMessage"
