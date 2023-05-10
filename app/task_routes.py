@@ -60,6 +60,9 @@ def update_task(task_id):
     
     request_body = request.get_json()
     
+    if "title" not in request_body or "description" not in request_body or "completed at" not in request_body:
+        abort(make_response({"details": f"Invalid data"}, 400))
+    
     task.title = request_body["title"]
     task.description = request_body["description"]
     
