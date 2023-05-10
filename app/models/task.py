@@ -14,9 +14,6 @@ class Task(db.Model):
         new_task = cls(title=task_data["title"],
                     description=task_data["description"],
                     completed_at=None)
-        # new_task = Task(title=task_data["title"],
-        #                 description=task_data["description"],
-        #                 completed_at=task_data["is_complete"])
         return new_task
     
     def to_dict(self):
@@ -26,13 +23,6 @@ class Task(db.Model):
             description = self.description,
             is_complete = self.is_task_complete()
         )
-            # task_dict = {}
-            # task_dict["id"] = self.id
-            # task_dict["title"] = self.title
-            # task_dict["description"] = self.description
-            # task_dict["is complete"] = self.is_task_complete()
-            
-            # return task_dict
     
     def is_task_complete(self):
         if self.completed_at == None:

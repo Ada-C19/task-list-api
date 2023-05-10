@@ -4,39 +4,20 @@ from app import db
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-#POST /tasks *******************************
+#POST /tasks
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     try:
         request_body = request.get_json()
         new_task = Task.from_dict(request_body)
     except:
-        return jsonify({"details": "Invalid data"}, 400)
+        return make_response({"details": "Invalid data"}, 400)
 
     db.session.add(new_task)
     db.session.commit()
 
     return jsonify({"task": new_task.to_dict()}), 201
     
-    # except:
-        # return jsonify({"details": "Invalid data"}, 400)
-
-
-# new_task = get_task_instance(request)
-
-#     db.session.add(new_task)
-#     db.session.commit()
-
-#     task = new_task.to_json()
-
-    # except:
-    #     return jsonify({"details": "Invalid data"}, 400)
-
-    # db.session.add(new_task)
-    # db.session.commit()
-    
-    # return make_response(jsonify({"task": new_task})), 201
-
 
 #Validate Model
 def validate_model(cls, model_id):
@@ -72,21 +53,6 @@ def get_all_tasks():
 
     return jsonify(tasks_response), 200
 
-# @tasks_bp.route("", methods=["GET"])
-# def get_all_tasks():
-
-#     title_query = request.args.get("title")
-
-#     if title_query:
-#         tasks = Task.query.filter_by(title=title_query)
-#     else:
-#         tasks = Task.query.all()
-    
-#     tasks_response = []
-#     for task in tasks:
-#         tasks_response.append(task.to_dict())
-
-#     return jsonify(tasks_response), 200
 
 
 #GET /tasks/<id>
@@ -99,8 +65,8 @@ def get_one_task(model_id):
     else:
         
         return {'details': 'Invalid data'}, 404
+    
 
-#*********************************************    
 #PUT /tasks/<id>
 @tasks_bp.route("<model_id>", methods=["PUT"])
 def update_task(model_id):
@@ -118,8 +84,6 @@ def update_task(model_id):
 
     return jsonify({"task": task.to_dict()}), 200
 
-    # return make_response(jsonify({"task": task})), 200
-#*****************************************
 
 #DELETE /tasks/<id>
 @tasks_bp.route("<model_id>", methods=["DELETE"])
@@ -135,25 +99,3 @@ def delete_task(model_id):
 
     message = {"details": f"Task 1 \"{task.title}\" successfully deleted"}
     return make_response(message, 200)
-    # message = {"details": f"Task 1 \"{task.title} 🏞\" successfully deleted"}
-    # return make_response(jsonify(message, 200))
-
-
-
-
-
-
-
-
-
-
-# @tasks_bp.route("", methods=['POST'])
-# def create_task():
-#     new_task = get_task_instance(request)
-
-#     db.session.add(new_task)
-#     db.session.commit()
-
-#     task = new_task.to_json()
-
-#     return make_response(jsonify(task=task)), 201
