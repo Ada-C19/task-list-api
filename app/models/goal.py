@@ -2,16 +2,14 @@ from app import db
 
 
 class Goal(db.Model):
-    goal_id = db.Column(db.Integer, primary_key=True)
+    goal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
 
     # powerful takeaway: you can call a function on a value in a dict!
     def to_dict(self):
         return {
-            "id": self.task_id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": bool(self.completed_at)
+            "id": self.goal_id,
+            "title": self.title
         }
     
     
