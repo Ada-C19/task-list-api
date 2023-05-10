@@ -25,7 +25,9 @@ class Task(db.Model):
     def patch_complete(self, request_body):
         self.completed_at = datetime.utcnow()
 
-    
+    def patch_incomplete(self,request_body):
+        self.completed_at = None
+
     @classmethod
     def create_dict(cls, response_body):
         try:

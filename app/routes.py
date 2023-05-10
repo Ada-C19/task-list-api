@@ -59,10 +59,22 @@ def delete_task(id):
 # PATCH tasks/<id>/mark_complete (UPDATE)
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_completed(id):
-    task_to_patch = validate_task(id)
+    task_to_complete = validate_task(id)
     request_body = request.get_json()
-    task_to_patch.patch_complete(request_body)
+    task_to_complete.patch_complete(request_body)
     db.session.commit()
 
-    return jsonify({"task":task_to_patch.to_json()}), 200
+    return jsonify({"task":task_to_complete.to_json()}), 200
+
+#PATCH /tasks/1/mark_incomplete" (UPDATE)
+@tasks_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
+def mark_incompleted(id):
+    task_to_incomplete = validate_task(id)
+    request_body = request.get_json()
+    task_to_incomplete.patch_incomplete(request_body)
+    db.session.commit()
+
+    return jsonify({"task":task_to_incomplete.to_json()}), 200
+
+
 
