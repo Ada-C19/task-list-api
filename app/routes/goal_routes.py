@@ -11,6 +11,7 @@ goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
 @goal_bp.route("", methods=["POST"])
 def add_goal():
     request_body = request.get_json()
+    verify_goal_inputs(request_body)
 
     new_goal = Goal.from_dict(request_body)
 
@@ -51,5 +52,19 @@ def update_one_goal(goal_id):
 
     return jsonify(response_dict), 200
 
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_one_goal(goal_id):
+    goal = verify_item(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
+
 def message_for_only_one_goal(goal):
     return {"goal": goal.to_dict()}
+
+def verify_goal_inputs(request_body):
+    if "title" in request_body:
+        return request_body
+    abort(make_response({"details": "Invalid data"}, 400))
