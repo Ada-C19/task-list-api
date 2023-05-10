@@ -86,7 +86,8 @@ def update_task(task_id):
 
     task.title = title
     task.description = description
-    
+
+        
     db.session.commit()
 
     response = {
