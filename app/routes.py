@@ -33,58 +33,33 @@ def add_task():
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
-
-    ### Creating the query Params######
+    # Getting the query params: If there's no "sort" get all tasks
     sort_query = request.args.get("sort")
     if sort_query == "asc":
         total_tasks = Task.query.order_by(Task.title.asc()).all()
     elif sort_query == "desc":
         total_tasks = Task.query.order_by(Task.title.desc()).all()
     else:
-    ####End of Query#############
         total_tasks = Task.query.all()
     
     for task in total_tasks:
-        # tasks_response.append({
-        #     "id": task.task_id,
-        #     "title": task.title,
-        #     "description": task.description,
-        #     "is_complete": False
-        # })
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response), 200
 
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def read_one_task(task_id):
-    # task = Task.query.get(task_id)
-    # task = validate_item(task_id)
     task = validate_model(Task, task_id)
 
-    # is_complete = False
-    # if task.completed_at:
-        # is_complete = True
-
-    # return {"task":{
-    #     "id": task.task_id, 
-    #     "title": task.title,
-    #     "description": task.description,
-    #     # "is_complete": False
-    #     "is_complete": is_complete
-    # }
-    # }, 200
     return {"task": task.to_dict()}, 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    # task = Task.query.get(task_id)
-    # task = validate_item(task_id)
     task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
     task.title = request_body["title"]
     task.description = request_body["description"]
-
 
     db.session.commit()
 
@@ -104,39 +79,14 @@ def update_task(task_id):
 ######GET CLARIFICATION ON THE RETURN MESSAGE
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    # task = Task.query.get(task_id)
-    # task = validate_item(task_id)
     task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
 
-# return {
-#   "details": "Task 1 \"Go on my daily walk 🏞\" successfully deleted"
-# },
-#make response returnse a status code 200
-# return make_response({
-#     "details": "Task {task.task_id}"
-# })
-
-    # return make_response(f"Task {task.task_id} successfully deleted")
     return {
         "details": f'Task {task_id} \"{task.title}\" successfully deleted'
     }, 200
-    
-# Working validation
-# def validate_item(task_id):
-#     try:
-#         task_id = int(task_id)
-#     except:
-#         abort(make_response({"message": f"invalid task_id: {task_id}"}, 400))
-    
-#     task = Task.query.get(task_id)
-
-#     if not task:
-#         abort(make_response({"message": f"task {task_id} not found"}, 404))
-
-#     return task
 
 def validate_model(cls, model_id):
     try:
