@@ -78,9 +78,9 @@ def add_tasks_to_goal(goal_id):
 def get_tasks_from_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    tasks_response = []
-    for task in goal.tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in goal.tasks]
+    # for task in goal.tasks:
+    #     tasks_response.append(task.to_dict())
 
     return make_response(jsonify({"id": goal.goal_id, "title": goal.title, "tasks": tasks_response}))
 

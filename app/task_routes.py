@@ -75,11 +75,11 @@ def mark_task_complete(task_id):
     url = "https://slack.com/api/chat.postMessage"
     headers = {
         "Authorization": os.environ.get("SLACK_API_KEY"),
-    }
+        }
     data = {
         "channel": "api-test-channel",
         "text": f"Someone just completed the task {task.title}",
-    }
+        }
 
     requests.post(url, headers=headers, data=data)
 
