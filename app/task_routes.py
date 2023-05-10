@@ -13,7 +13,7 @@ import json
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
-#helper function
+
 def validate_model(cls,model_id):
     try:
         model_id = int(model_id)
@@ -36,7 +36,7 @@ def get_external_task_representation(task):
     }
 
 
-#POST request
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -45,23 +45,14 @@ def create_task():
                     "details": "Invalid data"
                 }, 400))
 
-    # new_task = Task(title=request_body["title"],
-    #                 description=request_body["description"],
-    #                 completed_at=request_body.get("completed_at"))
-    
     new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit()
-    # if new_task.completed_at is None:
-    #     calculated_is_complete = False
-    # else:
-    #     calculated_is_complete = True
-    # calculated_is_complete = not new_task.completed_at is None
+
     return get_external_task_representation(new_task), 201
 
 
-#Get all request, take sort as params
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     response = []
@@ -81,14 +72,14 @@ def get_all_tasks():
     return jsonify(response), 200
 
 
-#Get one task by id:
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task_by_id(task_id):
     task = validate_model(Task,task_id)
     return get_external_task_representation(task), 200
 
 
-#Update task by id
+
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task_by_id(task_id):
     task = validate_model(Task,task_id)
@@ -102,7 +93,7 @@ def update_task_by_id(task_id):
     return get_external_task_representation(task), 200
 
 
-#Delete task 
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task,task_id)
@@ -116,6 +107,7 @@ def delete_task(task_id):
 
 
 def send_post_to_slack(task):
+
     slack_bot_token = os.environ['SLACK_BOT_TOKEN']
     slack_channel = 'task-notifications'
     text = f"Task {task.description} completed"
@@ -127,14 +119,8 @@ def send_post_to_slack(task):
     response = requests.post(
         'https://slack.com/api/chat.postMessage', headers=headers, json=data)
 
-    # if response.status_code == 200:
-    #     return 'Message sent to Slack successfully.'
-    # else:
-    #     return 'Failed to send message to Slack.'
 
 
-#responsability: to change (to completed) completed_at in the database with the time stamp 
-# and return the response with is_complete: True:
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def turn_complete(task_id):
     task = validate_model(Task, task_id)
@@ -145,13 +131,9 @@ def turn_complete(task_id):
     #send a message to slack with request:
     send_post_to_slack(task)
 
-
-    #esto queda:
     return get_external_task_representation(task), 200
 
 
-#responsability: to change (to incomplete) completed_at in the database removing the time stamp
-# and return the response with is_complete: False:
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def turn_incomplete(task_id):
     task = validate_model(Task, task_id)

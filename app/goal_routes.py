@@ -5,17 +5,8 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from app.task_routes import validate_model
 
-# from sqlalchemy import asc, desc
-# from datetime import datetime
-# import requests
-# import os
-# import json
-
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
-
-
-#goals routes:
 
 
 @goals_bp.route("", methods=["POST"])
@@ -35,7 +26,7 @@ def create_goal():
         "goal": new_goal.to_dict()
     }, 201
 
-#este no tiene tests --> get all goals
+
 @goals_bp.route("", methods=["GET"])
 def get_goals():
     goals_response = []
@@ -46,7 +37,6 @@ def get_goals():
     return jsonify(goals_response)
 
 
-#get goal by id
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_goal_by_id(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -55,7 +45,6 @@ def get_goal_by_id(goal_id):
     }, 200
 
 
-#Update goal by id:
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal_by_id(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -69,7 +58,7 @@ def update_goal_by_id(goal_id):
         "goal": goal.to_dict()
     }
 
-#Delete goal
+
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -82,10 +71,7 @@ def delete_goal(goal_id):
     }
 
 
-#nested routes:#####################################
 
-# POST request to /goals/1/tasks
-#asociando una lista de tasks to a goal. 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def post_tasks_ids_with_goals(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -93,12 +79,7 @@ def post_tasks_ids_with_goals(goal_id):
     task_ids = request_body.get("task_ids")
     added_ids = []
     for id in task_ids:
-        #buscar en la base de datos el task --> 
-        # task_desde_db = (buscar la task en DB en base al id)
-        # puede suceder que el id no exista
-        # si quer´s podes validar que task.goal sea None
         task_desde_db = Task.query.get(id)
-        # task_desde_db.goal_id = goal.goal_id
         task_desde_db.goal = goal
         added_ids.append(task_desde_db.task_id)
 
@@ -111,13 +92,10 @@ def post_tasks_ids_with_goals(goal_id):
     
 
 
-
-#getting all tasks of one goal:
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_task_from_goal(goal_id):
     response = []
     goal = validate_model(Goal, goal_id)
-    #ir a la task table i tomar todas las task  goal_id
     task_by_goal = Task.query.get(goal_id)
 
     if task_by_goal is None:
@@ -127,7 +105,6 @@ def get_task_from_goal(goal_id):
             "tasks": response
         })
     else:
-        #relationship
         task_by_goal.goal = goal
         for task in goal.tasks:
             response.append(
