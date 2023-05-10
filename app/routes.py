@@ -194,3 +194,16 @@ def create_task(goal_id):
         "id": goal.id,
         "task_ids": [task_id for task_id in request_body["task_ids"]]
     }, 200
+
+@goals_bp.route("/<goal_id>/tasks", method=["GET"])
+def read_all_goal_tasks(goal_id):
+    goal = validate_model(Goal, goal_id)
+    tasks = Goal.query.with_parent(goal).all()
+
+    tasks_response = [task.to_dict() for task in tasks]
+    
+    return {
+        "id": goal.id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }, 200
