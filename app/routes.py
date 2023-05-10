@@ -1,27 +1,18 @@
 import os
 import requests
 from datetime import datetime
-from flask import Blueprint, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
 from app.models.goal import Goal
-from routes_helpers import validate_model
+from app.routes_helpers import validate_model
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+from app import db
+
 
 SLACKBOT_TOKEN = os.environ.get("SLACKBOT_TOKEN")
 
-
-tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
-
-from flask import Blueprint, jsonify, request, make_response
-from app.models.task import Task
-from app.routes_helpers import validate_model
-from app import db
-from datetime import datetime
-
-tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
 @tasks_bp.route("", methods=["POST"])
@@ -251,7 +242,6 @@ def create_goal():
         return make_response({"details": "Invalid data"}, 400)
 
     goal = Goal(title=title)
-    db.session.add(goal)
     db.session.commit()
 
     response = {
@@ -263,7 +253,7 @@ def create_goal():
 
     return make_response(jsonify(response), 201)
 
-@goals_bp.route("/<goal_id>", methods=["PUT"])
+@goals_bp.route("/<int:goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
@@ -272,21 +262,28 @@ def update_goal(goal_id):
         return make_response({"details": "Invalid data"}, 400)
 
     title = request_body.get("title")
+    description = request_body.get("description")
 
-    if not title:
+    if not title or not description:
         return make_response({"details": "Invalid data"}, 400)
 
     goal.title = title
+    goal.description = description
+
     db.session.commit()
 
     response = {
         "goal": {
             "id": goal.goal_id,
-            "title": goal.title
+            "title": goal.title,
+            "description": goal.description,
+            "is_complete": False
         }
     }
 
     return make_response(jsonify(response), 200)
+
+
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
