@@ -49,7 +49,7 @@ def create_tasks():
 #UPDATE one task/RETURN msg not found [PUT]/tasks/<id> :(UPDATE)
 @tasks_bp.route("/<id>",methods=["PUT"])
 def update_task(id):
-    task = Task.query.get(id) #SQLA used to retrieve row from db tbl to update/delete
+    task = Task.query.get(id)
     if task is None:
         return jsonify({'error': 'Task not found'}),404
     
@@ -72,7 +72,7 @@ def delete_task(id):
 
     return make_response(message,200)
 
-#PATCH mark as complete [PATCH]/tasks/<id>/mark_complete (UPDATE)
+#PATCH mark as complete on incomplete [PATCH]/tasks/<id>/mark_complete :(UPDATE)
 @tasks_bp.route("/<id>/mark_complete",methods=["PATCH"])
 def mark_completed(id):
     task_to_complete = validate_task(id)
@@ -82,12 +82,18 @@ def mark_completed(id):
 
     return jsonify({"task":task_to_complete.to_dict()}),200
 
+#PATCH mark as incomplete on in/complete [PATCH]/tasks/<id>/mark_incomplete :(UPDATE)
+@tasks_bp.route("/<id>/mark_incomplete",methods=["PATCH"])
+def mark_incomplete(id):
+    task = Task.query.get(id)
+    if task is None:
+        return jsonify({'error':'Task not found'}),404
+    task_incomplete = validate_task(id)
+    request_body = request.get_json()
+    task_incomplete.patch_incomplete(request_body)
+    db.session.commit()
 
-
-
-
-
-
+    return jsonify({"task":task_incomplete.to_dict()}),200
 
 
 
