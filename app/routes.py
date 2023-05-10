@@ -2,7 +2,6 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 
-
 def validate_task(task_id):
     try:
         task_id = int(task_id)
@@ -38,11 +37,20 @@ def create_tasks():
 
 @task_bp.route("", methods=["GET"])
 def read_all_tasks():
-    title_query = request.args.get("title")
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
+    sort = request.args.get("sort")
+    tasks_query = Task.query
+    if sort == "desc":
+        tasks_query = tasks_query.order_by(Task.title.desc())
+    elif sort == "asc":
+        tasks_query = tasks_query.order_by(Task.title.asc())
+
+
+    title = request.args.get("title")
+    if title:
+        tasks = tasks_query.filter_by(title=title)
     else:
-        tasks = Task.query.all()
+        tasks = tasks_query.all()
+
 
     task_response = []
     for task in tasks:
@@ -56,28 +64,11 @@ def read_one_task(task_id):
     task = validate_task(task_id)
     return make_response(jsonify({"task":task.to_dict()}))
 
-@task_bp.route("/<task_id>", methods=["GET"])
-def read_one_task_ascending(task_id):
-    sort_query = request.args.get('sort')
-    if sort_query:
-        tasks = Task.query.filter_by(title=sort_query)
-    else:
-        tasks = Task.query.all()
-
-    task_response = []
-    for task in tasks:
-        task_response.append(task.to_dict())
-
-    return jsonify(task_response)
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
 
-    
     task = validate_task(task_id)
-    # request_body = request.get_json()
-    # task.description = request_body["description"]
-
     db.session.delete(task)
     db.session.commit()
 
