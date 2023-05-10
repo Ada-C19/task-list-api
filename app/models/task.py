@@ -29,7 +29,8 @@ class Task(db.Model):
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": self.is_complete()
+            "is_complete": self.is_complete(),
+            "goal_id": self.goal_id
         }
     
     # use this function for PATCH method

@@ -4,6 +4,7 @@ import requests, os
 from app.models.goal import Goal
 from app import db
 from app.routes.routes_helper_function import handle_valid_id
+from app.models.task import Task
 
 #Blueprint for goals, all routes have url prefix (/goals)
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -60,4 +61,37 @@ def delete_goal(goal_id):
 
     return {
         "details": f'Goal {goal_id} "{goal_to_delete.title}" successfully deleted'
+    }, 200
+
+@goals_bp.route("<goal_id>/tasks", methods=["POST"])
+def get_all_tasks_from_one_goal(goal_id):
+    goal = handle_valid_id(Goal, goal_id)
+    request_body = request.get_json()
+    
+    for task_id in request_body["task_ids"]:
+        task_to_add = handle_valid_id(Task, task_id)
+        goal.tasks.append(task_to_add)
+
+    db.session.add(goal)
+    db.session.commit()
+
+    task_ids = [task.task_id for task in goal.tasks]
+    return {
+        "id": int(goal_id),
+        "task_ids": task_ids
+        }, 200
+
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_one_goal(goal_id):
+    goal = handle_valid_id(Goal, goal_id)
+
+    #for task object in list of tasks for that goal
+    tasks_response = []
+    for task in goal.tasks:
+        tasks_response.append(task.to_dict())
+    
+    return {
+        "id":int(goal_id),
+        "title": goal.title,
+        "tasks": tasks_response
     }, 200
