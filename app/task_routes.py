@@ -15,6 +15,9 @@ def creat_task():
     request_body = request.get_json()
     new_task =  create_model(request_body, Task)
 
+    if "title" not in request_body or "description" not in request_body or request_body["description"] is None:
+        abort(make_response(jsonify({"details": "Invalid data"}), 400))
+
     return make_response(jsonify({
         "task": {
             "id": new_task.task_id,

@@ -1,7 +1,7 @@
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
-from app.helper_functions import validate_model, create_model, assign_tasks, task_dicts
+from app.helper_functions import validate_model, create_model, assign_tasks, task_dicts, abort
 from flask import Blueprint, jsonify, make_response, request
 
 goal_bp = Blueprint("goal_bp", __name__, url_prefix="/goals")
@@ -41,6 +41,9 @@ def read_one_goal(goal_id):
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
+
+    if "title" not in request_body:
+        abort(make_response(jsonify({"details": "Invalid data"}), 400))
 
     goal.title = request_body["title"]
 
