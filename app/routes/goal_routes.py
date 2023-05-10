@@ -50,7 +50,7 @@ def delete_goal(id):
 
 # update goal endpoint
 @goals_bp.route("/<id>", methods=["PUT"])
-def update_task(id):
+def update_goal(id):
     goal = validate_model(Goal, id)
 
     request_body = request.get_json()
