@@ -49,12 +49,9 @@ def test_get_goal(client, one_goal):
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
-    pass
     # Act
     response = client.get("/goals/1")
     response_body = response.get_json()
-
-    raise Exception("Complete test")
 
     assert response.status_code == 404
     assert response_body == {"message":"Goal 1 not found"}

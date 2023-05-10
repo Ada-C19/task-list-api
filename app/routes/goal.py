@@ -25,14 +25,14 @@ def validate_goal(goal_id):
     try:
         goal_id = int(goal_id)
     except:
-        abort(make_response({"message":f"Task {goal_id} invalid"}, 400))
+        abort(make_response({"message":f"Goal {goal_id} invalid"}, 400))
 
-    task = Goal.query.get(goal_id)
+    goal = Goal.query.get(goal_id)
 
-    if not task:
-        abort(make_response({"message":f"Task {goal_id} not found"}, 404))
+    if not goal:
+        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))
 
-    return task
+    return goal
 
 
 # Routes/Endpoints below 
@@ -42,11 +42,10 @@ def validate_goal(goal_id):
 def create_one_goal():
     request_body = request.get_json()
 
-    if "title" not in request_body or "description" not in request_body:
+    if "title" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
     else:
-        new_goal = Goal(title=request_body["title"], 
-                    description=request_body["description"])
+        new_goal = Goal(title=request_body["title"])
 
     db.session.add(new_goal)
     db.session.commit()
@@ -95,9 +94,6 @@ def update_one_goal(goal_id):
     if request_body["title"]:
         goal.title = request_body["title"]
 
-    if request_body["description"]:
-        goal.description = request_body["description"]
-
     # come back to this!
     # eventually you will need this b/c you will need the option to update this attribute 
     # if request_body["completed_at"]:
@@ -124,8 +120,6 @@ def delete_one_goal(goal_id):
     return make_response(jsonify({
         "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
     }), 200)
-
-
 
 
 @goals_bp.route("/<goal_id>/mark_complete", methods=["PATCH"])
