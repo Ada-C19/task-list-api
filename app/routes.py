@@ -3,6 +3,7 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 import datetime
 import requests
+from app import token 
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -114,6 +115,7 @@ def mark_task_incomplete(id):
     return make_response(jsonify(task_dict), 200)
 
 
+
 def send_slack_message():
     api_url = "https://slack.com/api/chat.postMessage"
 
@@ -122,7 +124,7 @@ def send_slack_message():
         "text": "Someone just completed the task My Beautiful Task"
     }
     headers = {
-        'Authorization': 'Bearer xoxb-4680452269380-5238717880866-WruhcGV5ObIA7yt4SDq6Z6Ns'
+        'Authorization': token
     }
 
     response = requests.post(api_url, headers=headers, data=payload)
