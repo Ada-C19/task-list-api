@@ -7,6 +7,7 @@ from app.routes_helper import validate_item_by_id
 # Blueprint for goals
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
+# Create a new goal
 @goals_bp.route("", methods=["POST"])
 def create_a_goal():
     
@@ -27,6 +28,7 @@ def create_a_goal():
     }, 201
     
 
+# Get saved goals
 @goals_bp.route("", methods=["GET"])
 def get_saved_goals():
     goals = Goal.query.all()
@@ -37,23 +39,29 @@ def get_saved_goals():
     return jsonify(goal_response), 200
 
 
+# Get one goal by goal_id
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_item_by_id(Goal, goal_id)
     return {
         "goal": goal.to_dict()
     }, 200
-    
+
+
+# Update one goal by its goal_id    
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_one_goal(goal_id):
     request_body = request.get_json()
     goal = validate_item_by_id(Goal, goal_id)
-    if "title" in request_body:
-        goal.title = request_body["title"]
+    
+    goal.title = request_body["title"] if "title" in request_body else None
+    
     db.session.commit()
+    
     return {"goal": goal.to_dict()}, 200
 
 
+# Delete one goal
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_one_goal(goal_id):
     goal_to_delete = validate_item_by_id(Goal, goal_id)
