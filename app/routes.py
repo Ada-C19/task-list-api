@@ -34,3 +34,16 @@ def read_all_tasks():
 
     tasks_response = [task.task_to_dict() for task in tasks]
     return jsonify(tasks_response)
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def read_one_task(task_id):
+    task = validate_model(Task, task_id)
+    task = Task.query.get(task_id)
+    return jsonify(task.task_to_dict()), 200
+
+def validate_model(cls, id):
+     try:
+         id = int(id)
+     except:
+         message = f"{cls.__name__} {id} is invalid"
+         abort(make_response({"message": message}, 400))
