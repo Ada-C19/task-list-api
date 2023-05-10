@@ -31,7 +31,7 @@ def create_goal():
         db.session.add(new_goal)
         db.session.commit()
 
-        return {"goal": new_goal.to_dict()}, 201
+        return jsonify({"goal": new_goal.to_dict()}), 201
     
     return jsonify({"details": "Invalid data"}), 400
 
@@ -40,12 +40,7 @@ def create_goal():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-    return {
-        "goal": {
-            "id": goal.goal_id,
-            "title": f"{goal.title}",
-        }
-    }, 200
+    return jsonify({"goal": goal.to_dict()}), 200
 
 # route to update a goal by id
 
@@ -57,12 +52,7 @@ def update_goal(goal_id):
 
     db.session.commit()
 
-    return {
-        "goal": {
-            "id": goal.goal_id,
-            "title": f"{goal.title}",
-        }
-    }, 200
+    return jsonify({"goal": goal.to_dict()}), 200
 
 # route to delete a goal by id
 
@@ -106,6 +96,6 @@ def get_tasks_for_specific_goal(goal_id):
         "title": f"{goal.title}",
         "tasks": task_list
     }
-    print(task_list)
+
     return jsonify(response_body), 200
 

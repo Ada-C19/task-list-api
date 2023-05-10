@@ -11,7 +11,7 @@ def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
     except:
-        abort(make_response({"message": f"{cls.__name__} {model_id} is not valid."}), 400)
+        abort(make_response({"message": f"{cls.__name__} {model_id} is not valid."}, 400))
 
     model = cls.query.get(model_id)
 

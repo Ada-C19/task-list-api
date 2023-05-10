@@ -11,5 +11,3 @@ class Goal(db.Model):
             "id": self.goal_id,
             "title": self.title,
         }
-    
-    
