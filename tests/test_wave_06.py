@@ -128,20 +128,17 @@ def test_get_tasks_sorted_by_id_asc(client, three_tasks):
     assert response_body == [
         {
             "description": "",
-            "goal_id": None,
             "id": 1,
             "is_complete": False,
             "title": "Water the garden 🌷"},
         {
             "description": "",
             "id": 2,
-            "goal_id": None,
             "is_complete": False,
             "title": "Answer forgotten email 📧"},
         {
             "description": "",
             "id": 3,
-            "goal_id": None,
             "is_complete": False,
             "title": "Pay my outstanding tickets 😭"}
     ]
@@ -157,7 +154,6 @@ def test_get_tasks_sorted_by_title(client, three_tasks):
     assert response_body == [
         {
             "description": "",
-            "goal_id": None,
             "id": 1,
             "is_complete": False,
             "title": "Water the garden 🌷"},
@@ -174,20 +170,17 @@ def test_get_tasks_sorted_by_id_asc_and_title_desc(client, three_tasks):
     assert response_body == [
         {
             "description": "",
-            "goal_id": None,
             "id": 1,
             "is_complete": False,
             "title": "Water the garden 🌷"},
         {
             "description": "",
             "id": 3,
-            "goal_id": None,
             "is_complete": False,
             "title": "Pay my outstanding tickets 😭"},
         {
             "description": "",
             "id": 2,
-            "goal_id": None,
             "is_complete": False,
             "title": "Answer forgotten email 📧"}
     ]
