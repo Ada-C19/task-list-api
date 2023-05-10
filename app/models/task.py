@@ -11,16 +11,15 @@ class Task(db.Model):
         task_dict = dict(
                 id = self.id,
                 title = self.title,
-                description = self.description,
-                completed_at = self.completed_at
+                description = self.description
             )   
         
         if self.completed_at:
-            return task_dict
+            task_dict["is_complete"] = True
         else:
             task_dict["is_complete"] = False
-            task_dict.pop("completed_at")
-            return task_dict
+        
+        return task_dict
     
     
     @classmethod
