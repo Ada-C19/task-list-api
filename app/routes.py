@@ -25,9 +25,16 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
+    sort_order = request.args.get("sort", "asc")
+    sort_key = lambda task: task.title
     tasks = Task.query.all()
-    task_list = [task.to_dict()["task"] for task in tasks]
 
+    if len(tasks) > 1:
+        tasks = sorted(tasks, key=sort_key)
+        if sort_order == "desc":
+            tasks = reversed(tasks)
+    
+    task_list = [task.to_dict()["task"]for task in tasks]
     return make_response(jsonify(task_list), 200)
 
 
@@ -57,4 +64,5 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response(jsonify({"details": 'Task 1 "Go on my daily walk 🏞" successfully deleted'}))
+
 
