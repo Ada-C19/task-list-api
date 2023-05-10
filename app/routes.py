@@ -76,7 +76,7 @@ def get_one_task(task_id):
     if task.goal_id:
         return {"task":task.to_dict_with_goal()}, 200
 
-    return {"task":task.to_dict()}, 200
+    return {"task":task.to_dict()}, 200 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
