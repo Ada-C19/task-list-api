@@ -3,6 +3,7 @@ from flask import Blueprint
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 
+
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 def validate_task(task_id):
@@ -46,9 +47,20 @@ def create_task():
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
     
-    sort_query = request.args.get("sort=asc")
+    # sort_ascending_query = request.args.get("sort=asc")
+    # # sort_descending_query = request.args.get("sort=desc")
+    
+    # if sort_ascending_query:
+    #     if request.args["sort"] == "asc":
+    #         tasks = Task.query(Task).order_by(Task.name)
+    # else:
+    #     tasks = Task.query.all()
+        
+    sort_query = request.args.get("sort")
     if sort_query:
-        tasks = Task.query(Task).order_by(Task.name)
+        if sort_query == "asc":
+            tasks = Task.query.order_by(Task.title)
+            # tasks = Task.query.all()
     else:
         tasks = Task.query.all()
     
@@ -57,6 +69,8 @@ def get_tasks():
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_dict())
+    # if sort_query == "asc":
+    #     tasks_response.append("SORT_QUERY GOT PROPERLY CHECKED")
         
     return jsonify(tasks_response)
 
