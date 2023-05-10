@@ -8,7 +8,17 @@ import os
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
+# Helper Functions 
 
+def validate_item(model, id):
+    try: 
+        id = int(id)
+    except ValueError:
+        return abort(make_response({"msg": f"Invalid id: {id}"}, 400))
+    
+    return model.query.get_or_404(id, {"msg":"id not found"})
+
+# Task routes 
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
@@ -24,10 +34,6 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    # is_complete = False
-    # if new_task.completed_at:
-    #     is_complete = True 
-
     return {
     "task": {
         "id": new_task.task_id,
@@ -36,14 +42,6 @@ def add_task():
         "is_complete": not bool(new_task.completed_at)
             }
             }, 201
-
-def validate_item(model, id):
-    try: 
-        id = int(id)
-    except ValueError:
-        return abort(make_response({"msg": f"Invalid id: {id}"}, 400))
-    
-    return model.query.get_or_404(id, {"msg":"id not found"})
 
 
 @task_bp.route("", methods=["GET"])
@@ -153,17 +151,36 @@ def add_task():
             }
             }, 201
 
+# Goal Routes 
+
 @goal_bp.route("", methods=["POST"])
 def add_goal():  
     request_body = request.get_json()      
     if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
         return {"details": "Invalid data"}, 400
     
-    new_goal = Goal(
+    goal = Goal(
         title=request_body["title"]
         )
 
-    db.session.add(new_goal)
+    db.session.add(goal)
     db.session.commit()
 
-    return {"goal": new_goal.to_dict()}
+    return {"goal": goal.to_dict()}, 201
+
+@goal_bp.route("", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    return goal.to_dict(), 200
+
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+    
+    request_data = request.get_json()
+
+    goal.title = request_data["title"]
+
+    db.session.commit()
+    return {"goal": goal.to_dict()}, 200
