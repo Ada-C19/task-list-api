@@ -9,16 +9,10 @@ tasks_bp = Blueprint("tasks",__name__, url_prefix="/tasks")
 # GET all Tasks - /tasks - (CREATE)
 @tasks_bp.route("",methods=["GET"])
 def get_all_tasks():
-    title_query = request.args.get("title")
-    description_query = request.args.get("description")
-    completed_query = request.args.get("is_completed")
-    
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    elif description_query:
-        tasks = Task.query.filter_by(description=description_query)
-    elif completed_query: 
-        tasks = Task.query.filter_by(is_completed = completed_query)
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
 
@@ -36,9 +30,9 @@ def get_one_task(id):
 
     return jsonify({'task':task.to_dict()}),200
 
-#CREATE one task -POST /tasks/<id> - (CREATE)
-@tasks_bp.route("",methods=["POST"])
-def create_task():
+#CREATE one task/must contain title+description [POST]/tasks/<id> :(CREATE)
+@tasks_bp.route("", methods = ["POST"])
+def create_tasks():
     request_body = request.get_json()
 
     if "title" not in request_body or "description" not in request_body:
@@ -50,7 +44,7 @@ def create_task():
     db.session.commit()
 
     return make_response({"task":new_task.to_dict()}), 201
-
+  
 #UPDATE a task/ RETURN msg not found -PUT / tasks/<id> - (UPDATE)
 @tasks_bp.route("/<id>",methods=["PUT"])
 def update_task(id):
@@ -73,13 +67,6 @@ def delete_task(id):
     db.session.delete(task_to_delete)
     db.session.commit()
 
-    message = {'details': f'Task 1 "{task_to_delete.title}" successfully deleted'}
+    message = {'details': f'Task {id} "{task_to_delete.title}" successfully deleted'}
 
     return make_response(message,200)
-
-
-
-
-
-
-
