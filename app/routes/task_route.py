@@ -49,7 +49,7 @@ def create_task():
         db.session.add(new_task)
         db.session.commit()
 
-        return {"task": new_task.to_dict()}, 201
+        return jsonify({"task": new_task.to_dict()}), 201
 
     return jsonify({"details": "Invalid data"}), 400
 
@@ -58,14 +58,7 @@ def create_task():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
-    return {
-        "task": {
-            "id": task.id,
-            "title": f"{task.title}",
-            "description": f"{task.description}",
-            "is_complete": False
-        }
-    }, 200
+    return jsonify({"task": task.to_dict()}), 200
 
 # route to update a task by id
 
@@ -78,14 +71,7 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {
-        "task": {
-            "id": task.id,
-            "title": f"{task.title}",
-            "description": f"{task.description}",
-            "is_complete": False
-        }
-    }, 200
+    return jsonify({"task": task.to_dict()}), 200
 
 # route to delete a task by id
 
@@ -126,13 +112,6 @@ def mark_incomplete_on_complete_task(task_id):
 
     db.session.commit()
 
-    return {
-        "task": {
-            "id": task.id,
-            "title": f"{task.title}",
-            "description": f"{task.description}",
-            "is_complete": False
-        }
-    }, 200
+    return jsonify({"task": task.to_dict()}), 200
 
 
