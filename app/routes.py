@@ -2,9 +2,8 @@ from flask import Blueprint, request, make_response, request, abort, jsonify
 from app import db
 from app.models.task import Task
 from app.models.goal import Goal
-# from sqlalchemy import asc, desc
 from datetime import datetime
-#to call slack api?:
+#to call slack api in this file:
 from dotenv import load_dotenv
 import requests 
 import os
@@ -24,33 +23,12 @@ def add_task():
     if not "completed_at" in request_body:
         request_body["completed_at"] = None
 
-    #Replacing this with the from_dict in task.py
-    # new_task = Task(
-    #         title= request_body["title"],
-    #         description= request_body['description'],
-    #         completed_at= request_body['completed_at']
-    #     )
     new_task = Task.from_dict(request_body)
 
-    
     db.session.add(new_task)
     db.session.commit()
 
-    is_complete = False
-    if new_task.completed_at:
-        is_complete = True
-
-    # print(f"new_task.todict {new_task.to_dict}")
-
     return {"task": new_task.to_dict()}, 201
-    # return {
-    #     "task": {
-    #         "id": new_task.task_id,
-    #         "title": new_task.title,
-    #         "description": new_task.description,
-    #         "is_complete": is_complete
-    #     }
-    # }
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -330,69 +308,4 @@ def get_tasks_of_one_goal(goal_id):
         "title": goal.title,
         "tasks": task_list
     }, 200
-
-    # tasks_response= []
-    # response_body={}
-    # for task in goal.tasks:
-    #     tasks_response.append(task.to_dict_with_goal())
-
-    # response_body["id"]= goal.goal_id
-    # response_body["title"] = goal.title  
-    # response_body["tasks"] = tasks_response
-
-    # return jsonify(response_body), 200
-
-
-
-
-
-
-
-#passing 1 test
-    # for task in goal.tasks:
-    #     is_complete = False
-    #     if task.completed_at:
-    #         is_complete = True
-    #     task_list.append({
-    #         "id": task.task_id,
-    #         "goal_id": goal.goal_id,
-    #         "title": task.title,
-    #         "description": task.description,
-    #         "is_complete": is_complete
-    #     })
-
-    # return {
-    #     "id": goal.goal_id,
-    #     "title": goal.title,
-    #     "tasks": task_list
-    # }
-
-
-    # all_tasks = goal.tasks
-
-    # for task in all_tasks:
-    #     # task_list_goal = 
-    #     task_list.append(task.to_dict_with_goal())
-    # # gives me a list of nulls....so....progress
-    # # return jsonify(task_list), 200
-    # return {
-    #     "id": goal.goal_id,
-    #     "title": goal.title,
-    #     "tasks": task_list
-    # }, 200
-
-
-    # #or can use something like this:
-    # #and inside the () we can call the goal.task_id
-    # # total_tasks = Task.query.limit(goal_id).all()
-
-    # ###ask my db that have that goal and then return in reponse
-
-    # # return({"tasks": total_tasks}), 200
-    # return make_response(goal.to_dict_with_goal(), 200)
-
-    # Goal.query.get(goal_id).tasks
-
-
-
 
