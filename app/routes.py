@@ -1,8 +1,10 @@
+from flask import Blueprint, request, jsonify, abort, make_response
 from app import db
 from app.models.task import Task
-from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import *
 import os
+from slack_sdk import WebClient
+
 
 tasks_bp = Blueprint("tasks_bp",__name__, url_prefix="/tasks")
 
@@ -101,7 +103,12 @@ def update_task_complete(task_id):
 
     db.session.commit()
 
-    return {"task": task.to_dict()}, 200
+    slack_token= os.environ["SLACK_TOKEN"]
+    client = WebClient(token=slack_token)
+    result = client.chat_postMessage(channel="task-notifications", 
+        text=f"Someone just completed the task {task.title}")
+
+    return make_response({"task": task.to_dict()}, 200)
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_incomplete(task_id):
