@@ -3,6 +3,7 @@ from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
 from sqlalchemy import asc, desc
+from datetime import datetime
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -59,6 +60,29 @@ def update_task(task_id):
 
     output = {"task":task.to_dict()}
     return jsonify(output), 200
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at=datetime.utcnow()
+
+    db.session.commit()
+
+    output = {"task":task.to_dict()}
+    return jsonify(output), 200
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at=None
+
+    db.session.commit()
+
+    output = {"task":task.to_dict()}
+    return jsonify(output), 200
+
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
