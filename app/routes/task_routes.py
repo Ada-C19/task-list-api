@@ -33,17 +33,20 @@ def create_task():
 def read_tasks():
     sort_query = request.args.get("sort")
 
-    if sort_query == "asc":
-        tasks = Task.query.order_by(Task.title).all()
-    elif sort_query == "desc":
-        tasks = Task.query.order_by(Task.title.desc()).all()
-    elif not sort_query:
+    if not sort_query:
         tasks = Task.query.all()
+    elif sort_query.lower() == "asc":
+        tasks = Task.query.order_by(Task.title).all()
+    elif sort_query.lower() == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
     
     tasks_response = []
 
-    for task in tasks:
-        tasks_response.append(task.to_dict())
+    try:
+        for task in tasks:
+            tasks_response.append(task.to_dict())
+    except:
+        abort(make_response({"message": f"{sort_query} query invalid"}, 400))
 
     return jsonify(tasks_response)
 
