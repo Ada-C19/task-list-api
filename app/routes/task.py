@@ -97,5 +97,3 @@ def mark_task_incomplete(task_id):
     response = task.to_dict()
     return jsonify(response), 200
 
-
-    
