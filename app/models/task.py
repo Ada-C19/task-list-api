@@ -1,15 +1,12 @@
 from app import db
 from flask import abort,  make_response, jsonify
- 
-
+from datetime import datetime
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement = True)
     title = db.Column(db.String, nullable = False)
     description = db.Column(db.String, nullable = False )
     completed_at = db.Column(db.DateTime, default = None, nullable = True)
-
-
 
     def to_json(self):
         is_complete = True if self.completed_at else False;
@@ -25,6 +22,10 @@ class Task(db.Model):
         self.title = request_body["title"]
         self.description = request_body["description"]
 
+    def patch_complete(self, request_body):
+        self.completed_at = datetime.utcnow()
+
+    
     @classmethod
     def create_dict(cls, response_body):
         try:
