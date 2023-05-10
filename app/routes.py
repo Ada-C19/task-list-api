@@ -1,5 +1,6 @@
 from flask import Blueprint, request, make_response, jsonify, abort
 from .models.task import Task
+from .models.goal import Goal
 from app import db
 from datetime import datetime
 import requests
@@ -123,5 +124,72 @@ def validate_model(cls, task_id):
         abort(make_response({"details" : f"{cls.__name__} #{task_id} not found"}, 404))
     return response
 
+#======================================
+goal_bp = Blueprint("goal_bp", __name__, url_prefix="/goals")
+# Read all goals:
+@goal_bp.route("", methods=["GET"])
+def get_all_goals():
+    title_query = request.args.get("sort") 
+
+    if title_query == "asc":
+        goal_objects = Goal.query.order_by(Goal.title) 
+        # goal_objects = goal.query.order_by(goal.title).all()
+    elif title_query == "desc":
+        goal_objects = Goal.query.order_by(Goal.title.desc()) 
+    else:
+        goal_objects = Goal.query.all()
+    goal_list = [Goal.to_dict(goal) for goal in goal_objects]
+    return make_response(jsonify(goal_list), 200)
+ 
+ # Read one goal:
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal_object_list = validate_model(Goal, goal_id)#goal.query.filter_by(goal_id=goal_id).all()
+    # goal_list = [goal.to_dict(goal) for goal in goal_object]
+    # return make_response(jsonify(goal_list), 200)
+    response = Goal.add_goal_key(Goal.to_dict(goal_object_list))
+    return make_response(response, 200)
+
+# Create goal:
+@goal_bp.route("", methods=["POST"])
+def create_a_goal():
+    try:
+        request_body_dict = request.get_json()
+        goal_object = Goal.from_dict(request_body_dict)
+        db.session.add(goal_object)
+        db.session.commit()
+        response_object_list = Goal.query.all()
+        # response_body ={"goal":{"id":response_object[0].goal_id,
+        #                         "title":request_body_dict["title"],
+        #                         "description":request_body_dict["description"],
+        #                         "is_complete": False}} #request_body["completed_at"]
+        response_dict = Goal.to_dict(response_object_list[0])
+        return make_response(Goal.add_goal_key(response_dict), 201)
+    except(KeyError):
+        return make_response({"details": "Invalid data"}, 400)
+    
+# Replace a goal
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def replace_a_goal(goal_id):
+    goal_object = validate_model(Goal, goal_id)
+    goal_request_body_dict = request.get_json()
+
+    if goal_request_body_dict.get("title"):
+        goal_object.title = goal_request_body_dict.get("title")
+    if goal_request_body_dict.get("description"):
+        goal_object.description = goal_request_body_dict.get("description")
+    if goal_request_body_dict.get("completed_at"):
+        goal_object.complete_at = goal_request_body_dict.get("completed_at")
+    db.session.commit()
+    return Goal.add_goal_key(Goal.to_dict(goal_object))
+
+# Delete a goal
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_a_goal(goal_id):
+    response_object = validate_model(Goal, goal_id)
+    db.session.delete(response_object)
+    db.session.commit()
+    return make_response({
+        'details': f'Goal {response_object.goal_id} "{response_object.title}" successfully deleted'}, 200)
 
 

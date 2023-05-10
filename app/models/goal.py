@@ -10,5 +10,8 @@ class Goal(db.Model):
         
     
     def to_dict(self):
-        return dict(id=self.task_id,
+        return dict(id=self.goal_id,
                     title=self.title)
+    
+    def add_goal_key(dict_data):
+        return {"goal":dict_data}
