@@ -62,7 +62,7 @@ def update_goal(id):
 
     return jsonify({"goal": goal.to_dict()}), 200
 
-# update tasks assigned to goal
+# assign tasks to goal
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def assign_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -76,3 +76,12 @@ def assign_tasks_to_goal(goal_id):
     db.session.commit()
 
     return jsonify({"id": goal.id, "task_ids": [task.id for task in goal.tasks]})
+
+# get all tasks from a goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_from_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    response = goal.to_dict()
+
+    return jsonify(response), 200
