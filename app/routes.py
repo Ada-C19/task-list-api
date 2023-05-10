@@ -88,14 +88,14 @@ def validate_item(model, item_id):
     try:
         item_id= int(item_id)
     except ValueError:
-        abort(make_response({"message": f"invalid id: {item_id}"}, 400))
+        abort(make_response({"message": f"invalid id: {model.__name__}{item_id}"}, 400))
     
-    task = Task.query.get(item_id)
+    item = model.query.get(item_id)
 
-    if not task:
-        abort(make_response({"message": f"Task {item_id} not found."}, 404))
+    if not item:
+        abort(make_response({"message": f"{model.__name__} {item_id} not found."}, 404))
 
-    return task.query.get(item_id)
+    return item
 
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
@@ -147,6 +147,7 @@ def add_goal():
 
     return {"goal": new_goal.to_result()}, 201
 
+
 @goal_bp.route("", methods=["GET"])
 def get_goals():
     all_goals = Goal.query.all()
@@ -157,4 +158,34 @@ def get_goals():
         response.append(goal.to_result())
     
     return jsonify(response), 200
+
+
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    one_goal = validate_item(Goal, goal_id)
+
+    return make_response({"goal": one_goal.to_result()})
+
+
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return make_response({"goal": goal.to_result()})
+
+
+@goal_bp.route("<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return make_response({"details": f'Goal {goal_id} "{goal.title}" successfully deleted'})
 
