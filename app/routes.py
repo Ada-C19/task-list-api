@@ -90,8 +90,8 @@ def delete_one_task(id):
 def mark_task_complete(id):
     task = validate_task(id)
     
-    if not task:
-        return make_response(jsonify({"error":f"Task {id} not found"}), 404)
+    # if not task:
+    #     return make_response(jsonify({"error":f"Task {id} not found"}), 404)
     
     task.completed_at = datetime.date.today().isoformat()
     
@@ -104,8 +104,8 @@ def mark_task_complete(id):
 def mark_task_incomplete(id):
     task = validate_task(id)
     
-    if not task:
-        return make_response(jsonify({"error":f"Task {id} not found"}), 404)
+    # if not task:
+    #     return make_response(jsonify({"error":f"Task {id} not found"}), 404)
     
     task.completed_at = None
     
