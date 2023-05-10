@@ -19,11 +19,6 @@ class Task(db.Model):
         return return_dict
 
 
-        # return({"id" : self.task_id,
-        #         "title" : self.title,
-        #         "description" : self.description,
-        #         "is_complete" : self.completed_at})
-    
     @classmethod
     def from_dict(cls, data_dict):
         return cls(

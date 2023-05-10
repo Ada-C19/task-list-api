@@ -1,8 +1,9 @@
 from app import db
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
-from app.helpers.helpers import validate_model
+from app.helpers.helpers import validate_model, send_message
 from datetime import datetime
+import requests 
 
 task_bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
 
@@ -14,8 +15,6 @@ def create_task():
 
         db.session.add(new_task)
         db.session.commit()
-        # if not new_task["is_complete"]:
-        #     new_task["is_complete"] = False
 
         return {"task" : new_task.to_dict()}, 201
     
@@ -25,15 +24,15 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(f"Task {new_task.title} successfully created", 201)
+
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
-    title_query = request.args.get("sort")
-    if title_query:
-        if title_query == "asc":
+    sort_query = request.args.get("sort")
+    if sort_query:
+        if sort_query == "asc":
             tasks = Task.query.order_by(Task.title.asc()).all()
-        elif title_query == "desc":
+        elif sort_query == "desc":
             tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
@@ -80,7 +79,7 @@ def mark_complete(task_id):
     
 
     db.session.commit()
-
+    send_message(task_to_update)
     return {"task" : task_to_update.to_dict()}
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])

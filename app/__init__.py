@@ -9,6 +9,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
 
+token = os.environ.get("API_TOKEN")
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -32,5 +33,8 @@ def create_app(test_config=None):
     # Register Blueprints here
     from .routes.task_routes import task_bp
     app.register_blueprint(task_bp)
+    
+    from .routes.goal_routes import goal_bp
+    app.register_blueprint(goal_bp)
 
     return app
