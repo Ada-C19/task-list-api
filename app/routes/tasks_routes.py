@@ -17,25 +17,6 @@ def get_valid_item_by_id(model, id):
     return item if item else abort(make_response({'msg': f"No {model.__name__} with id {id}"}, 404))
 
 
-@tasks_bp.route("", methods=["GET"])
-def handle_get_tasks_request():
-    tasks = Task.query.all()
-    task_response = []
-    for task in tasks:
-        is_complete = False
-        if task.to_dict()["completed_at"]:
-            is_complete = True
-
-        task_response.append({
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete
-        })
-
-    return jsonify(task_response), 200
-
-
 @tasks_bp.route("", methods=['POST'])
 def create_task():
     request_body = request.get_json()
@@ -62,6 +43,34 @@ def create_task():
             "is_complete": is_complete
         }
     }, 201
+
+
+@tasks_bp.route("", methods=["GET"])
+def handle_get_tasks_request():
+    sort_query = request.args.get("sort")
+
+    if sort_query:
+        if sort_query == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
+        elif sort_query == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+    
+    task_response = []
+    for task in tasks:
+        is_complete = False
+        if task.to_dict()["completed_at"]:
+            is_complete = True
+
+        task_response.append({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": is_complete
+        })
+
+    return jsonify(task_response), 200
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
