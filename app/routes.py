@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models.task import Task
 from app import db
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -59,5 +60,25 @@ def delete_task(task_id):
         db.session.delete(task)
         db.session.commit()
         return jsonify(details=f'Task {task_id} "{task.title}" successfully deleted'), 200
+    else:
+        return jsonify(details="Task not found"), 404
+@tasks_bp.route("/<int:task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = Task.query.get(task_id)
+    if task:
+        task.completed_at = datetime.utcnow()
+        db.session.commit()
+        return jsonify(task=task.to_dict()), 200
+    else:
+        return jsonify(details="Task not found"), 404
+
+
+@tasks_bp.route("/<int:task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = Task.query.get(task_id)
+    if task:
+        task.completed_at = None
+        db.session.commit()
+        return jsonify(task=task.to_dict()), 200
     else:
         return jsonify(details="Task not found"), 404
