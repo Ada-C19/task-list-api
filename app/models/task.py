@@ -12,7 +12,8 @@ class Task(db.Model):
         return_dict["id"] = self.task_id
         return_dict["title"] = self.title
         return_dict["description"] = self.description
-        return_dict["is_complete"] = self.completed_at 
+        if self.completed_at:
+            return_dict["is_complete"] = True
         if not self.completed_at:
             return_dict["is_complete"] = False
         return return_dict
