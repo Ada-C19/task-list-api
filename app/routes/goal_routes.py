@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
 from app.models.task import Task
-#from app.routes.helper_routes import validate_object
+from app.routes.helper_routes import validate_object
 from app import db
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
