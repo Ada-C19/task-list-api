@@ -1,22 +1,23 @@
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
-from app.tasks_routes import validate_task
+from app.helper import validate_model
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-def validate_goal(id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({"message": f"Goal {id} is invalid"}, 400))
+# def validate_goal(id):
+#     try:
+#         id = int(id)
+#     except:
+#         abort(make_response({"message": f"Goal {id} is invalid"}, 400))
 
-    goal = Goal.query.get(id)
+#     goal = Goal.query.get(id)
 
-    if not goal:
-        abort(make_response({"message": f"Goal {id} not found"}, 404))
+#     if not goal:
+#         abort(make_response({"message": f"Goal {id} not found"}, 404))
 
-    return goal
+#     return goal
 
 # WAVE 5: Create a Goal: Valid Goal
 @goals_bp.route("", methods=["POST"])
@@ -52,7 +53,7 @@ def get_all_saved_goals():
 # WAVE 5: Get One Goal: One Saved Goal cont.
 @goals_bp.route("/<id>", methods=["GET"])
 def get_one_saved_goal(id):
-    goal = validate_goal(id)
+    goal = validate_model(Goal, id)
 
     goal_dict = dict(goal=goal.make_goal_dict())
 
@@ -61,7 +62,7 @@ def get_one_saved_goal(id):
 # WAVE 5: Update Goal
 @goals_bp.route("/<id>", methods=["PUT"])
 def update_goal(id):
-    goal = validate_goal(id)
+    goal = validate_model(Goal, id)
 
     request_body = request.get_json()
 
@@ -75,7 +76,7 @@ def update_goal(id):
 # WAVE 5: Delete Goal: Deleting a Goal
 @goals_bp.route("/<id>", methods=["DELETE"])
 def delete_goal(id):
-    goal = validate_goal(id)
+    goal = validate_model(Goal, id)
 
     deleted_response = {
         "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
@@ -89,12 +90,12 @@ def delete_goal(id):
 # WAVE 6: Sending a List of Task IDs to a Goal
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def send_tasks_to_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
 
     for id in task_ids:
-        task = validate_task(id)
+        task = validate_model(Task, id)
         task.goal_id = goal_id
 
     goal_dict = dict(id=int(task.goal_id), task_ids=task_ids)
@@ -109,7 +110,7 @@ def send_tasks_to_goal(goal_id):
 # WAVE 6: Getting Tasks of One Goal: No Matching Tasks
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_one_goals_tasks(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
     
     tasks_response = []
     for task in goal.tasks:

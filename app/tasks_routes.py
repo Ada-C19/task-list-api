@@ -5,21 +5,9 @@ from sqlalchemy import text
 from datetime import datetime
 import os
 import requests
+from app.helper import validate_model
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
-def validate_task(id):
-    try:
-        id = int(id)
-    except:
-        abort(make_response({"message": f"Task {id} is invalid"}, 400))
-
-    task = Task.query.get(id)
-
-    if not task:
-        abort(make_response({"message": f"Task {id} not found"}, 404))
-
-    return task
 
 # WAVE 1: Create a Task: Valid Task With null completed_at
 @tasks_bp.route("", methods=["POST"])
@@ -65,7 +53,7 @@ def get_all_saved_tasks():
 # WAVE 1: Get One Task: One Saved Task cont.
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_saved_task(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     task_dict = dict(task=task.make_task_dict())
 
@@ -75,7 +63,7 @@ def get_one_saved_task(id):
 # WAVE 1: Update Task
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     request_body = request.get_json()
 
@@ -91,7 +79,7 @@ def update_task(id):
 # WAVE 1: Delete Task: Deleting a Task
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     deleted_response = {
         "details": f'Task {task.task_id} "{task.title}" successfully deleted'
@@ -105,7 +93,7 @@ def delete_task(id):
 # WAVE 3: Mark Complete on an Incompleted Task
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_complete_on_incomplete(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
 
     if not task.completed_at:  # if complete mark as complete
@@ -132,7 +120,7 @@ def mark_complete_on_incomplete(id):
 # WAVE 3: Mark Incomplete on a Completed Task
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete_on_complete(id):
-    task = validate_task(id)
+    task = validate_model(Task, id)
 
     if task.completed_at:
         task.completed_at = None
