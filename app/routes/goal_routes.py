@@ -57,7 +57,7 @@ def update_one_goal(goal_id):
 
         db.session.commit()
 
-        return make_response({"goal": goal_to_update.to_dict()}, 200)
+        return make_response({"Goal": goal_to_update.to_dict()}, 200)
     except KeyError:
         abort(make_response({'details': f"Goal{goal_id} not found"}, 404))
 
@@ -71,7 +71,7 @@ def delete_one_goal(goal_id):
         db.session.commit()
 
 
-        message = {"details": f'goal {goal_id} "{goal.title}" successfully deleted'}
+        message = {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}
         return make_response(message, 200)
     
     except KeyError:
