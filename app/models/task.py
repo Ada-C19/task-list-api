@@ -17,7 +17,6 @@ class Task(db.Model):
             is_complete = True
         dic_data = {
             "id": self.task_id,
-            # "goal_id": self.goal_id,
             "title": self.title,
             "description": self.description,
             "is_complete": is_complete
@@ -29,9 +28,8 @@ class Task(db.Model):
     @classmethod
     def from_dict(cls, task_data):
         new_task = cls(
-        # new_task = Task(
         title= task_data["title"],
         description= task_data['description'],
         completed_at= task_data['completed_at'])
 
-        return new_task()
+        return new_task

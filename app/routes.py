@@ -34,6 +34,8 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
+    print(f"new_task.todict {new_task.to_dict}")
+
     return {"task": new_task.to_dict()}, 201
 
 @tasks_bp.route("", methods=["GET"])
@@ -264,22 +266,21 @@ def delete_goal(goal_id):
 
 
 # Nested Routes one(Goal) to many(tasks) relationships
-#have to also validate the task id's we are being given..it'l return the
-#task ids as a model. 
-# @goals_bp.route("/<goal_id>/tasks")
-# def sending_task_ids_to_goal(goal_id):
-#     goal = validate_model(Goal, goal_id)
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def sending_task_ids_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
 
-#     request_body=request.get_json()
+    request_body=request.get_json()
 
-#     list_task_ids = request_body["task_ids"]
+    list_task_ids = request_body["task_ids"]
     
-#     for task_id in list_task_ids:
-#         pass
-        #I should validate task_id..:here???
+    for task_id in list_task_ids:
+        task = validate_model(Task, task_id)
+        #instance of task. setting it's goal_id = goal_id that's being passed in
+        task.goal_id = goal_id
+        db.session.commit()
 
-
-
-
-#     db.session.add()
-#     db.session.commit
+    return{
+        "id": goal.goal_id,
+        "task_ids": list_task_ids
+    }, 200
