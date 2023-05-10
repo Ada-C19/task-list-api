@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 import os
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 
 @task_bp.route("", methods=["POST"])
@@ -43,14 +45,6 @@ def validate_item(model, id):
     
     return model.query.get_or_404(id, {"msg":"id not found"})
 
-# @task_bp.route("", methods=["GET"])
-# def get_at_least_one_task():
-#     response = []
-#     all_tasks = Task.query.all() 
-#     for task in all_tasks: 
-#         response.append(task.to_dict())
-
-#     return jsonify(response), 200
 
 @task_bp.route("", methods=["GET"])
 def get_at_least_one_task():
@@ -134,4 +128,42 @@ def task_incomplete(task_id):
     return {"task": task.to_dict()}, 200
 
 
+
+@task_bp.route("", methods=["POST"])
+def add_task():
+    request_body = request.get_json()
+    if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
+        return {"details": "Invalid data"}, 400
     
+    new_task = Task(
+        title=request_body["title"],
+        description=request_body["description"],
+        completed_at=request_body["completed_at"]
+    )
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return {
+    "task": {
+        "id": new_task.task_id,
+        "title": new_task.title,
+        "description": new_task.description,
+        "is_complete": not bool(new_task.completed_at)
+            }
+            }, 201
+
+@goal_bp.route("", methods=["POST"])
+def add_goal():  
+    request_body = request.get_json()      
+    if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
+        return {"details": "Invalid data"}, 400
+    
+    new_goal = Goal(
+        title=request_body["title"]
+        )
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_dict()}
