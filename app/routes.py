@@ -10,7 +10,8 @@ def create_task():
     request_body = request.get_json()
     try:
         new_task = Task(title = request_body["title"],
-                        description = request_body["description"])
+                        description = request_body["description"],
+                        completed_at = request_body["completed_at"])
         
         db.session.add(new_task)
         db.session.commit()
@@ -29,6 +30,14 @@ def read_all_tasks():
     for task in tasks:
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response)
+
+@task_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_task(task_id)
+    message  = {
+            "task": task.to_dict()
+        }
+    return make_response(message, 200)
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
