@@ -6,6 +6,9 @@ import datetime
 import os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
+
+
 def get_valid_item_by_id(model, id):
     try:
         id = int(id)
@@ -99,3 +102,13 @@ def mark_incomplete(task_id):
     db.session.commit()
     return {"task": task.to_dict()}, 200
 
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
+
+# @goals_bp.route("/<goals_id>, methods=["GET"])
+# def mark_incomplete(task_id):
+#     task = get_valid_item_by_id(Task, task_id)
+#     if task.completed_at is None:
+#         return {"task": task.to_dict()}, 200
+#     task.completed_at = None
+#     db.session.commit()
+#     return {"task": task.to_dict()}, 200
