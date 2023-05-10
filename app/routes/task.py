@@ -119,7 +119,7 @@ def delete_one_task(task_id):
     }), 200)
 
 
-# wave 4
+# wave 3
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def patch_task_as_complete(task_id):
