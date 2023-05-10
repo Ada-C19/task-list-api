@@ -8,3 +8,16 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime)
     goals = db.relationship("Goal", back_populates="tasks")
     goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
+
+    def to_dic(self):
+        task_dic = {
+            "task": {
+                "id": self.task_id,
+                "title": self.title,
+                "description": self.description, 
+                "is_complete": True if self.completed_at else False
+            }
+        }
+        if self.goal_id:
+            task_dic["task"]["goal_id"] = self.goal_id
+        return task_dic

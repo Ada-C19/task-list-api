@@ -70,25 +70,7 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def read_task_by_id(task_id):
     task = validate_model(Task, task_id)
-    if not task.goal_id:
-        return {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description, 
-                "is_complete": True if task.completed_at else False
-            }
-        }, 200
-    else:
-        return {
-            "task": {
-                "id": task.task_id,
-                "goal_id": task.goal_id,
-                "title": task.title,
-                "description": task.description, 
-                "is_complete": True if task.completed_at else False
-            }
-        }, 200
+    return task.to_dic(), 200
 
 @tasks_bp.route("/<task_id>", methods=['PUT'])
 def update_task(task_id):
