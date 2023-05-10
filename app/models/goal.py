@@ -6,8 +6,8 @@ class Goal(db.Model):
     title = db.Column(db.String, nullable=False)
 
 
-    # def to_dict(self):
-    #     return dict(
-    #     id = self.id,
-    #     title = self.title,
-    #     )
+    def to_dict(self):
+        return dict(
+        id = self.id,
+        title = self.title,
+        )
