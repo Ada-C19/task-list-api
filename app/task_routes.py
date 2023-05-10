@@ -36,19 +36,13 @@ def create_a_task():
 def get_saved_tasks():
     tasks = Task.query.all()
     sort_request = request.args.get("sort")
-    task_response = []
 
     # Get tasks with sorting by title request
-    if sort_request:
-        if sort_request == "asc":
-            tasks = Task.query.order_by(Task.title.asc())
-        if sort_request == "desc":
-            tasks = Task.query.order_by(Task.title.desc())
-            
+    tasks = Task.query.order_by(Task.title.asc() if sort_request == "asc" else Task.title.desc() if sort_request == "desc" else None)
+    
     # Get tasks without sorting request
-    for task in tasks:
-        task_response.append(task.to_dict())
-        
+    task_response = [task.to_dict() for task in tasks]
+    
     return jsonify(task_response), 200
     
 
