@@ -57,7 +57,7 @@ def create_task():
     #     calculated_is_complete = False
     # else:
     #     calculated_is_complete = True
-    calculated_is_complete = not new_task.completed_at is None
+    # calculated_is_complete = not new_task.completed_at is None
     return get_external_task_representation(new_task), 201
 
 

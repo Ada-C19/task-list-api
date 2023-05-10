@@ -4,7 +4,7 @@ from app.models.goal import Goal
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from app.task_routes import validate_model
-import pdb
+
 # from sqlalchemy import asc, desc
 # from datetime import datetime
 # import requests
@@ -102,7 +102,6 @@ def post_tasks_ids_with_goals(goal_id):
         task_desde_db.goal = goal
         added_ids.append(task_desde_db.task_id)
 
-    
     db.session.commit()
     
     return jsonify({
@@ -110,15 +109,6 @@ def post_tasks_ids_with_goals(goal_id):
         "task_ids": added_ids
     })
     
-
-# author = validate_model(Author, author_id)
-
-# request_body = request.get_json()
-# new_book = Book(
-#     title=request_body["title"],
-#     description=request_body["description"],
-#     author=author
-# )
 
 
 
@@ -143,7 +133,7 @@ def get_task_from_goal(goal_id):
             response.append(
                 task.to_dict()
             )
-            
+
     return jsonify({
         "id": goal.goal_id,
         "title": goal.title,
