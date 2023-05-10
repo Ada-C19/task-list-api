@@ -37,40 +37,6 @@ def create_task():
     return {"task": new_task.to_dict()}, 201
 
 
-@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def send_tasks_to_goal(goal_id):
-    goal = validate_item_by_id(Goal, goal_id)
-
-    request_body = request.get_json()
-
-    tasks = Task.query.all()
-
-    task_ids = request_body["task_ids"]
-
-    for task in tasks:
-        if task.id in task_ids:
-            task.goal_id = goal_id
-    
-    db.session.commit()
-    return {"id": goal.goal_id, "task_ids": task_ids}, 200
-
-
-@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def get_tasks_of_one_goal(goal_id):
-    goal = validate_item_by_id(Goal, goal_id)
-    tasks = Task.query.all()
-    tasks_response = []
-    for task in tasks:
-        if task.goal_id == goal.goal_id:
-            tasks_response.append(task.to_dict())
-    
-    return {
-        "id": goal.goal_id,
-        "title": goal.title,
-        "tasks": tasks_response
-        }
-
-
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
@@ -203,3 +169,37 @@ def delete_goal(goal_id):
     return {
         "details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"
     }, 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def send_tasks_to_goal(goal_id):
+    goal = validate_item_by_id(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    tasks = Task.query.all()
+
+    task_ids = request_body["task_ids"]
+
+    for task in tasks:
+        if task.id in task_ids:
+            task.goal_id = goal_id
+    
+    db.session.commit()
+    return {"id": goal.goal_id, "task_ids": task_ids}, 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_item_by_id(Goal, goal_id)
+    tasks = Task.query.all()
+    tasks_response = []
+    for task in tasks:
+        if task.goal_id == goal.goal_id:
+            tasks_response.append(task.to_dict())
+    
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+        }
