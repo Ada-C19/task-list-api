@@ -7,11 +7,12 @@ def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
     except: 
-        abort(make_response({"error message": f"{cls.__name__} {model_id} is invalid"}, 400))
+        abort(make_response({"details": "Invalid data"}, 400))
 
     model = cls.query.get(model_id)
 
     if not model:
-        abort(make_response({"error message": f"{cls.__name__} {model_id} not found"}, 404))
+        abort(make_response({"details": "Data not found"}, 404))
 
     return model
+

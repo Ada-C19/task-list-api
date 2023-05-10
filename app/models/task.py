@@ -5,22 +5,34 @@ class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    completed_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, default=None, nullable=True)
 
     def to_dict(self):
         return {
             "task_id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": self.completed_at
+            "completed_at": self.completed_at
         }
+    
+    def validate_complete(self):
+        if self.completed_at:
+            is_complete = True
+        else:
+            is_complete = False
+    
+        return {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": is_complete
+            }
     
     @classmethod
     def from_dict(cls, data_dict):
         return cls(
             title = data_dict["title"],
-            description = data_dict["description"],
-            is_complete = data_dict["completed_at"]
+            description = data_dict["description"]
         )
 
 
