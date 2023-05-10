@@ -13,25 +13,29 @@ bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 @bp.route("", methods=["GET"])
 def get_tasks():
     sort_param = request.args.get("sort")
-    order_param = request.args.get("order")
+    order_param = request.args.get("order_by")
+    title_param = request.args.get("title")
 
-    tasks = Task.query.all()
+    tasks_query = Task.query
     
-    if sort_param == "title":
-        column = Task.title
-    elif sort_param == "id":
+    # Filter tasks by case-insensitive substring
+    if title_param:
+        tasks_query = tasks_query.filter(Task.title.ilike(f"%{title_param}%"))
+    
+    # Option to order tasks by id, default is to order by title
+    if order_param == "id":
         column = Task.id
     else:
-        return abort(make_response(jsonify(f"Tasks cannot be sorted by {sort_param}"), 400))
-    
-    if order_param == "asc":
-        tasks = Task.query.order_by(column.asc())
-    elif order_param == "desc":
-        tasks = Task.query.order_by(column.desc())
-    else:
-        return abort(make_response(jsonify(f"Tasks cannot be ordered by {order_param}"), 400))
-    
-    tasks_response = [task.to_dict() for task in tasks]
+        column = Task.title
+
+    # Sort by ascending or descending
+    if sort_param == "asc":
+        tasks_query = tasks_query.order_by(column.asc())
+        print(tasks_query)
+    elif sort_param == "desc":
+        tasks_query = tasks_query.order_by(column.desc())
+
+    tasks_response = [task.to_dict() for task in tasks_query]
     
     return make_response(jsonify(tasks_response), 200)
 
@@ -46,10 +50,11 @@ def create_task():
         abort(make_response(jsonify({"details": "Invalid data"}), 400))
     
     db.session.add(new_task)
-    
+
+    # Catch invalid datetime data submitted to "completed_at"
     try:
         db.session.commit()
-    except exc.DataError: # Catches invalid datetime data submitted to "completed_at"
+    except exc.DataError: 
         abort(make_response(jsonify({"details": "Invalid datetime data"}), 400))
 
     return make_response(jsonify({f"task": new_task.to_dict()}), 201) 
@@ -70,10 +75,11 @@ def update_one_task(id):
     task.title = request_body["title"]
     task.description = request_body["description"]
     task.completed_at = None if not request_body.get("completed_at") else request_body["completed_at"]
-
+    
+    # Catch invalid datetime values for completed_at
     try:
         db.session.commit()
-    except exc.DataError: # Catches invalid datetime values for completed_at
+    except exc.DataError: 
         abort(make_response(jsonify({"details": "Invalid datetime data"}), 400))
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
