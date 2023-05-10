@@ -144,20 +144,19 @@ def test_delete_goal(client, one_goal):
     # *****************************************************************
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
-    pass
-    # raise Exception("Complete test")
-
     # Act
-    # ---- Complete Act Here ----
+    response = client.delete("/goals/1")
+    response_body = response.get_json()
 
     # Assert
-    # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # ---- Complete Assertions Here ----
+    assert response.status_code == 404
 
+    
+    assert response_body == {'msg': f'invalid data'}
+
+    assert Goal.query.all() == []
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal_missing_title(client):
