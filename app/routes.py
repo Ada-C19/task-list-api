@@ -20,7 +20,9 @@ def validate_model(cls, model_id):
 
     return model
 
+# - - - - - - - - - - - - - - - - - #
 ###~~~--- task model routes ---~~~###
+# - - - - - - - - - - - - - - - - - #
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -177,7 +179,9 @@ def delete_task(task_id):
 
     return jsonify({"details":f'Task {task.task_id} "{task.title}" successfully deleted'}), 200
 
-###~~~--- goal model routes ---~~~###
+# - - - - - - - - - - - - - - - - - #
+###~~~--- task model routes ---~~~###
+# - - - - - - - - - - - - - - - - - #
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -264,4 +268,4 @@ def delete_task(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return jsonify({"details":f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}), 200
+    return jsonify({"details":f'Goal {goal.goal_id} \"{goal.title}\" successfully deleted'}), 200
