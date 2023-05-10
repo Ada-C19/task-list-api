@@ -1,7 +1,8 @@
 from flask import Blueprint, abort, jsonify, make_response, request
 from app import db
 from app.models.task import Task
-
+from datetime import datetime
+import requests
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -18,7 +19,6 @@ def add_task():
         )
     except KeyError:
         return {"details": "Invalid data"}, 400
-
 
     db.session.add(new_task)
     db.session.commit()
@@ -38,11 +38,19 @@ def validate_task(task_id):
 @task_bp.route("", methods=["GET"])
 def get_tasks():
     response = []
+    sort_order = request.args.get("sort", None)
     all_tasks = Task.query.all()
     for task in all_tasks:
         response.append(task.to_dict())
 
-    return jsonify(response), 200
+    if sort_order == 'asc':
+        tasks_sorted = sorted(response, key=lambda d: d['title'])
+    elif sort_order == 'desc':
+        tasks_sorted = sorted(response, key=lambda d: d['title'], reverse=True)
+    else:
+        tasks_sorted = response
+
+    return jsonify(tasks_sorted), 200
 
 
 @task_bp.route("/<task_id>", methods=["GET"])
@@ -74,6 +82,7 @@ def delete_task(task_id):
 
     return {"details": f'Task {task_id} "{task.title}" successfully deleted'}
 
+
 @task_bp.errorhandler(404)
 def not_found(error):
     message_body = {
@@ -82,3 +91,28 @@ def not_found(error):
         "message": "The requested task id could not be found."
     }
     return jsonify(message_body), 404
+
+
+@task_bp.route("/<task_id>/<action>", methods=["PATCH"])
+def complete_or_incomplete(task_id, action):
+    task = validate_task(task_id)
+    current_datetime = datetime.utcnow()
+    task_status = action
+    if task_status == "mark_complete":
+        task.completed_at = current_datetime
+        #send a message to the slack api here
+        message = f"Someone just completed the task {task.title}"
+        header = {
+            "Authorization": "Bearer xoxb-5239032091394-5224524979687-wJSHhKH8K99Wtofamg4TtaAW"
+        }
+        data_to_send = {
+            "channel": "task-notifications",
+            "text": message
+        }
+        response = requests.post("https://slack.com/api/chat.postMessage", headers=header, json=data_to_send)   
+
+    elif task_status == "mark_incomplete":
+        task.completed_at = None
+    db.session.commit()
+
+    return task.to_dict_task(), 200
