@@ -112,3 +112,30 @@ def test_get_task_includes_goal_id(client, one_task_belongs_to_one_goal):
             "is_complete": False
         }
     }
+
+
+# NEW UNIT TESTS
+def test_post_tasks_to_invalid_goal(client):
+    response = client.post("/goals/one/tasks", json={
+        "task_ids": [1, 2, 3]
+    })
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Goal one invalid"}
+
+def test_post_tasks_to_goal_not_found(client, one_goal, three_tasks):
+    response = client.post("/goals/2/tasks", json={
+        "task_ids": [1, 2, 3]
+    })
+    response_body = response.get_json()
+
+    assert response.status_code == 404
+    assert response_body == {"message": "Goal 2 not found"}
+
+def test_get_tasks_invalid_goal(client):
+    response = client.get("/goals/one/tasks")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Goal one invalid"}

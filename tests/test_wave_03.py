@@ -139,3 +139,19 @@ def test_mark_incomplete_missing_task(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Task 1 not found"}
+
+
+    # NEW UNIT TESTS
+def test_mark_complete_invalid_task(client):
+    response = client.patch("/tasks/one/mark_complete")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Task one invalid"}
+
+def test_mark_incomplete_invalid_task(client):
+    response = client.patch("/tasks/one/mark_incomplete")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Task one invalid"}

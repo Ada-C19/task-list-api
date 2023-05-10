@@ -188,3 +188,38 @@ def test_create_task_must_contain_description(client):
         "details": "Invalid data"
     }
     assert Task.query.all() == []
+
+
+# NEW UNIT TESTS
+def test_get_invalid_task_id(client):
+    response = client.get("/tasks/one")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {
+        "message": "Task one invalid"
+    }
+    assert "message" in response_body
+
+def test_update_invalid_task_id(client):
+    response = client.put("/tasks/one", json={
+        "title": "Updated Task Title",
+        "description": "Updated Test Description",
+    })
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {
+        "message": "Task one invalid"
+    }
+    assert "message" in response_body
+
+def test_get_invalid_task_id(client):
+    response = client.delete("/tasks/one")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {
+        "message": "Task one invalid"
+    }
+    assert "message" in response_body

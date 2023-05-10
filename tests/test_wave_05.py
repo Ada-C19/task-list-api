@@ -98,7 +98,7 @@ def test_update_goal(client, one_goal):
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
     # Act
-    response = client.put("goals/1", json={
+    response = client.put("/goals/1", json={
         "title": "Updated Goal Title"
     })
     response_body = response.get_json()
@@ -150,3 +150,28 @@ def test_create_goal_missing_title(client):
     assert response_body == {
         "details": "Invalid data"
     }
+
+
+# NEW UNIT TESTS
+def test_get_goal_invalid(client):
+    response = client.get("/goals/one")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Goal one invalid"}
+
+def test_update_goal_invalid(client):
+    response = client.put("/goals/one", json={
+        "title": "Updated Goal Title"
+    })
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Goal one invalid"}
+
+def test_delete_goal_invalid(client):
+    response = client.delete("/goals/one")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Goal one invalid"}
