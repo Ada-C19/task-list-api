@@ -31,20 +31,20 @@ def get_one_task(id):
     return jsonify({'task':task.to_dict()}),200
 
 #CREATE one task/must contain title+description [POST]/tasks/<id> :(CREATE)
-@tasks_bp.route("",methods=["POST"])
-def create_task():
+@tasks_bp.route("", methods = ["POST"])
+def create_tasks():
     request_body = request.get_json()
-    if request.method == "POST":
-        if "name" not in request_body or "description" not in request_body:
-            message = {"details": "Invalid data"}
-            return make_response(message,400)
-           
-    new_task = Task.create_dict(request_body)
+
+    try:
+        if request_body["title"] or request_body["description"]:
+            new_task = Task.create_dict(request_body)
+    except KeyError:
+        return make_response({"details": "Invalid data"}), 400
 
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response({"task":new_task.to_dict()}), 201
+    return jsonify({"task":new_task.to_dict()}), 201
 
 #UPDATE one task/RETURN msg not found [PUT]/tasks/<id> :(UPDATE)
 @tasks_bp.route("/<id>",methods=["PUT"])
@@ -68,7 +68,7 @@ def delete_task(id):
     db.session.delete(task_to_delete)
     db.session.commit()
 
-    message = {'details': f'Task {task_to_delete.id} "{task_to_delete.title}" successfully deleted'}
+    message = {'details': f'Task {id} "{task_to_delete.title}" successfully deleted'}
 
     return make_response(message,200)
 
