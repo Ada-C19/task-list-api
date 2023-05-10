@@ -5,7 +5,7 @@ def validate_task(id):
     try:
         id = int(id)
     except:
-        abort(make_response({"message": f"Task {id} is invalid"},400))
+        abort(make_response({"details": f"Task {id} is invalid"},400))
     
     task = Task.query.get(id)
 
