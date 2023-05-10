@@ -61,6 +61,29 @@ def delete_one_goal(goal_id):
 
     return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
 
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    goal = verify_item(Goal, goal_id)
+
+    request_body = request.get_json()
+    try:
+        tasks = request_body["task_ids"]
+    except KeyError:
+        abort(make_response({"details": "Invalid data"}, 400))
+    
+    for task_id in tasks:
+        task = verify_item(Task, task_id)
+        task.goal_id = goal.goal_id
+
+    db.session.commit()
+    return make_response({"id": goal.goal_id, "task_ids": tasks}, 200)
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_from_goal(goal_id):
+    goal = verify_item(Goal, goal_id)
+
+    return make_response(goal.to_dict_with_tasks(), 200)
+
 def message_for_only_one_goal(goal):
     return {"goal": goal.to_dict()}
 
