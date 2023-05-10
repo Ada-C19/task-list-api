@@ -16,32 +16,25 @@ def validate_item(model, id):
     except ValueError:
         return abort(make_response({"msg": f"Invalid id: {id}"}, 400))
     
-    return model.query.get_or_404(id, {"msg":"id not found"})
+    return model.query.get_or_404(id, {"msg": f"{id} not found"})
 
 # Task routes 
 @task_bp.route("", methods=["POST"])
 def add_task():
     request_body = request.get_json()
-    if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
+    if "title" not in request_body or "description" not in request_body: #or "completed_at" not in request_body:
         return {"details": "Invalid data"}, 400
     
     new_task = Task(
         title=request_body["title"],
         description=request_body["description"],
-        completed_at=request_body["completed_at"]
+        # completed_at=request_body["completed_at"]
     )
 
     db.session.add(new_task)
     db.session.commit()
 
-    return {
-    "task": {
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": not bool(new_task.completed_at)
-            }
-            }, 201
+    return {"task": new_task.to_dict()}, 201
 
 
 @task_bp.route("", methods=["GET"])
@@ -64,7 +57,7 @@ def get_at_least_one_task():
 def get_one_task(task_id):
     task = validate_item(Task, task_id)
 
-    return task.to_dict(), 200
+    return ({"task": task.to_dict()}), 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -76,7 +69,7 @@ def update_task(task_id):
     task.description = request_data["description"]
 
     db.session.commit()
-    return jsonify({"task": task.to_dict()}), 200
+    return {"task": task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -127,52 +120,38 @@ def task_incomplete(task_id):
 
 
 
-@task_bp.route("", methods=["POST"])
-def add_task():
-    request_body = request.get_json()
-    if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
-        return {"details": "Invalid data"}, 400
-    
-    new_task = Task(
-        title=request_body["title"],
-        description=request_body["description"],
-        completed_at=request_body["completed_at"]
-    )
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return {
-    "task": {
-        "id": new_task.task_id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": not bool(new_task.completed_at)
-            }
-            }, 201
-
 # Goal Routes 
 
 @goal_bp.route("", methods=["POST"])
 def add_goal():  
     request_body = request.get_json()      
-    if "title" not in request_body or "description" not in request_body or "completed_at" not in request_body:
+    if "title" not in request_body:
         return {"details": "Invalid data"}, 400
     
-    goal = Goal(
+    new_goal = Goal(
         title=request_body["title"]
         )
 
-    db.session.add(goal)
+    db.session.add(new_goal)
     db.session.commit()
 
-    return {"goal": goal.to_dict()}, 201
+    return {"goal": new_goal.to_dict()}, 201
 
-@goal_bp.route("", methods=["GET"])
+@goal_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_item(Goal, goal_id)
 
-    return goal.to_dict(), 200
+    return {"goal": goal.to_dict()}, 200
+
+@goal_bp.route("", methods=["GET"])
+def get_at_least_one_goal():
+    response = []
+    all_goals = Goal.query.all()
+        
+    for goal in all_goals: 
+        response.append(goal.to_dict())
+
+    return jsonify(response), 200
 
 @goal_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
@@ -192,4 +171,7 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
+    # return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
+    return {
+        "details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"
+        }, 200
