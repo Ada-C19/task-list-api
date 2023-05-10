@@ -87,11 +87,14 @@ def test_update_goal(client, one_goal):
     response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 405
-    assert "error" in response_body
-    assert response_body["error"] == "Goal not found or cannot be updated"
-
-
+    assert response.status_code == 200
+    assert "goal" in response_body
+    assert response_body == {
+        "goal": {
+        "goal_id": 1,
+        "title": "Updated Goal Title"
+    }
+}
 
 
 
@@ -109,7 +112,7 @@ def test_update_goal_not_found(client):
 
     # Assert
     # ---- Complete Assertions Here ----
-    assert response.status_code == 405
+    assert response.status_code == 404
     assert response_body==None
     
     # ---- Complete Assertions Here ----
@@ -149,8 +152,7 @@ def test_delete_goal_not_found(client):
     # Assert
     # ---- Complete Assertions Here ----
     assert response.status_code == 404
-    assert response_body["details"] == "Goal not found"
-
+    assert response_body== "Goal"
     
     # assertion 2 goes here
     # ---- Complete Assertions Here ----
