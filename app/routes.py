@@ -1,6 +1,7 @@
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+from sqlalchemy import desc
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -19,7 +20,16 @@ def validate_model(cls, model_id):
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    tasks = Task.query.all()
+
+    sort_direction = request.args.get("sort")
+
+    if sort_direction == "asc":
+        tasks = Task.query.order_by(Task.title)
+    elif sort_direction == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+    
     results = [task.to_dict() for task in tasks]
 
     return jsonify(results)
