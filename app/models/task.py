@@ -4,9 +4,11 @@ from flask import abort, make_response, jsonify
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String)
+    title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, nullable=True, default=None)
+    completed_at = db.Column(db.DateTime, default=None)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'))
+    goal = db.relationship("Goal", back_populates="tasks")
 
     @classmethod
     def from_dict(cls, task_data):
@@ -25,12 +27,16 @@ class Task(db.Model):
         else:
             is_complete = False
 
-        return dict(
-            id=self.task_id,
-            title=self.title,
-            description=self.description,
-            is_complete=is_complete,
-        )
+        task_dict = {}
+        task_dict["id"] = self.task_id
+        task_dict["title"] = self.title
+        task_dict["description"] = self.description
+        task_dict["is_complete"] = is_complete
+
+        if self.goal:
+            task_dict["goal_id"] = self.goal_id
+
+        return task_dict
     
     def update_from_dict(self, task_data):
         try:
