@@ -82,6 +82,9 @@ def assign_tasks_to_goal(goal_id):
 def get_all_tasks_from_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    response = goal.to_dict()
+    goal_response = goal.to_dict()
 
-    return jsonify(response), 200
+    if "tasks" not in goal_response:
+        goal_response["tasks"] = []
+
+    return jsonify(goal_response), 200
