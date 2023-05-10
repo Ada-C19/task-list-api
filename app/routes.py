@@ -169,3 +169,14 @@ def update_goal(goal_id):
     return {
         "goal": goal_to_update.to_dict()
     }, 200
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_task(goal_id):
+    goal_to_delete = validate_model(Goal, goal_id)
+
+    db.session.delete(goal_to_delete)
+    db.session.commit()
+
+    return {
+        "details": f'Goal {goal_to_delete.id} "{goal_to_delete.title}" successfully deleted'
+    }, 200
