@@ -38,7 +38,7 @@ def create_task():
     new_task = Task.create_dict(request_body)
     db.session.add(new_task)
     db.session.commit()
-    return make_response({"task":new_task.to_json()}), 200
+    return make_response({"task":new_task.to_json()}), 201
 
 #UPDATE one task- PUT /tasks/<id>  (UPDATE)
 @tasks_bp.route("/<id>",methods=["PUT"])
@@ -62,14 +62,3 @@ def delete_task(id):
     return make_response(message, 200)
 
 
-    # message = "details": 'Task 1 "Go on my daily walk {task_to_delete.title}" successfuly deleted'
-    # return make_response(message,200)
-
-    # message = {"details": f'Task {task_to_delete.title} "{task_to_delete.description}" successfully deleted'}
-    # return make_response(message, 200)
-
-
-    #return make_response({"details": f"Task {task.title} successfully deleted"})
-
-
-# #return make_response({"task":new_task})

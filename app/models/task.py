@@ -1,10 +1,12 @@
 from app import db
+from flask import abort,  make_response, jsonify
+ 
 
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    title = db.Column(db.String)
-    description = db.Column(db.String)
+    title = db.Column(db.String, nullable = False)
+    description = db.Column(db.String, nullable = False )
     completed_at = db.Column(db.DateTime, default = None, nullable = True)
 
 
@@ -25,8 +27,11 @@ class Task(db.Model):
 
     @classmethod
     def create_dict(cls, response_body):
-        return cls(
-            title = response_body["title"],
-            description = response_body["description"]
-        )
-
+        try:
+            new_task = cls(
+                title = response_body["title"],
+                description = response_body["description"]
+            )
+        except KeyError:
+            abort(make_response(jsonify({"details": "Invalid data"}), 400))                              
+        return new_task
