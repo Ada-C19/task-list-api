@@ -1,5 +1,6 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import desc, asc
@@ -8,10 +9,10 @@ import requests
 import pytz
 import os
 from dotenv import load_dotenv
-# load_dotenv()
 
 SLACK_API_KEY = os.environ.get('SLACK_API_KEY')
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 def validate_model(cls, model_id):
     try:
@@ -115,3 +116,24 @@ def patch_task_completion(task_id, completion_marker):
     return {
         "task": task_to_update.to_dict()
     }, 200
+
+# -----------------------------------------------
+
+@goals_bp.route("", methods=["GET"])
+def read_all_goals():
+    sort_query = request.args.get("sort")
+    if sort_query == 'asc':
+        goals = Goal.query.order_by(Goal.title.asc()).all()
+    elif sort_query == 'desc':
+        goals = Goal.query.order_by(Goal.title.desc()).all()
+    else:
+        goals = Goal.query.all()
+
+    goals_response = [goal.to_dict() for goal in goals]
+
+    return jsonify(goals_response), 200
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    return {"goal": goal.to_dict()}, 200
