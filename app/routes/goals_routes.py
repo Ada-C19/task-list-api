@@ -40,9 +40,7 @@ def handle_get_goals_request():
 
     goals = Goal.query.all()
     
-    goal_response = []
-    for goal in goals:
-        goal_response.append(goal.to_dict())
+    goal_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goal_response), 200
 
@@ -108,10 +106,7 @@ def get_tasks_by_goal(goal_id):
     goal = get_valid_item_by_id(Goal, goal_id)
 
     tasks = goal.tasks
-    tasks_by_goal_response = []
-
-    for task in tasks:
-        tasks_by_goal_response.append(task.to_dict())
+    tasks_by_goal_response = [task.to_dict() for task in tasks]
 
     return {
         "id": goal.goal_id,

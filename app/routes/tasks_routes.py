@@ -38,9 +38,7 @@ def handle_get_tasks_request():
     else:
         tasks = Task.query.all()
     
-    task_response = []
-    for task in tasks:
-        task_response.append(task.to_dict())
+    task_response = [task.to_dict() for task in tasks]
 
     return jsonify(task_response), 200
 
