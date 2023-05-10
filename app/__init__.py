@@ -27,9 +27,6 @@ def create_app(test_config=None):
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_TEST_DATABASE_URI")
         
-        
-# SLACK_API_TOKEN = "xoxb-4680452269380-5238717880866-WruhcGV5ObIA7yt4SDq6Z6Ns"
-
     # Import models here for Alembic setup
     from app.models.task import Task
     from app.models.goal import Goal
@@ -38,7 +35,10 @@ def create_app(test_config=None):
     migrate.init_app(app, db)
 
     # Register Blueprints here
-    from .routes import tasks_bp
+    from .task_routes import tasks_bp
     app.register_blueprint(tasks_bp)
+    
+    from .goal_routes import goal_bp
+    app.register_blueprint(goal_bp)
     
     return app

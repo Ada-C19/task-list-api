@@ -40,8 +40,6 @@ def create_task():
     
     return make_response(jsonify(task_dict), 201)
     
-
-
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
     sort = request.args.get("sort")
@@ -97,7 +95,7 @@ def mark_task_complete(id):
     task.completed_at = datetime.date.today().isoformat()
     
     db.session.commit()
-    send_slack_message()
+    send_slack_message(task)
     
     task_dict = dict(task=task.to_dict())
     return make_response(jsonify(task_dict), 200)
@@ -116,15 +114,16 @@ def mark_task_incomplete(id):
 
 
 
-def send_slack_message():
+def send_slack_message(task):
     api_url = "https://slack.com/api/chat.postMessage"
 
     payload = {
         "channel": "api-test-channel",
-        "text": "Someone just completed the task My Beautiful Task"
+        "text": f"Someone just completed the task {task.title}"
     }
+
     headers = {
-        'Authorization': token
+        'Authorization': f"Bearer {token}"
     }
 
     response = requests.post(api_url, headers=headers, data=payload)
