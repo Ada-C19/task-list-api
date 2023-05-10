@@ -20,11 +20,25 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    tasks = Task.query.all()
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.validate_complete())
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+        tasks_response = []
+        for task in tasks:
+            tasks_response.append(task.validate_complete())
+        return jsonify(tasks_response)
+    
+    tasks_response = [task.validate_complete() for task in tasks]
     return jsonify(tasks_response)
+
+# @tasks_bp.route("", methods=["GET"])
+# def sort_tasks():
+    
+    
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
