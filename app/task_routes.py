@@ -38,3 +38,19 @@ def create_task():
     response_body = dict(task = new_task.to_dict())
 
     return jsonify(response_body), 201
+
+@tasks_bp.route("", methods=["GET"])
+def get_all_tasks():
+
+    #WAVE 2: Sorting Tasks: By Title, Ascending
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(text("title asc"))
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(text("title desc"))
+    else:
+        tasks = Task.query.all()
+
+    tasks_list = [task.to_dict() for task in tasks]
+
+    return jsonify(tasks_list), 200
+
