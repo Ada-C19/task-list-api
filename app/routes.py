@@ -2,6 +2,8 @@ from flask import Blueprint, request, make_response, jsonify, abort
 from .models.task import Task
 from app import db
 from datetime import datetime
+import requests
+import os
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -73,18 +75,41 @@ def delete_task(task_id):
 
 # Update a task, mark complete
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def update_task_complete(task_id):
+def update_task_mark_complete(task_id):
     task_object = validate_model(Task, task_id)
     task_object.completed_at = datetime.utcnow()
     db.session.commit()
+
+    url = "https://slack.com/api/chat.postMessage"
+    API_KEY = "Bearer xoxb-4680452269380-5222659283431-QKg66zTyHbkT2F9a9Dq51ebD"#os.environ.get(API_KEY)
+    headers = {
+        "Authorization" : API_KEY}
+    
+    data = {"channel": "api-test-channel",
+    "text" :  f"Task #{task_id} is complete!"}
+
+    response = requests.post(url, headers=headers, json=data)
+    print(response)
     return Task.add_task_key(Task.to_dict(task_object))
+
 
 # Update a task, mark incomplete
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-def update_task_incomplete(task_id):
+def update_task_mark_incomplete(task_id):
     task_object = validate_model(Task, task_id)
     task_object.completed_at = None
     db.session.commit()
+
+    url = "https://slack.com/api/chat.postMessage"
+    API_KEY = "Bearer xoxb-4680452269380-5222659283431-QKg66zTyHbkT2F9a9Dq51ebD"#os.environ.get(API_KEY)
+    headers = {
+        "Authorization" : API_KEY}
+    
+    data = {"channel": "api-test-channel",
+    "text" :  f"Task #{task_id} is incomplete!"}
+
+    response = requests.post(url, headers=headers, json=data)
+    print(response)
     return Task.add_task_key(Task.to_dict(task_object))
 
 
@@ -99,10 +124,4 @@ def validate_model(cls, task_id):
     return response
 
 
-
-# - JSON's value of `true` is similar to Python's value of `True`,
-# and `false` is similar to Python's `False`.
-# - SQL's value of `null` is similar to Python's value of `None`.
-# - Python has a [datetime library]
-# (https://docs.python.org/3/library/datetime.html#module-datetime) which we recommend using to represent dates in model attributes.
 
