@@ -2,6 +2,7 @@ from flask import Blueprint,jsonify, request, make_response, abort
 from app import db
 from app.models.task import Task
 from app.helper import validate_model
+import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -47,26 +48,40 @@ def update_task(task_id):
 
     request_body = request.get_json()
 
-    try:
-        task.title = request_body["title"]
-        task.description = request_body["description"]
+    task.title = request_body["title"]
+    task.description = request_body["description"]
 
-        db.session.commit()
+    db.session.commit()
 
-        return jsonify({"task":task.to_dict()})
-
-    except KeyError as error:
-        abort(make_response(jsonify({"message":f"Task {task_id} not found"}), 404))
+    return jsonify({"task":task.to_dict()})
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
 
-    try:
-        db.session.delete(task)
-        db.session.commit()
+    db.session.delete(task)
+    db.session.commit()
 
-        return jsonify({"details": "Task 1 \"Go on my daily walk 🏞\" successfully deleted"})
+    return jsonify({"details":f"Task {task_id} \"{task.title}\" successfully deleted"})
     
-    except KeyError as error:
-        abort(make_response(jsonify({"message":f"Task {task_id} not found"}), 404))
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = datetime.date.today().isoformat()
+
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()})
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = None
+
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()})
+    
+    
