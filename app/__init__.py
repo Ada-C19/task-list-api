@@ -12,7 +12,7 @@ load_dotenv()
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("SQLALCHEMY_DATABASE_URI")
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("RENDER_DATABASE_URI")
