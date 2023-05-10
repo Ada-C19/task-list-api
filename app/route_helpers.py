@@ -1,5 +1,4 @@
-from flask import Blueprint, jsonify, abort, make_response, request
-from app import db
+from flask import jsonify, abort, make_response
 
 def validate_model(cls, id):
     try:

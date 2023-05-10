@@ -3,10 +3,7 @@ from app import db
 from app.models.goal import Goal
 from app.models.task import Task
 from .route_helpers import validate_model
-from datetime import datetime
-import requests
-from dotenv import load_dotenv
-import os
+
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -32,10 +29,10 @@ def create_goal():
     return make_response(jsonify({"goal": new_goal.to_dict()}), 201)
 
 
-
 @goal_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
+
     return make_response(jsonify({"goal": goal.to_dict()}), 200)
 
 
@@ -43,6 +40,7 @@ def get_one_goal(goal_id):
 def update_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
+
     goal.title = request_body["title"]
 
     db.session.commit()
@@ -64,20 +62,31 @@ def delete_one_goal(goal_id):
 def assign_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
-    task_ids = request_body['task_ids']
-    tasks = []
-    print(f"{tasks=}")
+    
+    try:
+        task_ids = request_body['task_ids']
+    except KeyError: # Catch requests without list of task ids
+        abort(make_response(jsonify({"details": "Invalid data"}), 400))
+    
+    # Update each task to link it to this goal
     for id in task_ids:
-        print(f"{id=}")
         task = validate_model(Task, id)
         task.goal = goal
-        tasks.append(task)
-    
-    db.session.add_all(tasks)
+
+    goal_tasks = [task.id for task in goal.tasks] # Thought of making this into an object method, but decided against as it would only get used once
+
     db.session.commit()
-    return make_response(jsonify(goal.to_dict()))
+
+    return make_response(jsonify({'id': goal.id, "task_ids": goal_tasks}), 200) 
 
 
 @goal_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_related_tasks(goal_id):
-    pass
+    goal = validate_model(Goal, goal_id)
+    response_body = goal.to_dict()
+    
+    # Necessary conditional check to pass both Wave 5 and 6 tests
+    if not goal.tasks:
+        response_body["tasks"] = []
+
+    return make_response(jsonify(response_body), 200)
