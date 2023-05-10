@@ -6,7 +6,16 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix = "/tasks")
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
+
     request_body = request.get_json()
+
+  
+    if not request_body.get("title") or not request_body.get("description"):
+        abort(make_response(
+                {
+                    "details": "Invalid data"
+                }, 400
+            ))
 
     task = Task(
         title = request_body["title"],
@@ -22,7 +31,7 @@ def create_task():
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": False
+                "is_complete": True if task.completed_at else False
             }
         }, 201
     )
@@ -38,7 +47,7 @@ def read_tasks():
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": False
+                "is_complete": True if task.completed_at else False
             }
         ), 200
 
@@ -46,20 +55,20 @@ def read_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_saved_task(task_id):
-    task = validate_task_id(task_id)
+    task = validate_task(task_id)
 
     return {
         "task": {
             "id": task.task_id,
             "title": task.title,
             "description": task.description,
-            "is_complete": False
+            "is_complete": True if task.completed_at else False
         }
     }
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task_id(task_id)
+    task = validate_task(task_id)
 
     request_body = request.get_json()
 
@@ -74,14 +83,14 @@ def update_task(task_id):
                 "id": task.task_id,
                 "title": task.title,
                 "description": task.description,
-                "is_complete": False
+                "is_complete": True if task.completed_at else False
             }
         }, 200
     )
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task_id(task_id)
+    task = validate_task(task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -92,7 +101,7 @@ def delete_task(task_id):
         }, 200
     )
 
-def validate_task_id(task_id):
+def validate_task(task_id):
     task = Task.query.get(task_id)
 
     if not task:
@@ -102,4 +111,3 @@ def validate_task_id(task_id):
             }, 404
         ))
     return task
-   
