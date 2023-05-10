@@ -38,5 +38,7 @@ def create_task():
     new_task = Task.from_dict(request_body)
     db.session.add(new_task)
     db.session.commit()
+    
+    response = {"task": new_task.to_dict()}
 
-    return make_response(jsonify(f"Task {new_task.name} created successfully."), 201)
+    return make_response((jsonify(response)), 201)

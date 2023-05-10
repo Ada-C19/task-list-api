@@ -17,6 +17,9 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, task_data):
+        if "completed_at" not in task_data:
+            task_data["completed_at"] = None
+        
         return Task(
             title=task_data["title"],
             description=task_data["description"],
