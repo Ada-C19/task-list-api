@@ -33,8 +33,12 @@ def get_one_task(task_id):
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-
     request_body = request.get_json()
+    
+    new_task_is_valid = "title" in request_body and "description" in request_body
+    if not new_task_is_valid:
+        abort(make_response(jsonify({"details":"Invalid data"}), 400))
+
     new_task = Task.from_dict(request_body)
     db.session.add(new_task)
     db.session.commit()
