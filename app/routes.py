@@ -267,7 +267,7 @@ def delete_goal(goal_id):
 
 # Nested Routes one(Goal) to many(tasks) relationships
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def sending_task_ids_to_goal(goal_id):
+def post_task_ids_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     request_body=request.get_json()
@@ -284,3 +284,7 @@ def sending_task_ids_to_goal(goal_id):
         "id": goal.goal_id,
         "task_ids": list_task_ids
     }, 200
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    pass
