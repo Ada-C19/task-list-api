@@ -3,6 +3,8 @@ from app.models.task import Task
 from app import db
 from app.helpers import validate_model, sort_title_asc, sort_title_desc
 from datetime import datetime
+import os
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -74,6 +76,9 @@ def delete_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_complete(task_id):
+
+
+
     task_to_update = validate_model(Task, task_id)
 
     current_time = datetime.utcnow()
@@ -81,6 +86,14 @@ def update_task_complete(task_id):
     task_to_update.completed_at = current_time
 
     db.session.commit()
+
+    Api_key = os.environ.get("Slack_API_Key")
+    message = f"Someone just completed the task {task_to_update.title}"
+    headers = {"Authorization": f"Bearer {Api_key}"}
+    data = {"channel": "task-notifications", "text":message}
+    requests.post("https://slack.com/api/chat.postMessage", headers=headers, json=data )
+    
+
     message = task_to_update.to_dict()
     return make_response({"task":message}, 200)
 
@@ -94,6 +107,9 @@ def update_task_incomplete(task_id):
     db.session.commit()
     message = task_to_update.to_dict()
     return make_response({"task":message}, 200)
+
+
+
 
 
 
