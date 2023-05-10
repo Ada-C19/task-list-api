@@ -2,6 +2,12 @@ from flask import Blueprint, make_response, jsonify, request, abort
 from app.models.task import Task
 from app import db
 from datetime import datetime
+import requests
+# from slack_sdk import WebClient
+# from slack_sdk.errors import SlackApiError
+
+# client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+# logger = logging.getLogger(__name__)
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -148,6 +154,39 @@ def complete_task(id):
     # else:
     #     return {"details": "Invalid data"}, 400
 
+    PATH = "https://slack.com/api/chat.postMessage"
+
+    Authorization = "Bearer xoxb-5242678399683-5266537240624-SzcfKHmF2xZaq407bmmGcsdL"
+
+    headers = {
+        "Authorization": Authorization,
+        "format": "json"
+    }
+
+    body = {
+        "channel": "task-notifications",
+        "text": "Hello, World!",
+    }
+    requests.post(PATH, headers=headers, json=body)
+    # response = requests.post(PATH, headers=headers, json=body)
+
+
+    # # return response.json()
+    # response_data = response.json()
+    # print("Response data:", response_data)
+
+    #channel_id = "C12345"
+
+    # try:
+    # # Call the chat.postMessage method using the WebClient
+    #     result = client.chat_postMessage(
+    #     channel=channel_id, 
+    #     text="Hello world"
+    # )
+    #     logger.info(result)
+
+    # except SlackApiError as e:
+    # logger.error(f"Error posting message: {e}")
 
     db.session.commit()
     return {"task": task.to_dict()}, 200    
