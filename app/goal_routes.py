@@ -74,6 +74,7 @@ def delete_one_goal(goal_id):
     }, 200
     
 
+# Get all tasks of one goal
 @goals_bp.route("/<goal_id>/tasks", methods=['GET'])
 def handle_all_tasks_of_one_goal(goal_id):
     goal = validate_item_by_id(Goal, goal_id)
@@ -85,6 +86,7 @@ def handle_all_tasks_of_one_goal(goal_id):
     return jsonify(response_body), 200
 
 
+# Assign a list of task to one goal
 @goals_bp.route("/<goal_id>/tasks", methods=['POST'])
 def send_a_list_of_task_ids_to_one_goal(goal_id):
     goal = validate_item_by_id(Goal, goal_id)
