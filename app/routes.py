@@ -10,6 +10,17 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 
+def validate_item_by_id(model, id):
+    try:
+        id = int(id)
+    except:
+        abort(make_response({"message":f"{model.__name__} {id} invalid"}, 400))
+
+    item = model.query.get(id)
+
+    return item if item else abort(make_response({"message":f"{model.__name__} {id} not found"}, 404))
+
+
 def validate_goal_by_id(id):
     try:
         id = int(id)
@@ -56,7 +67,7 @@ def create_task():
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def send_tasks_to_goal(goal_id):
-    goal = validate_goal_by_id(goal_id)
+    goal = validate_item_by_id(Goal, goal_id)
 
     request_body = request.get_json()
 
@@ -74,7 +85,7 @@ def send_tasks_to_goal(goal_id):
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_tasks_of_one_goal(goal_id):
-    goal = validate_goal_by_id(goal_id)
+    goal = validate_item_by_id(Goal, goal_id)
     tasks = Task.query.all()
     tasks_response = []
     for task in tasks:
@@ -107,14 +118,14 @@ def get_all_tasks():
 
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
-    task = validate_task_by_id(id)
+    task = validate_item_by_id(Task, id)
     print("IM PRINTING", task.to_dict()) # DELETE THIS LATER
     return {"task": task.to_dict()}, 200
 
 
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
-    task = validate_task_by_id(id)
+    task = validate_item_by_id(Task, id)
 
     request_body = request.get_json()
     task.title = request_body["title"]
@@ -126,7 +137,7 @@ def update_task(id):
 
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
-    task = validate_task_by_id(id)
+    task = validate_item_by_id(Task, id)
 
     db.session.delete(task)
     db.session.commit()
@@ -138,7 +149,7 @@ def delete_task(id):
 
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_complete(id):
-    task = validate_task_by_id(id)
+    task = validate_item_by_id(Task, id)
 
     task.completed_at = datetime.utcnow()
 
@@ -159,7 +170,7 @@ def mark_complete(id):
 
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(id):
-    task = validate_task_by_id(id)
+    task = validate_item_by_id(Task, id)
 
     task.completed_at = None
 
@@ -195,13 +206,13 @@ def get_all_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    goal = validate_goal_by_id(goal_id)
+    goal = validate_item_by_id(Goal, goal_id)
     return {"goal": goal.to_dict()}, 200
 
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal = validate_goal_by_id(goal_id)
+    goal = validate_item_by_id(Goal, goal_id)
 
     request_body = request.get_json()
     goal.title = request_body["title"]
@@ -212,7 +223,7 @@ def update_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = validate_goal_by_id(goal_id)
+    goal = validate_item_by_id(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
