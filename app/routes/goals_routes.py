@@ -111,3 +111,20 @@ def assign_tasks_to_goal(goal_id):
         "id": goal.goal_id,
         "task_ids": tasks
     }, 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_by_goal(goal_id):
+    goal = get_valid_item_by_id(Goal, goal_id)
+
+    tasks = goal.tasks
+    tasks_by_goal_response = []
+
+    for task in tasks:
+        tasks_by_goal_response.append(task.to_dict())
+
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_by_goal_response
+    }, 200
