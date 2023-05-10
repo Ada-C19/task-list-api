@@ -61,10 +61,6 @@ def get_all_tasks():
             "is_complete": False
 
         })
-    if len(tasks_response) == 0:
-        return jsonify(tasks_response), 200
-    else:
-        return jsonify(tasks_response), 200
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 
