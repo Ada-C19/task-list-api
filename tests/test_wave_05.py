@@ -81,20 +81,23 @@ def test_create_goal(client):
 
 #@pytest.mark.skip(reason="test to be completed by student")
 def test_replace_goal(client, one_goal):
-    response = client.put('/goals/<goal_id>')
+    response = client.put('/goals/1', json={'title': 'Build a habit of going outside daily'})
     response_body = response.get_json()
     
     assert response.status_code == 200
-    assert response_body == {'id': 1, 'title': 'Build a habit of going outside daily'}
-    assert Goal.query.get.all() == 1
+    assert 'goal' in response_body
+    assert response_body == {
+            'goal': 
+                    {'id': 1, 'title': 'Build a habit of going outside daily'
+                    }
+            }
     replaced_goal = Goal.query.get(1)
-    assert replaced_goal
     assert replaced_goal.title == 'Build a habit of going outside daily'
 
 
 #@pytest.mark.skip(reason="test to be completed by student")
 def test_replace_goal_not_found(client):
-    response = client.put('/goals/<goal_id>')
+    response = client.put('/goals/1')
     response_body = response.get_json()
     
     assert response.status_code == 404
@@ -118,6 +121,7 @@ def test_delete_goal(client, one_goal):
     
     assert response.status_code == 404
     assert response_body == {'Not found': 'No Goal with id#1 is found'}
+    assert Goal.query.all() == []
 
 
 #@pytest.mark.skip(reason="test to be completed by student")
