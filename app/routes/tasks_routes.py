@@ -31,11 +31,6 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    # Check whether task "is_complete"
-    # is_complete = False
-    # if new_task.to_dict()["completed_at"]:
-    #     is_complete = True
-
     return {
         "task": new_task.to_dict()
     }, 201
@@ -55,10 +50,6 @@ def handle_get_tasks_request():
     
     task_response = []
     for task in tasks:
-        # is_complete = False
-        # if task.to_dict()["completed_at"]:
-        #     is_complete = True
-
         task_response.append(task.to_dict())
 
     return jsonify(task_response), 200
@@ -67,11 +58,6 @@ def handle_get_tasks_request():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_get_single_task(task_id):
     task = get_valid_item_by_id(Task, task_id)
-    # task_dict = task.to_dict()
-
-    # is_complete = False
-    # if task_dict["completed_at"]:
-    #     is_complete = True
 
     return {
         "task": task.to_dict()
@@ -91,10 +77,6 @@ def update_one_task(task_id):
     task_to_update.description = request_body["description"]
 
     db.session.commit()
-
-    # is_complete = False
-    # if task_to_update.to_dict()["completed_at"]:
-    #     is_complete = True
     
     return {
         "task": task_to_update.to_dict()
