@@ -163,3 +163,5 @@ def delete_one_goal(goal_id):
     db.session.commit()
 
     return {"details": f"Goal {goal_id} \"{goal_to_delete.title}\" successfully deleted"}, 200
+
+# NESTED ROUTES
