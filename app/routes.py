@@ -26,6 +26,12 @@ def validate_model(task_id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+    
+    if "title" not in request_body or "description" not in request_body:
+        return {"details": "Invalid data"}, 400
+    # elif "completed_at" not in request_body:
+    #     return {"details": "Invalid data"}, 400
+    
     new_task = Task(title=request_body["title"],
                     description=request_body["description"], 
                     completed_at=request_body["completed_at"])
