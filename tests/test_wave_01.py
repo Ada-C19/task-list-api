@@ -60,11 +60,14 @@ def test_get_task_not_found(client):
     # Assert
     assert response.status_code == 404
 
-    raise Exception("Complete test with assertion about response body")
+    # raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
-
+    assert "details" in response_body
+    assert response_body == {
+        "details": f"Task 1 not found"
+    }
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task(client):
