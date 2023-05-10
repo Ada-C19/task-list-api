@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 class Task(db.Model):
     task_id = db.Column(db.Integer,primary_key=True,autoincrement = True) #autoincrement for the generated number
@@ -27,3 +28,9 @@ class Task(db.Model):
             description=response_body.get("description"),
             # completed_at = response_body.get("completed_at",None)
         )
+    
+    def patch_complete(self,request_body):
+        self.completed_at = datetime.utcnow()
+    
+    def patch_incomplete(self,request_body):
+        self.completed_at = None

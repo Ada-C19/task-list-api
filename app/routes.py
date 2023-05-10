@@ -70,3 +70,17 @@ def delete_task(id):
     message = {'details': f'Task {id} "{task_to_delete.title}" successfully deleted'}
 
     return make_response(message,200)
+  
+
+#PATCH mark as incomplete on in/complete [PATCH]/tasks/<id>/mark_incomplete :(UPDATE)
+@tasks_bp.route("/<id>/mark_incomplete",methods=["PATCH"])
+def mark_incomplete(id):
+    task = Task.query.get(id)
+    if task is None:
+        return jsonify({'error':'Task not found'}),404
+    task_incomplete = validate_task(id)
+    request_body = request.get_json()
+    task_incomplete.patch_incomplete(request_body)
+    db.session.commit()
+
+    return jsonify({"task":task_incomplete.to_dict()}),200
