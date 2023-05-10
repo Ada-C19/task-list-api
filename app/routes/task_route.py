@@ -25,6 +25,7 @@ def validate_model(cls, model_id):
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
     sort_query = request.args.get("sort")
+
     if sort_query == "asc":
         tasks = Task.query.order_by(Task.title.asc())
     elif sort_query == "desc":
@@ -35,6 +36,7 @@ def read_all_tasks():
     task_response = []
     for task in tasks:
         task_response.append(task.to_dict())
+
     return jsonify(task_response), 200
 
 # route to create a new task
@@ -58,6 +60,7 @@ def create_task():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
+
     return jsonify({"task": task.to_dict()}), 200
 
 # route to update a task by id
@@ -65,6 +68,7 @@ def read_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_model(Task, task_id)
+
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
@@ -94,14 +98,7 @@ def mark_complete_on_incomplete_task(task_id):
 
     db.session.commit()
 
-    return {
-        "task": {
-            "id": task.id,
-            "title": f"{task.title}",
-            "description": f"{task.description}",
-            "is_complete": True
-        }
-    }, 200
+    return {"task": task.to_dict()}, 200
 
 # route to mark Incomplete on a Completed Task
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
