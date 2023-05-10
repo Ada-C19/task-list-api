@@ -11,16 +11,16 @@ import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 SLACK_POST_ENDPOINT = "https://slack.com/api/chat.postMessage"
-# SLACK_API = os.environ.get("SLACK_API")
+SLACK_API = os.environ.get("SLACK_API")
 
 
-# POST
+# POST /tasks
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-    book_data = request.get_json()
+    response = request.get_json()
 
     try:
-        new_task = Task.from_dict(book_data)
+        new_task = Task.from_dict(response)
         db.session.add(new_task)
         db.session.commit()
 
@@ -32,7 +32,7 @@ def create_task():
         abort(make_response(jsonify(message), 400))
 
 
-# GET
+# GET /tasks
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     sort_query = request.args.get("sort")
@@ -48,6 +48,7 @@ def get_all_tasks():
     return make_response(jsonify(tasks_response), 200)
 
 
+# GET /tasks/<task_id>
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -56,21 +57,25 @@ def get_one_task(task_id):
     return (jsonify(response), 200)
 
 
-# PUT
+# PUT /tasks/<task_id>
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task_to_update = validate_model(Task, task_id)
     response = request.get_json()
+    try:
+        task_to_update = validate_model(Task, task_id)
+        task_to_update.title = response["title"]
+        task_to_update.description = response["description"]
+        db.session.commit()
 
-    task_to_update.title = response["title"]
-    task_to_update.description = response["description"]
-    db.session.commit()
+        message = {"task": task_to_update.to_dict()}
+        return make_response(jsonify(message), 200)
 
-    message = {"task": task_to_update.to_dict()}
-    return make_response(jsonify(message), 200)
+    except KeyError:
+        message = {"details": "Invalid data"}
+        abort(make_response(jsonify(message), 400))
 
 
-# DELETE
+# DELETE /tasks/<task_id>
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task_to_delete = validate_model(Task, task_id)
@@ -78,11 +83,11 @@ def delete_task(task_id):
     db.session.commit()
 
     message = {
-        "details": f'Task {task_id} "{task_to_delete.title}" successfully deleted'}
+        "details": f'Task {task_to_delete.task_id} "{task_to_delete.title}" successfully deleted'}
     return (jsonify(message), 200)
 
 
-# PATCH
+# PATCH /tasks/<task_id>/mark_complete
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
@@ -92,8 +97,7 @@ def mark_complete(task_id):
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {os.environ.get('SLACK_API')}"
-        ############ not working!!!!!!!#########################
+        "Authorization": f"Bearer {SLACK_API}"
     }
 
     slack_post_data = json.dumps({
@@ -101,14 +105,14 @@ def mark_complete(task_id):
         "channel": "C05769EL4RF",
     })
 
-    slack_response = requests.post(
+    requests.post(
         url=SLACK_POST_ENDPOINT, headers=headers, data=slack_post_data)
 
-    print(slack_response.text)
     message = {"task": task.to_dict()}
     return make_response(jsonify(message), 200)
 
 
+# PATCH /tasks/<task_id>/mark_incomplete
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)

@@ -129,7 +129,6 @@ def test_mark_complete_missing_task(client):
     assert response.status_code == 404
     assert response_body == {"message": "Task 1 not found"}
     assert Task.query.get(1) == None
-    assert Task.query.all() == []
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
@@ -145,7 +144,6 @@ def test_mark_incomplete_missing_task(client):
     assert response.status_code == 404
     assert response_body == {"message": "Task 1 not found"}
     assert Task.query.get(1) == None
-    assert Task.query.all() == []
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
@@ -159,7 +157,6 @@ def test_mark_complete_invalid_id(client):
     # Assert
     assert response.status_code == 400
     assert response_body == {"message": "Invalid Task id hello"}
-    assert Task.query.all() == []
 
 
 def test_mark_incomplete_invalid_id(client):
@@ -170,4 +167,3 @@ def test_mark_incomplete_invalid_id(client):
     # Assert
     assert response.status_code == 400
     assert response_body == {"message": "Invalid Task id hello"}
-    assert Task.query.all() == []

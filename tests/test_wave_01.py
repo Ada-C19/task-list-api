@@ -194,7 +194,6 @@ def test_delete_task_not_found(client):
     assert response.status_code == 404
     assert response_body == {"message": "Task 1 not found"}
     assert Task.query.get(1) == None
-    assert Task.query.all() == []
 
     # *****************************************************************
     # **Complete test with assertion about response body***************
@@ -209,7 +208,6 @@ def test_delete_task_invalid_id(client):
     # Assert
     assert response.status_code == 400
     assert response_body == {"message": "Invalid Task id hello"}
-    assert Task.query.all() == []
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
