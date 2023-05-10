@@ -138,7 +138,7 @@ def update_task(goal_id):
 
     db.session.commit()
 
-    return make_response(jsonify({"goal": goal.to_dict()}), 200)
+    return make_response(jsonify({"goal": goal.to_dict()}))
 
 #Delete a goal
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
@@ -149,3 +149,32 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response(jsonify({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"}))
+
+#Get tasks for a goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_from_goal(goal_id):
+    goal = Goal.validate_model(goal_id)
+    tasks = [task.to_dict() for task in goal.tasks]
+
+    goal_response = goal.to_dict()
+    goal_response["tasks"] = tasks
+
+    return make_response(jsonify(goal_response))
+
+#Add list of task IDs to a goal
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    request_body = request.get_json()
+    task_ids = request_body.get("task_ids")
+
+    goal = Goal.validate_model(goal_id)
+    #Validate task IDs
+    for id in task_ids:
+        task = Task.validate_model(id)
+
+        if task not in goal.tasks:
+            goal.tasks.append(task)
+
+        db.session.commit()
+    
+    return make_response(jsonify({"id": int(goal_id), "task_ids": task_ids}))
