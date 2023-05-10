@@ -189,3 +189,4 @@ def delete_goal(goal_id):
 
     return make_response({"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'})
 
+
