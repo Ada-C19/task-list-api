@@ -13,7 +13,13 @@ def create_tasks():
         db.session.add(new_task)
         db.session.commit()
 
-        message = f"Task {new_task.task_title} successfully created"
+        message = {
+        "task": {
+        "id": new_task.task_id,
+        "title": new_task.task_title,
+        "description": new_task.description,
+        "is_complete": new_task.is_complete
+    }}
         return make_response(jsonify(message), 201)
 
     except KeyError as e:

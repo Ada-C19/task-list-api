@@ -20,9 +20,10 @@ class Task(db.Model):
     def create_new_task(cls, request_data):
         if "title" not in request_data or "description" not in request_data:
             raise ValueError("Invalid Request. Missing required fields: title or description")
-        
+        is_complete = False if request_data["completed_at"] is None else True
         return cls(
             task_title=request_data["title"].title(),
             description=request_data["description"],
             completed_at=request_data.get("completed_at"),
+            is_complete = is_complete
             )
