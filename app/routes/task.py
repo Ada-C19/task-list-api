@@ -19,20 +19,6 @@ def create_one_task():
 
     return make_response({"task": new_task.to_dict()}, 201)
 
-
-
-
-# @task_bp.route("", methods=["GET"])
-# def get_tasks():
-#     response = []
-#     title_query = request.args.get("title")
-#     if title_query is None:
-#         all_tasks = Task.query.all()
-#     else:
-#         all_tasks = Task.query.filter_by(title = title_query)
-#     for task in all_tasks:
-#         response.append(task.to_dict())   
-#     return jsonify(response), 200
 @task_bp.route("", methods=["GET"])
 def get_tasks():
     sort_direction = request.args.get("sort", default="desc")
@@ -84,6 +70,7 @@ def mark_complete(task_id, complete_status):
     task = validate_item(Task, task_id)
     if complete_status == "mark_complete":
         task.completed_at = datetime.now()
+        msg_dict = json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"}
         requests.post("https://slack.com/api/chat.postMessage", 
                       json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"})
     elif complete_status == "mark_incomplete":
