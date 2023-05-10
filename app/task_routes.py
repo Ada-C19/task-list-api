@@ -22,7 +22,7 @@ def validate_task(task_id):
 def create_task():
     request_body = request.get_json()
     
-    if "description" not in request_body:
+    if "description" not in request_body or "title" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
     
     new_task = Task(title=request_body["title"],
