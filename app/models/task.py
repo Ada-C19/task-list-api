@@ -1,12 +1,11 @@
 from app import db
-# from sqlalchemy import Column, Integer, DateTime
-# from sqlalchemy.sql import func
+from datetime import datetime
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    completed_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, default=None, nullable = True)
     
 
     def to_dict(self):
@@ -17,6 +16,19 @@ class Task(db.Model):
         task_as_dict["completed_at"] = self.completed_at
 
         return task_as_dict
+    
+    def to_json(self):
+        if self.completed_at:
+            is_complete = True
+        else:
+            is_complete = False
+
+        return{
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": is_complete
+        }
 
     @classmethod
     def from_dict(cls, task_data):
@@ -24,3 +36,10 @@ class Task(db.Model):
                         description=task_data["description"]
                         )
         return new_task
+    
+    def mark_complete(self, request_body):
+        self.completed_at = datetime.utcnow()
+
+    def mark_incomplete(self, request_body):
+        self.completed_at = None
+    
