@@ -3,7 +3,7 @@ from app import db
 
 class Goal(db.Model):
     __tablename__ = 'goals'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String, nullable=False)
     
     def to_dict(self):
