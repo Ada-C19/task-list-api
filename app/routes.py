@@ -43,15 +43,11 @@ def create_task():
     response_body = {
         "task": new_task.task_to_dict()
     }
-    return response_body
+    return response_body, 201
 
 @task_list_bp.route("", methods=["GET"])
 def get_all_tasks():
-    title_query = request.args.get("title")
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    else:
-        tasks = Task.query.all()
+    tasks = Task.query.all()
     
     tasks_response = []
     for task in tasks:
