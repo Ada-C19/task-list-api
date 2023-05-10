@@ -36,16 +36,6 @@ def create_task():
 def get_tasks():
     title_query = request.args.get('title')
     sort_query = request.args.get('sort')
-
-    # if sort_query == 'asc':
-    #     tasks = Task.query.order_by(Task.title.asc())
-    # elif sort_query == 'desc':
-    #     tasks = Task.query.order_by(Task.title.desc())
-
-    # if title_query:
-    #     tasks = Task.query.filter(Task.title.ilike(title_query.strip()+'%'))
-    # else:
-    #     tasks = Task.query.all()
     
     if title_query:
         tasks = Task.query.filter(Task.title.ilike(title_query.strip()+'%'))
