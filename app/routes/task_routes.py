@@ -37,12 +37,9 @@ def read_tasks():
         tasks = Task.query.order_by(Task.title).all()
     elif sort_query.lower() == "desc":
         tasks = Task.query.order_by(Task.title.desc()).all()
-    
-    tasks_response = []
 
     try:
-        for task in tasks:
-            tasks_response.append(task.to_dict())
+        tasks_response = [task.to_dict() for task in tasks]
     except:
         abort(make_response({"message": f"{sort_query} query invalid"}, 400))
 
