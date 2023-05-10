@@ -2,20 +2,27 @@ from app import db
 
 
 class Task(db.Model):
-    task_id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, primary_key=True, autoincrement=True )
     title = db.Column(db.String)
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True, default=None)
 
 
 
+    def to_dict(self):
+        is_complete=True if self.completed_at else False 
+        """
+        if self.completed_at:
+            is_complete = True
+        else:
+            is_complete = False
+        """
+        return{
+            "id":self.task_id,
+            "title":self.title,
+            "description":self.description,
+            "is_complete":is_complete
+        }
 
-# Tasks should contain these attributes. Feel free to change the name of 
-# the task_id column if you would like. The tests require the remaining columns 
-# to be named exactly as title, description, and completed_at.
 
-# task_id: a primary key for each task
-# title: text to name the task
-# description: text to describe the task
-# completed_at: a datetime that has the date that a task is completed on. 
-# Can be nullable, and contain a null value. A task with a null value for completed_at has not been completed. When we create a new task, completed_at should be null AKA None in Python.
+
