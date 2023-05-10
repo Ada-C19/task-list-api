@@ -1,41 +1,19 @@
 from app import db
 from app.models.task import Task
-from flask import Blueprint, jsonify, abort, make_response, request
+from flask import Blueprint, jsonify, make_response, request, abort
 import datetime
 from sqlalchemy.orm.exc import NoResultFound
 import os
 import requests
+from app.helper_functions import validate_model, create_model
 
 
 task_bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
 
-
-def validate_model(cls, model_id):
-    try:
-        model_id = int(model_id)
-    except:
-        abort(make_response({"details": "Invalid data"}, 400))
-
-    model = cls.query.get(model_id)
-
-    if not model:
-        abort(make_response(
-            {"message": f"{cls.__name__} {model_id} not found"}, 404))
-
-    return model
-
-
 @task_bp.route("", methods=["POST"])
 def creat_task():
     request_body = request.get_json()
-
-    if "title" not in request_body or "description" not in request_body:
-        abort(make_response({"details": "Invalid data"}, 400))
-
-    new_task = Task.from_dict(request_body)
-
-    db.session.add(new_task)
-    db.session.commit()
+    new_task =  create_model(request_body, Task)
 
     return make_response(jsonify({
         "task": {
@@ -76,6 +54,9 @@ def update_task(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
 
+    if "title" not in request_body or "description" not in request_body or request_body["description"] is None:
+        abort(make_response(jsonify({"details": "Invalid data"}), 400))
+
     task.title = request_body["title"],
     task.description = request_body["description"],
     task.is_complete = False
@@ -106,10 +87,7 @@ def mark_complete(task_id):
     slack_channel = "#tasks-notifications"
     slack_token = os.environ.get("SLACK_TOLKEN")
 
-    try:
-        task = validate_model(Task, task_id)
-    except NoResultFound:
-        return make_response(jsonify({"error": "Task not found"}), 404)
+    task = validate_model(Task, task_id)
     
     if task.completed_at is None:
         task.completed_at = datetime.datetime.now()
@@ -132,14 +110,10 @@ def mark_complete(task_id):
     }), 200)
 
 
-
 @task_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
-    try:
-        task = validate_model(Task, task_id)
-    except NoResultFound:
-        return make_response(jsonify({"error": "Task not found"}), 404)
-    
+    task = validate_model(Task, task_id)
+
     if task.completed_at is not None:
         task.completed_at = None
         db.session.commit()
