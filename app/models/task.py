@@ -14,3 +14,11 @@ class Task(db.Model):
             "description": self.description,
             "completed_at": self.completed_at
         }
+    
+    @classmethod
+    def from_dict(cls, task_data):
+        return Task(
+            title=task_data["title"],
+            description=task_data["description"],
+            completed_at=task_data["completed_at"]
+        )
