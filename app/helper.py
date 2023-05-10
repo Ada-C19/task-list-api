@@ -10,6 +10,6 @@ def validate_task(id):
     task = Task.query.get(id)
 
     if not task:
-        abort(make_response({"message": f"Task {id} not found."},404))
+        abort(make_response({"message": f"Task not found."},404))
     
     return task
