@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 
 class Task(db.Model):
@@ -13,7 +14,7 @@ class Task(db.Model):
         else:
             is_complete = False
         return {
-            "task_id": self.task_id,
+            "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": is_complete
@@ -26,9 +27,16 @@ class Task(db.Model):
             is_complete = False
         return {
             "task": {
-            "task_id": self.task_id,
+            "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": is_complete
             }
         }
+    
+    def mark_complete(self, is_complete):
+        if is_complete:
+            self.completed_at = datetime.utcnow()
+        else:
+            self.completed_at = None
+        db.session.commit()
