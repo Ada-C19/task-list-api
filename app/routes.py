@@ -43,7 +43,7 @@ def read_all_tasks():
 def read_one_task(task_id):
     task = validate_model(task_id)
 
-    return task.to_dict(), 200
+    return make_response({"task": task.to_dict()}, 200)
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
