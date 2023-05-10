@@ -9,16 +9,10 @@ tasks_bp = Blueprint("tasks",__name__, url_prefix="/tasks")
 #GET ALL tasks [GET]/tasks :(CREATE)
 @tasks_bp.route("",methods=["GET"])
 def get_all_tasks():
-    title_query = request.args.get("title")
-    description_query = request.args.get("description")
-    completed_query = request.args.get("is_completed")
-    
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    elif description_query:
-        tasks = Task.query.filter_by(description=description_query)
-    elif completed_query: 
-        tasks = Task.query.filter_by(is_completed = completed_query)
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
 
@@ -85,23 +79,6 @@ def delete_task(id):
 
 
 
-
-#CREATE task must contain title/description - POST /tasks/<id> - (CREATE)
-# @tasks_bp.route("",methods=["POST"])
-# def create_task_must_contain_title():
-#     request_body = request.get_json()
-#     if not request_body or "title" not in request_body:
-#         return make_response({"details": "Invalid data, request must contain title."}, 400)    
-#     elif "description" not in request_body:
-#         return make_response({"details":"Invalid data, ruest must contain description"},400)
-        
-#     new_task = Task.create_dict(request_body)
-
-#     db.session.add(new_task)
-#     db.session.commit()
-
-#     return make_response({"task":new_task.to_dict()}), 201
-    
 
 
 
