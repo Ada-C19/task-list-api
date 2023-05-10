@@ -70,14 +70,25 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=['GET'])
 def read_task_by_id(task_id):
     task = validate_model(Task, task_id)
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description, 
-            "is_complete": True if task.completed_at else False
-        }
-    }, 200
+    if not task.goal_id:
+        return {
+            "task": {
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description, 
+                "is_complete": True if task.completed_at else False
+            }
+        }, 200
+    else:
+        return {
+            "task": {
+                "id": task.task_id,
+                "goal_id": task.goal_id,
+                "title": task.title,
+                "description": task.description, 
+                "is_complete": True if task.completed_at else False
+            }
+        }, 200
 
 @tasks_bp.route("/<task_id>", methods=['PUT'])
 def update_task(task_id):
@@ -130,9 +141,6 @@ def mark_complete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
 def mark_incomplete_task(task_id):
     task = validate_model(Task, task_id)
-
-    # if task.completed_at:
-    #     return make_response({"details":f"Task with id {task_id} is already completed"})
 
     task.completed_at = None
 

@@ -94,5 +94,25 @@ def add_tasks_to_goal_by_id(goal_id):
         "id": goal.goal_id,
         "task_ids": request_body["task_ids"]
     }
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_task_by_id(goal_id):
+    goal = validate_model(Goal, goal_id)
+    tasks_response = ({
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": []
+        })
+    for task in goal.tasks:
+        tasks_response["tasks"].append({
+            "id": task.task_id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True if task.completed_at else False
+            })
+    
+    return jsonify(tasks_response)
+    
     
 
