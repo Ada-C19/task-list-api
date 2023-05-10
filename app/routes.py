@@ -6,7 +6,6 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import desc, asc
 from datetime import datetime
 import requests
-import pytz
 import os
 from dotenv import load_dotenv
 
