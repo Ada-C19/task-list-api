@@ -125,16 +125,13 @@ def test_delete_goal(client, one_goal):
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
 
-    # Act
-    # ---- Complete Act Here ----
+
     response = client.delete("/goals/1")
     response_body = response.get_json()
 
-    # Assert
-    # ---- Complete Assertions Here ----
     assert response.status_code == 404
     assert response_body == {"msg": "invalid endpoint"}
-    # ---- Complete Assertions Here ----
+
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
