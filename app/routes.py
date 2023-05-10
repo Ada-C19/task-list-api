@@ -19,7 +19,7 @@ def get_valid_item_by_id(model, id):
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    # new_task = Task.from_dict(request_body)
+    
 
     try:
         new_task = Task.from_dict(request_body)
@@ -80,3 +80,22 @@ def delete_one_task(task_id):
     db.session.commit()
 
     return {"details": f"Task {task_id} \"{task_to_delete.title}\" successfully deleted"}, 200
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = get_valid_item_by_id(Task, task_id)
+    if task.completed_at is not None:
+        return {"task": task.to_dict()}, 200
+    task.completed_at = datetime.datetime.utcnow()
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = get_valid_item_by_id(Task, task_id)
+    if task.completed_at is None:
+        return {"task": task.to_dict()}, 200
+    task.completed_at = None
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
+
