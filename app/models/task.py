@@ -18,15 +18,11 @@ class Task(db.Model):
             id = self.task_id,
             title = self.title,
             description = self.description,
-            is_complete = self.is_it_done()
+            is_complete = bool(self.completed_at)
         )
 
-    def is_it_done(self):
-        if self.completed_at == None:
-            self.completed_at = False
-        else:
-            self.completed_at = True 
-        return self.completed_at
+    
+    
     
 
 

@@ -1,6 +1,7 @@
 from app import db
 from .models.task import Task
 from sqlalchemy import asc, desc
+from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -26,7 +27,7 @@ def create_task():
 def get_all_tasks():
 
     order_param = request.args.get("sort")
- 
+
     
     if order_param == "asc" :
         tasks = Task.query.order_by(Task.title.asc())
@@ -78,13 +79,36 @@ def delete_task(task_id):
 
     return make_response(jsonify(response), 200)
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    
+    task.completed_at = None 
+    db.session.commit()
+    
+    response = {"task": task.to_dict()}
+
+    return make_response(jsonify(response), 200)
+    
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_model(Task, task_id)
+    
+    task.completed_at = datetime.utcnow()
+    
+    db.session.commit()
+    
+    response = {"task": task.to_dict()}
+
+    return make_response(jsonify(response), 200)
+      
 
 
 
 
 
-
-
+# datetime.utcnow()
 
 # HELPER FUNCTION
 def validate_model(cls, id):
