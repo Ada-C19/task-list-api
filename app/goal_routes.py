@@ -3,11 +3,8 @@ from sqlalchemy import asc, desc
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
-from datetime import datetime
-from slack_sdk import WebClient
-import os
-import requests
-from slack_sdk.errors import SlackApiError
+
+
 
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
