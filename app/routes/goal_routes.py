@@ -33,8 +33,19 @@ def get_goals():
 
 @goal_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
-    response_list = []
     goal = verify_item(Goal, goal_id)
+
+    response_dict = message_for_only_one_goal(goal)
+
+    return jsonify(response_dict), 200
+
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_one_goal(goal_id):
+    goal = verify_item(Goal, goal_id)
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+    db.session.commit()
 
     response_dict = message_for_only_one_goal(goal)
 
