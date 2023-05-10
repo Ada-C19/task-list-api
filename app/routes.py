@@ -73,6 +73,9 @@ def get_tasks():
 def get_one_task(task_id):
     task = validate_item(Task, task_id)
 
+    if task.goal_id:
+        return {"task":task.to_dict_with_goal()}, 200
+
     return {"task":task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -179,3 +182,31 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {'details': f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}, 200
+
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_task_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    # getting the list of task ids from the request body
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = validate_item(Task, task_id)
+        task.goal_id = goal_id
+        db.session.add(task)
+
+    # iterate through the list of task ids to associate each task with one goal
+    # only have the task id, so I need to grab the task instance
+    # then associate the task id with a goal id
+
+    
+    db.session.commit()
+
+    return {"id": goal.goal_id, "task_ids": request_body["task_ids"]}, 200
+
+@goal_bp.route("<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_of_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    return goal.to_dict_with_task(), 200
