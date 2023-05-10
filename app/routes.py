@@ -1,21 +1,27 @@
 from flask import Blueprint, jsonify, abort, request,make_response
 from app.models.task import Task
 from app import db
-from app.helpers import validate_model
+from app.helpers import validate_model, sort_title_asc, sort_title_desc
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
+
     tasks = Task.query.all()
-
     response_body = []
-
     for task in tasks:
         response_body.append(task.to_dict())
+
+    sort_query = request.args.get("sort")
     
-    return jsonify(response_body)
+    if sort_query and sort_query == "asc":
+        return jsonify(sort_title_asc(response_body))
+    elif sort_query and sort_query == "desc":
+        return jsonify(sort_title_desc(response_body))
+    else:
+        return jsonify(response_body)
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
@@ -65,6 +71,9 @@ def delete_task(task_id):
     return make_response({"details": message}, 200)
 
 
+# @tasks_bp.route("/<task_id>/<mark_complete>", methods=["PATCH"])
+# def update_task(task_id):
+#     
 
 
 

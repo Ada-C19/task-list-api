@@ -21,7 +21,7 @@ class Task(db.Model):
             task_dict["is_complete"] = False
             task_dict.pop("completed_at")
             return task_dict
-        
+    
     
     @classmethod
     def from_dict(cls, task_data):

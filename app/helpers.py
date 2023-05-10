@@ -14,3 +14,12 @@ def validate_model(cls, model_id):
         abort(make_response({"Message": message}, 404))
 
     return model
+
+
+def sort_title_asc(response_body):
+    response_body = sorted(response_body, key=lambda task:task["title"])
+    return response_body
+
+def sort_title_desc(response_body):
+    response_body = sorted(response_body, reverse=True, key=lambda task:task["title"])
+    return response_body
