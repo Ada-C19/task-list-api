@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+import datetime
 from app.models.task import Task
 from app import db
 
@@ -31,17 +32,12 @@ def create_task():
     db.session.commit()
 
     # Check whether task "is_complete"
-    is_complete = False
-    if new_task.to_dict()["completed_at"]:
-        is_complete = True
+    # is_complete = False
+    # if new_task.to_dict()["completed_at"]:
+    #     is_complete = True
 
     return {
-        "task": {
-            "id": new_task.id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": is_complete
-        }
+        "task": new_task.to_dict()
     }, 201
 
 
@@ -59,16 +55,11 @@ def handle_get_tasks_request():
     
     task_response = []
     for task in tasks:
-        is_complete = False
-        if task.to_dict()["completed_at"]:
-            is_complete = True
+        # is_complete = False
+        # if task.to_dict()["completed_at"]:
+        #     is_complete = True
 
-        task_response.append({
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete
-        })
+        task_response.append(task.to_dict())
 
     return jsonify(task_response), 200
 
@@ -76,19 +67,14 @@ def handle_get_tasks_request():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_get_single_task(task_id):
     task = get_valid_item_by_id(Task, task_id)
-    task_dict = task.to_dict()
+    # task_dict = task.to_dict()
 
-    is_complete = False
-    if task_dict["completed_at"]:
-        is_complete = True
+    # is_complete = False
+    # if task_dict["completed_at"]:
+    #     is_complete = True
 
     return {
-        "task": {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": is_complete
-        }
+        "task": task.to_dict()
     }, 200
 
 
@@ -106,17 +92,12 @@ def update_one_task(task_id):
 
     db.session.commit()
 
-    is_complete = False
-    if task_to_update.to_dict()["completed_at"]:
-        is_complete = True
+    # is_complete = False
+    # if task_to_update.to_dict()["completed_at"]:
+    #     is_complete = True
     
     return {
-        "task": {
-            "id": task_to_update.id,
-            "title": task_to_update.title,
-            "description": task_to_update.description,
-            "is_complete": is_complete
-        }
+        "task": task_to_update.to_dict()
     }, 200
 
 
@@ -128,3 +109,25 @@ def delete_one_task(task_id):
     db.session.commit()
 
     return {'details': f'Task {task_to_delete.id} "{task_to_delete.title}" successfully deleted'}, 200
+
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_as_completed(task_id):
+    updated_task=get_valid_item_by_id(Task, task_id)
+    updated_task.completed_at = datetime.datetime.utcnow()
+    db.session.commit()
+
+    return {
+        "task": updated_task.to_dict()
+    }
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_as_incomplete(task_id):
+    updated_task=get_valid_item_by_id(Task, task_id)
+    updated_task.completed_at = None
+    db.session.commit()
+
+    return {
+        "task": updated_task.to_dict()
+    }
