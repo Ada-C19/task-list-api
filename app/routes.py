@@ -35,24 +35,25 @@ def create_task():
     return {"task":new_task.to_dict()}, 201
 
 @task_bp.route("", methods=["GET"])
-def get__all_tasks():
-    title_query = request.args.get("title")
-    if title_query == "asc":
-        tasks = Task.query.order_by(Task.title.asc)
-    
+def get_all_tasks():
+    title_query = request.args.get("sort")
+    if title_query:
+        if title_query == "asc":
+            tasks = Task.query.order_by(Task.title.asc())
+        elif title_query == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
 
-    task_response = []
-    for task in tasks:
-        task_response.append(task.to_dict())
-    return jsonify(task_response)
+    task_response = [Task.to_dict(task) for task in tasks]
+
+    return jsonify(task_response), 200
 
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_task(task_id)
-    return {"task": task.to_dict()}
+    return make_response({"task": task.to_dict()}, 200)
     
 
 #UPDATE TASK
