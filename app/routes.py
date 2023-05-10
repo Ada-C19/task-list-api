@@ -1,6 +1,7 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
+import datetime 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -39,10 +40,14 @@ def create_new_task():
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
     
-    title_query = request.args.get("title")
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
+    sort_param = request.args.get("sort")
 
+    if sort_param == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+        
+    elif sort_param == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    
     else:
         tasks = Task.query.all()
 
@@ -73,6 +78,26 @@ def update_one_task(task_id):
 
     db.session.commit()
 
+    return make_response({"task": task.to_dict()}), 200
+
+
+# UPDATES ALL FIELDS OF TASK
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def update_mark_complete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = datetime.datetime.now()
+
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()}), 200
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def update_mark_incomplete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = None
+    db.session.commit()
     return make_response({"task": task.to_dict()}), 200
 
 # DELETES ONE TASK
