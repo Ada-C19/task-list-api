@@ -20,3 +20,30 @@ def get_all_tasks():
 def get_task(id):
     task = validate_id(id)
     return jsonify({"task":task.to_dict()}), 200
+
+
+#create task-"/tasks"-POST(create)
+@tasks_bp.route("", methods=["POST"])
+def create_task():
+    request_body = request.get_json()
+    try:
+        new_task = Task.create(request_body)
+    except KeyError:
+        return make_response({"details": "Invalid data"}), 400
+    
+    db.session.add(new_task)
+    db.session.commit()
+    return jsonify({"task":new_task.to_dict()}), 201
+
+
+#update task-"tasks/1"-PUT(update)
+@tasks_bp.route("/<id>", methods=["PUT"])
+def update_task(id):
+    task = validate_id(id)
+    request_body = request.get_json()
+    task.update(request_body)
+    db.session.commit()
+    return jsonify({"task":task.to_dict()}), 200
+
+
+
