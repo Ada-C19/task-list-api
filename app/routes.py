@@ -72,6 +72,16 @@ def delete_task(id):
 
     return make_response(message,200)
 
+#PATCH mark as complete [PATCH]/tasks/<id>/mark_complete (UPDATE)
+@tasks_bp.route("/<id>/mark_complete",methods=["PATCH"])
+def mark_completed(id):
+    task_to_complete = validate_task(id)
+    request_body = request.get_json()
+    task_to_complete.patch_complete(request_body)
+    db.session.commit()
+
+    return jsonify({"task":task_to_complete.to_dict()}),200
+
 
 
 
