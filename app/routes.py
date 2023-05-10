@@ -40,7 +40,10 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(jsonify(f"Task {new_task.title} successfully created"), 201)
+    response_body = {
+        "task": new_task.task_to_dict()
+    }
+    return response_body
 
 @task_list_bp.route("", methods=["GET"])
 def get_all_tasks():
