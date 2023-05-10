@@ -179,7 +179,7 @@ def post_tasks_under_goal(goal_id):
         return {"id": goal.goal_id, "task_ids": new_tasks_for_goal}, 200
     except:
         return abort(make_response({"details": "Invalid data"}, 400))
-# #RETURN TO THIS ROUTE LATER
+
 
 @goal_bp.route("/<goal_id>/tasks", methods = ["GET"])
 def get_tasks_of_one_goal(goal_id):
