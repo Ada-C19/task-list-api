@@ -54,3 +54,24 @@ def get_all_tasks():
 
     return jsonify(tasks_list), 200
 
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_task(task_id)
+    response_body = dict(task = task.to_dict())
+
+    return jsonify(response_body), 200
+
+@tasks_bp.route("/<task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = validate_task(task_id)
+    request_body = request.get_json()
+
+    task.title = request_body["title"]
+    task.description =request_body["description"]
+    #task.completed_at = request_body[ "completed_at"]
+
+    db.session.commit()
+
+    response_body = dict(task = task.to_dict())
+
+    return jsonify(response_body), 200
