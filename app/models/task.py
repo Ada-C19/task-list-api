@@ -6,13 +6,22 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, default=None)
-    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'))
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
     goal = db.relationship("Goal", back_populates="tasks")
 
-    def to_dict(self): 
+    def to_dict(self):
+        if not self.goal_id: 
+            return {
+                "id":self.id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": self.completed_at is not None
+            }
+        
         return {
-            "id":self.id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": self.completed_at is not None 
-        }
+                "id":self.id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": self.completed_at is not None,
+                "goal_id" : self.goal_id
+            }
