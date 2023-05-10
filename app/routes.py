@@ -35,19 +35,24 @@ def create_task():
 @tasks_bp.route('', methods=['GET'])
 def get_tasks():
     title_query = request.args.get('title')
-    sort_query = request.args.get('sort')#sort=title/sort=-title
-    
-    # Task.query.order_by(Task.count.desc()).all()
-    # Task.query.order_by(Task.count.asc()).all()
-    if sort_query:
-        if sort_query == 'asc':
-            tasks = Task.query.order_by(Task.title.asc())
-        elif sort_query == 'desc':
-            tasks = Task.query.order_by(Task.title.desc())
-            # tasks = Task.query.order_by(Task.title.desc()).all()
+    sort_query = request.args.get('sort')
 
+    # if sort_query == 'asc':
+    #     tasks = Task.query.order_by(Task.title.asc())
+    # elif sort_query == 'desc':
+    #     tasks = Task.query.order_by(Task.title.desc())
+
+    # if title_query:
+    #     tasks = Task.query.filter(Task.title.ilike(title_query.strip()+'%'))
+    # else:
+    #     tasks = Task.query.all()
+    
     if title_query:
-        tasks = Task.guery.filter(Task.title.ilike(title_query.strip()+'%'))
+        tasks = Task.query.filter(Task.title.ilike(title_query.strip()+'%'))
+    elif sort_query == 'asc':
+        tasks = Task.query.order_by(Task.title.asc())
+    elif sort_query == 'desc':
+        tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
     
