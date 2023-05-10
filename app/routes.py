@@ -92,4 +92,16 @@ def update_task(task_id):
         }
     }, 200
     
+# DELETE TASK- DELETE request to /tasks/<task_id>
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_book(task_id):
+    task = validate_model(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    # return make_response(f"Task {task.task_id} \"{task.title}\" successfully deleted")
+    return { "details":f"Task {task.task_id} \"{task.title}\" successfully deleted"}, 200
+
+    
     
