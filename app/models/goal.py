@@ -11,7 +11,12 @@ class Goal(db.Model):
         return cls(title=data_dict["title"])
     
     def to_dict(self):
-        return dict(
+        goal_dict = dict(
             id=self.id,
             title=self.title
         )
+
+        if self.tasks:
+            goal_dict["tasks"] = self.tasks
+        
+        return goal_dict

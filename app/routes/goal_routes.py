@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.goal import Goal
+from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
 
@@ -60,3 +61,18 @@ def update_goal(id):
     db.session.commit()
 
     return jsonify({"goal": goal.to_dict()}), 200
+
+# update tasks assigned to goal
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def assign_tasks_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        goal.tasks.append(task)
+    
+    db.session.commit()
+
+    return jsonify({"id": goal.id, "task_ids": [task.id for task in goal.tasks]})
