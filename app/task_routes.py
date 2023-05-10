@@ -27,12 +27,8 @@ def create_task():
         }, 201
     )
 
-
-
-
-
 @tasks_bp.route("", methods=["GET"])
-def read_task():
+def read_tasks():
     tasks_response = []
     tasks = Task.query.all()
 
@@ -47,3 +43,16 @@ def read_task():
         ), 200
 
     return jsonify(tasks_response)
+
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def read_one_saved_task(task_id):
+    task = Task.query.get(task_id)
+
+    return {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+        }
+    }
