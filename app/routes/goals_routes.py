@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
+from app.models.task import Task
 from app import db
 
 # All routes for goals start with "/goals" URL prefix
@@ -91,3 +92,39 @@ def delete_one_goal(goal_id):
     db.session.commit()
 
     return {'details': f'Goal {goal_to_delete.goal_id} "{goal_to_delete.title}" successfully deleted'}, 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def assign_tasks_to_goal(goal_id):
+    goal = get_valid_item_by_id(Goal, goal_id)
+
+    request_body = request.get_json()
+    tasks = request_body["task_ids"]
+
+    for task_id in tasks:
+        task = get_valid_item_by_id(Task, task_id)
+        task.goal_id = goal.goal_id
+
+    db.session.commit()
+
+    return {
+        "id": goal.goal_id,
+        "task_ids": tasks
+    }, 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_by_goal(goal_id):
+    goal = get_valid_item_by_id(Goal, goal_id)
+
+    tasks = goal.tasks
+    tasks_by_goal_response = []
+
+    for task in tasks:
+        tasks_by_goal_response.append(task.to_dict())
+
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_by_goal_response
+    }, 200
