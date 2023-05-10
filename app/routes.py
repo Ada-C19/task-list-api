@@ -18,9 +18,7 @@ def create_task():
     request_body = request.get_json()
     try:
         new_task = Task.from_dict(request_body)
-        # new_task = Task(title=request_body["title"],
-        #                 description=request_body["description"]
-        #                 )
+
     except:
         abort(make_response({
             "details":"Invalid data"
@@ -31,16 +29,12 @@ def create_task():
     
     response_body = {"task":new_task.to_dict()}
     
-    # response_body = {
-    #     "task":{
-    #     "id":new_task.task_id,
-    #     "title":new_task.title,
-    #     "description":new_task.description,
-    #     "is_complete":False 
-    #     }
-    # }
-    
     return make_response(response_body, 201)
+
+"""
+Get all tasks - sort by descending order if users specify to do so, 
+otherwise sort by ascending order by default
+"""
 
 @tasks_bp.route("",methods=["GET"])
 def check_all_tasks():
@@ -54,12 +48,6 @@ def check_all_tasks():
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_dict())
-        # tasks_response.append({
-        #     "id":task.task_id,
-        #     "title":task.title,
-        #     "description":task.description,
-        #     "is_complete":False 
-        # })
         
     return jsonify(tasks_response) 
 
@@ -68,14 +56,6 @@ def get_one_task(task_id):
     task = validate_model(Task, task_id)
     
     return {"task":task.to_dict()}
-    # return {
-    #     "task":{
-    #         "id":task.task_id,
-    #         "title":task.title,
-    #         "description":task.description,
-    #         "is_complete": False 
-    #     }
-    # }
     
 @tasks_bp.route("/<task_id>",methods=["PUT"])
 def update_a_task(task_id):
@@ -89,15 +69,6 @@ def update_a_task(task_id):
     
     return {"task":task.to_dict()}
     
-    # return {
-    #     "task":{
-    #         "id":task.task_id,
-    #         "title":task.title,
-    #         "description":task.description,
-    #         "is_complete": False 
-    #     }
-    # }
-    
 @tasks_bp.route("/<task_id>",methods=["DELETE"])
 def delete_a_task(task_id):
     task = validate_model(Task, task_id)
@@ -108,21 +79,6 @@ def delete_a_task(task_id):
     return {
         "details":f'Task {task.task_id} "{task.title}" successfully deleted'
     }
-
-# def validate_task(task_id):
-#     try: 
-#         task_id = int(task_id)
-#     except:
-#         abort(make_response({
-#             "message":f"Task {task_id} invalid"
-#         },400))
-        
-#     task = Task.query.get(task_id)
-#     if not task:
-#         abort(make_response({
-#             "message":f"Task {task_id} not found"
-#         },404))
-#     return task 
 
 @tasks_bp.route("/<task_id>/mark_complete",methods=["PATCH"])
 def mark_complete_on_incompleted(task_id):
