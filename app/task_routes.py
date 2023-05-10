@@ -57,7 +57,7 @@ def get_tasks():
 def get_one_task(task_id):
     task = validate_task(task_id)
     
-    return task.to_dict()
+    return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
