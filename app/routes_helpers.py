@@ -1,6 +1,6 @@
 from flask import abort, make_response, jsonify
 from app.models.task import Task
-
+from app.models.goal import Goal
 
 def validate_model(cls, model_id):
     try:
