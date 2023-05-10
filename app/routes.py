@@ -1,10 +1,15 @@
 from flask import Blueprint, abort, jsonify, make_response, request
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
+from dotenv import load_dotenv
 import requests
+import os
+
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
 
 @task_bp.route("", methods=["POST"])
 def add_task():
@@ -101,9 +106,10 @@ def complete_or_incomplete(task_id, action):
     if task_status == "mark_complete":
         task.completed_at = current_datetime
         #send a message to the slack api here
+        slack_bot_token = os.environ.get("SLACK_BOT_TOKEN")
         message = f"Someone just completed the task {task.title}"
         header = {
-            "Authorization": "Bearer xoxb-5239032091394-5224524979687-wJSHhKH8K99Wtofamg4TtaAW"
+            "Authorization": f"Bearer {slack_bot_token}"
         }
         data_to_send = {
             "channel": "task-notifications",
@@ -116,3 +122,77 @@ def complete_or_incomplete(task_id, action):
     db.session.commit()
 
     return task.to_dict_task(), 200
+
+# Goal routes --------------------------------
+
+
+@goal_bp.route("", methods=["POST"])
+def add_goal():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal(
+            title = request_body["title"]
+        )
+    except KeyError:
+        return {"details": "Invalid data"}, 400
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify(new_goal.to_dict_goal()), 201
+
+
+def validate_goal(goal_id):
+    try:
+        goal_id = int(goal_id)
+    except ValueError:
+        return abort(make_response({"msg": f"invalid goal id: {goal_id}"}, 400))
+
+    return Goal.query.get_or_404(goal_id)
+
+@goal_bp.errorhandler(404)
+def not_found(error):
+    message_body = {
+        "status": 404,
+        "error": "Not Found",
+        "message": "The requested goal id could not be found."
+    }
+    return jsonify(message_body), 404
+
+
+@goal_bp.route("", methods=["GET"])
+def get_goals():
+    response = []
+    all_goals = Goal.query.all()
+    for goal in all_goals:
+        response.append(goal.to_dict())
+
+    return jsonify(response), 200
+
+
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    return goal.to_dict_goal(), 200
+
+
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_goal(goal_id)
+    request_data = request.get_json()
+    goal.title = request_data["title"]
+
+    db.session.commit()
+
+    return goal.to_dict_goal()
+
+
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
