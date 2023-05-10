@@ -19,7 +19,7 @@ class Task(db.Model):
             "description": self.description,
             "is_complete": is_complete
         }
- 
+
         if self.goal_id:
             task_response["goal_id"] = self.goal_id
 

@@ -11,3 +11,13 @@ class Goal(db.Model):
             "id": self.goal_id,
             "title": self.title
         }
+    
+    def to_result_with_tasks(self):
+        response = []
+        for task in self.tasks:
+            response.append(task.to_result())
+        return {
+            "id": self.goal_id,
+            "title": self.title,
+            "tasks": response
+        }

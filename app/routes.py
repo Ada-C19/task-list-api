@@ -213,4 +213,8 @@ def add_task_to_goal(goal_id):
     }, 200
 
 
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
 
+    return make_response(goal.to_result_with_tasks())
