@@ -4,11 +4,21 @@ from app import db
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-@tasks_bp.route('', methods=['GET'])
+@tasks_bp.route("", methods=["GET"])
 def get_tasks():
-    tasks = Task.query.all()
+    sort_query = request.args.get("sort")
+
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        tasks = Task.query.all()
+
     tasks_response = [task.to_dict() for task in tasks]
+
     return jsonify(tasks_response), 200
+
 
 @tasks_bp.route('/<int:task_id>', methods=['GET'])
 def get_task(task_id):
