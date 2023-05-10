@@ -180,7 +180,7 @@ def update_goal(goal_id):
     return make_response({"goal": goal.to_result()})
 
 
-@goal_bp.route("<goal_id>", methods=["DELETE"])
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     goal = validate_item(Goal, goal_id)
 
@@ -188,5 +188,29 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response({"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'})
+
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_task_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    task_ids_list = request_body["task_ids"]
+
+    for task_id in task_ids_list:
+        task = validate_item(Task, task_id) 
+        # goal_id on the left is the column in task and we're setting 
+        # it equal to the given goal_id (they are not the same id)
+        task.goal_id = goal_id
+
+
+    db.session.commit()
+
+    return {
+        "id": goal.goal_id,
+        "task_ids": task_ids_list
+    }, 200
+
 
 

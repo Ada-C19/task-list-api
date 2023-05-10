@@ -13,12 +13,17 @@ class Task(db.Model):
         is_complete = True 
         if not self.completed_at:
             is_complete = False 
-        return {
+        task_response = {
             "id":self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": is_complete
         }
+ 
+        if self.goal_id:
+            task_response["goal_id"] = self.goal_id
+
+        return task_response
 
 
 
