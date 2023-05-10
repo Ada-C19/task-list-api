@@ -14,8 +14,9 @@ def create_app(test_config=None):
 
     if test_config is None:
         print("using prod config")
-        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "SQLALCHEMY_DATABASE_URI")
+        # app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        #     "SQLALCHEMY_DATABASE_URI")
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("RENDER_DATABASE_URI")
     else:
         print("using test config")
         app.config["TESTING"] = True
