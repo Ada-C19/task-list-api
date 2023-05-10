@@ -99,8 +99,13 @@ def mark_task_incomplete(task_id):
 
     db.session.commit()
 
-    response_dict = message_for_only_one_task(task)
+    slack_path = "https://slack.com/api/chat.postMessage"
+    channel_id = "task-notifications"
+    response_text = f"Someone just marked the task {task.title} as incomplete"
 
+    result = client.chat_postMessage(channel=channel_id, text=response_text)
+
+    response_dict = message_for_only_one_task(task)
     return make_response(response_dict, 200)
 
 def verify_item(model, item_id):
