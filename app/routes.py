@@ -20,7 +20,7 @@ def validate_model(cls, model_id):
     model = cls.query.get(model_id)
     
     if not model: 
-        abort(make_response({"{message":f"{cls.__name__} {model_id} not found"}, 404))
+        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
     return model
 
@@ -129,7 +129,10 @@ def mark_task_incomplete(task_id):
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
-    new_goal=Goal(title=request_body["title"])
+    if "title" not in request_body:
+        abort(make_response({"details": "Invalid data"},400))
+    
+    new_goal=Goal.from_dict(request_body)
     db.session.add(new_goal)
     db.session.commit()
 
@@ -164,7 +167,7 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return jsonify({"details": f'Goal {goal_id} "{goal.title}" sucessfully deleteted'}),200
+    return jsonify({"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}),200
 
 
 
