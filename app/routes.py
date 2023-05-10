@@ -60,7 +60,9 @@ def get_all_tasks():
             "description": task.description,
             "is_complete": False
 
-        })
+        }), 
+
+    return jsonify(tasks_response), 200
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 
