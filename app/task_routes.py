@@ -119,7 +119,7 @@ def send_post_to_slack(task):
     slack_bot_token = os.environ['SLACK_BOT_TOKEN']
     slack_channel = 'task-notifications'
     text = f"Task {task.description} completed"
-    headers = {'Authorization': slack_bot_token}
+    headers = {'Authorization': f"Bearer {slack_bot_token}"}
     data = {
         'channel': slack_channel,
         'text': text
