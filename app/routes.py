@@ -7,6 +7,10 @@ import os
 from app.models.task import Task
 from app.models.goal import Goal
 
+# - - - - - - - - - - - - - - - - - #
+###~~~---- helper function ----~~~###
+# - - - - - - - - - - - - - - - - - #
+
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
