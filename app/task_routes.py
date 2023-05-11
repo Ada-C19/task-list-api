@@ -6,10 +6,8 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix = "/tasks")
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-
     request_body = request.get_json()
 
-  
     if not request_body.get("title") or not request_body.get("description"):
         abort(make_response(
                 {
@@ -38,9 +36,16 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def read_tasks():
-    tasks_response = []
-    tasks = Task.query.all()
+    
+    title_query = request.args.get("sort")
+    if title_query == "asc":
+        tasks = Task.query.order_by(Task.title).all()
+    elif title_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        tasks = Task.query.all()
 
+    tasks_response = []
     for task in tasks:
         tasks_response.append(
             {
