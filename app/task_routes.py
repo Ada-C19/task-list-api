@@ -26,11 +26,15 @@ def get_all_tasks():
     task_query = Task.query
 
     sort_query = request.args.get("sort")
+    title_query = request.args.get("title")
 
     if sort_query == "asc":
         task_query = task_query.order_by(asc(Task.title))
     elif sort_query == "desc":
         task_query = task_query.order_by(desc(Task.title))
+
+    if title_query:
+        task_query = Task.query.filter_by(title=title_query)
     
     tasks_response = [task.to_dict() for task in task_query]
     return jsonify(tasks_response)
