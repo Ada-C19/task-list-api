@@ -58,7 +58,7 @@ def delete_goal(goal_id):
     return jsonify({"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'})
 
 ######## POST ONE-TO-MANY TASKS ####################
-@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+@goals_bp.route("/<goal_id>/tasks", methods=["POST", "PUT"])
 def create_goal_with_tasks(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
