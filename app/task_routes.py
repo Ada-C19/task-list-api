@@ -39,13 +39,19 @@ def create_task():
 @tasks_bp.route("", methods=['GET'])
 def read_all_tasks():
     sort_query = request.args.get("sort")
+    title_query = request.args.get("title")
 
     if sort_query == 'asc':
         tasks = Task.query.order_by(Task.title.asc()).all()
     elif sort_query == 'desc':
         tasks = Task.query.order_by(Task.title.desc()).all()
+    elif sort_query == "id":
+        tasks = Task.query.order_by(Task.task_id).all()
+    elif title_query:
+        tasks = Task.query.filter_by(title=title_query).all()
     else:
         tasks = Task.query.all()
+
     task_response = [task.to_dic()["task"] for task in tasks]
     return jsonify(task_response), 200
 
@@ -80,6 +86,7 @@ def mark_complete_task(task_id):
         "text": message_to_slack
         }
     response = requests.post("https://slack.com/api/chat.postMessage", headers=header, json=json_response)
+    
     if response.status_code != 200:
         return make_response({"details": "Failed to send message to Slack"}, 500)
 
