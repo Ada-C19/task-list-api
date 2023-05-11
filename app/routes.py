@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.task import Task
 from app.models.goal import Goal
 from app import db
-import pdb
 import datetime
 import os
 from slack_sdk import WebClient

@@ -17,9 +17,3 @@ class Goal(db.Model):
             title=goal_details["title"])
         return new_goal
     
-    # def relationships_to_dict(self):
-    #     return {
-    #         "id": self.goal_id,
-    #         "title": self.title,
-    #         "tasks": self.tasks
-    #     }
