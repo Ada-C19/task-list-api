@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+import requests
 from app.models.task import Task
 from datetime import datetime
 from app import db
@@ -43,10 +44,10 @@ def get_all_tasks():
     sort_query = request.args.get("sort")
 
     if sort_query == "asc":
-        tasks = Task.query.order_by(Task.title.asc()).all()
+        tasks = Task.query.order_by(Task.title)
     
     elif sort_query == "desc":
-        tasks = Task.query.order_by(Task.title.desc()).all()
+        tasks = Task.query.order_by(Task.title.desc())
 
     else:
         tasks = Task.query.all()
@@ -94,7 +95,6 @@ def delete_task(model_id):
 
     if task is None:
         return {'details': 'Invalid data'}, 404
-        # return jsonify(message="Task not found"), 404
 
     db.session.delete(task)
     db.session.commit()
@@ -105,23 +105,47 @@ def delete_task(model_id):
 
 #---------------------------------------------
 
-
 @tasks_bp.route("<model_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(model_id):
     try:
         new_task = validate_model(Task, model_id)
     except:
         return jsonify({"Message": "Invalid id"}), 404
-
-    # if new_task.completed_at == None:
-    new_task.completed_at = datetime.utcnow()
-
-        # task.completed_at = request_body["completed_at"]
-
-    # new_task.completed_at = request_body["completed_at"]
-    db.session.commit()
+    
+    # Send the message to Slack
+    message = f"Someone just completed the task {new_task.title} My Beautiful Task"
+    payload = {
+        "text": message,
+        "channel": "api-test-channel",
+        "token": "your_slack_token"  
+    }
+    response = requests.post("https://slack.com/api/chat.postMessage", data=payload)
 
     return jsonify({"task": new_task.to_dict()}), 200
+    
+    # if:
+    # https://slack.com/api/chat.postMessage
+    # return "Someone just completed the task {task.title} My Beautiful Task"
+
+
+    # new_task.completed_at = datetime.utcnow()
+
+    # db.session.commit()
+
+    # return jsonify({"task": new_task.to_dict()}), 200
+
+# @tasks_bp.route("<model_id>/mark_complete", methods=["PATCH"])
+# def mark_task_complete(model_id):
+#     try:
+#         new_task = validate_model(Task, model_id)
+#     except:
+#         return jsonify({"Message": "Invalid id"}), 404
+
+#     new_task.completed_at = datetime.utcnow()
+
+#     db.session.commit()
+
+#     return jsonify({"task": new_task.to_dict()}), 200
 
 
 @tasks_bp.route("<model_id>/mark_incomplete", methods=["PATCH"])
@@ -137,32 +161,3 @@ def mark_task_incomplete(model_id):
 
     return jsonify({"task": new_task.to_dict()}), 200
 
-
-#def completed_task(app):
-    # new_task = Task(
-        # title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=datetime.utcnow())
-    # db.session.add(new_task)
-    # db.session.commit()
-
-
-
-
-
-# @tasks_bp.route("<model_id>/mark_complete", methods=["PATCH"])
-# def mark_task_complete(model_id):
-#     try:
-#         task = validate_model(Task, model_id)
-#     except:
-#         return jsonify({"Message": "Invalid id"}), 404
-    
-#     request_body = request.get_json()
-
-#     # task.completed_at = request_body["completed_at"]
-
-#     # if task.completed_at == None:
-#     #     task.completed_at = datetime.now()
-
-
-#     db.session.commit()
-
-#     return jsonify({"task": task.to_dict()}), 200
