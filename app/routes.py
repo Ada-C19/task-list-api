@@ -21,6 +21,18 @@ def validate_model(task_id):
     
     return task
 
+def slack_bot_message(message):
+    slack_api_key = os.environ.get("SLACK_BOT_TOKEN")
+    slack_url = "https://slack.com/api/chat.postMessage"
+    header = {"Authorization": slack_api_key}
+
+    slack_query_params = {
+        "channel": "task-notifications",
+        "text": message
+    }
+    print(slack_api_key)
+    requests.post(url=slack_url, data=slack_query_params, headers=header)
+
 # -----------------------------------
 #               ROUTES
 # -----------------------------------
