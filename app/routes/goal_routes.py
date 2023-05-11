@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from app.routes.routes_helpers import validate_model
 import datetime
 
@@ -51,29 +52,6 @@ def update_Goal(goal_id):
 
     return {"goal": goal.to_dict()}
 
-#MARK AS COMPLETE PATCH
-# @goals_bp.route("/<Goal_id>/mark_complete", methods=["PATCH"])
-# def mark_complete(Goal_id):
-#     goal = validate_model(Goal, Goal_id)
-
-#     #goal.completed_at = datetime.datetime.now()
-
-#     db.session.commit()
-#     #create_msg_slack(Goal)
-
-#     return {"goal": goal.to_dict()}, 200
-
-#MARK AS INCOMPLETE PATCH endpoint
-# @goals_bp.route("/<Goal_id>/mark_incomplete", methods=["PATCH"])
-# def mark_incomplete(Goal_id):
-#     Goal = validate_model(Goal, Goal_id)
-
-#     Goal.completed_at = None
-
-#     db.session.commit()
-
-#     return {"Goal": Goal.to_dict()}, 200
-
 #DELETES A Goal
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
@@ -83,3 +61,25 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response({'details': f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}, 200)
+
+#Connecting relationships
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_all_tasks_in_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    goal_response = goal.to_dict_tasks()
+
+    return make_response(goal_response), 200
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    request_body = request.get_json()
+    task_ids = request_body.get("task_ids")
+    #task_ids = request.json.get("task_ids", [])
+
+    for id in task_ids:
+        task = validate_model(Task, id)
+        task.goal_id = goal_id
+
+    db.session.commit()
+
+    return make_response({"id": int(goal_id), "task_ids": task_ids}, 200)
