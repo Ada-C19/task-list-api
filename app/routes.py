@@ -124,7 +124,7 @@ def update_task(task_id):
         }
     }, 200
 
-# in progress
+
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def task_mark_complete(task_id):
     task = validate_model(Task, task_id) 
@@ -180,14 +180,12 @@ def delete_task(task_id):
     return jsonify({"details":f'Task {task.task_id} "{task.title}" successfully deleted'}), 200
 
 # - - - - - - - - - - - - - - - - - #
-###~~~--- task model routes ---~~~###
+###~~~--- goal model routes ---~~~###
 # - - - - - - - - - - - - - - - - - #
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @goal_bp.route("", methods=['POST'])
-
-# define a route for creating a task
 def create_goal():
     request_body = request.get_json()
 
@@ -206,7 +204,7 @@ def create_goal():
             "title": new_goal.title
             }}, 201
 
-# define a route for getting all tasks
+
 @goal_bp.route("", methods=["GET"])
 def read_all_goals():
     # querries
@@ -261,8 +259,8 @@ def update_goal(goal_id):
             "title": goal.title
             }}, 200
 
-@task_bp.route("/<goal_id>", methods=["DELETE"])
-def delete_task(goal_id):
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)

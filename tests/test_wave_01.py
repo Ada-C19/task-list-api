@@ -55,7 +55,7 @@ def test_get_task_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    assert response_body == {"message": f"Sorry, task 1 does not exist"}
+    assert response_body == {"message": f"Sorry, Task 1 does not exist"}
 
 def test_create_task(client):
     # Act
@@ -118,7 +118,7 @@ def test_update_task_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    assert response_body == {"message": f"Sorry, task 1 does not exist"}
+    assert response_body == {"message": f"Sorry, Task 1 does not exist"}
 
 
 def test_delete_task(client, one_task):
@@ -145,7 +145,7 @@ def test_delete_task_not_found(client):
 
     # Assert
     assert response.status_code == 404
-    assert response_body == {"message": f"Sorry, task 1 does not exist"}
+    assert response_body == {"message": f"Sorry, Task 1 does not exist"}
 
     assert Task.query.all() == []
 
