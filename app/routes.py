@@ -1,9 +1,11 @@
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, request
 from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
-from sqlalchemy import asc, desc
+# from sqlalchemy import asc, desc
 from datetime import datetime
+import os
+import requests 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -66,8 +68,18 @@ def mark_complete(task_id):
     task = validate_model(Task, task_id)
 
     task.completed_at=datetime.utcnow()
-
+    
     db.session.commit()
+
+    path = "https://slack.com/api/chat.postMessage"
+
+    ada_bot = {
+        "token": os.environ.get("SLACK_API_TOKEN"),
+        "channel": "task_notifications",
+        "text": f"Someone just completed the task {task.title}"
+    }
+
+    requests.post(path, data=ada_bot)
 
     output = {"task":task.to_dict()}
     return jsonify(output), 200
