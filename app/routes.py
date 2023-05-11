@@ -1,3 +1,5 @@
+
+from datetime import datetime
 from app import db
 
 from flask import Blueprint, jsonify, make_response, request, abort
@@ -109,6 +111,47 @@ def update_task(task_id):
         "title": task.title,
         "description": task.description,
         "is_complete": True if task.completed_at else False
+        }
+    }, 200
+    
+    
+# mark complete on a complete task
+# UPDATE TASK- PATCH request to /tasks/<task_id>/mark_complete
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_model(task_id)
+    
+    task.completed_at=datetime.utcnow()
+    
+    db.session.commit()
+    
+    # return make_response(f"Task #{task.task_id} successfully updated"), 200
+
+    return { "task": {
+        "id": task.task_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": True if task.completed_at else False
+        }
+    }, 200
+
+
+# mark incomplete on an complete task
+# UPDATE TASK- PATCH request to /tasks/<task_id>/mark_incomplete
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_model(task_id)
+
+    task.completed_at= None
+    
+    db.session.commit()
+    
+    # return make_response(f"Task #{task.task_id} successfully updated"), 200
+    return { "task": {
+        "id": task.task_id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete":  True if task.completed_at else False
         }
     }, 200
 
