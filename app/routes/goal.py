@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
 from app import db 
-from datetime import datetime 
+from datetime import datetime
+from app.routes.task import validate_task 
 
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -122,33 +123,73 @@ def delete_one_goal(goal_id):
     }), 200)
 
 
-@goals_bp.route("/<goal_id>/mark_complete", methods=["PATCH"])
-def patch_goal_as_complete(goal_id):
-    goal = validate_goal(goal_id) 
 
-    # updated boolean completed_at for the value associated with is_complete to True by providing a return for current local datetime. This forces it to evaluate to True
-    goal.completed_at = datetime.today()
+############################ wave 6 ###############################
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
 
-    db.session.commit()
+    # for task in goal.tasks:
+    #     task.goal_id = None
 
-    response_body = {
-        "goal": goal.to_dict()
-    }
-
-    return response_body, 200
-
-
-@goals_bp.route("/<goal_id>/mark_incomplete", methods=["PATCH"])
-def patch_goal_as_incomplete(goal_id):
-    goal = validate_goal(goal_id) 
-
-    # updated boolean completed_at for the value associated with is_complete to False by assigning None. This forces it to evaluate to False
-    goal.completed_at = None
+    for task_id in task_ids:
+        task = validate_task(task_id)
+        task.goal_id = goal.goal_id
+        # task.goal = goal
+        # task.goal_id = goal.id
+    # goal.title = request.args.get("title", goal.title)
 
     db.session.commit()
 
-    response_body = {
-        "goal": goal.to_dict()
-    }
+    return make_response({"id": int(goal.goal_id), "task_ids": task_ids}, 200)
 
-    return response_body, 200
+# need to make one POST HTTP request to /goals/1/tasks
+# @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+# def assign_tasks_to_one_goal(goal_id):
+#     goal = validate_goal(goal_id)
+#     request_body = request.get_json()
+#     task_ids = request_body["task_ids"]
+
+#     for task in goal.tasks:
+#         task.goal_id = None
+        
+#     # db.session.add(new_goal)
+#     for task_id in task_ids:
+#         task = validate_task(task_id)
+#         task.goal_id = goal.id
+
+#     goal.title = request.args.get("title", goal.title)
+
+#     db.session.commit()
+
+    # response_body = {
+    #     "goal": new_goal.to_dict()
+    # }
+
+    response_body = {
+        "id": goal_id,
+        "task_ids": request_body["task_ids"]
+    }
+    
+    return make_response(response_body, 200)
+
+# need to make one GET http request to /goals/333/tasks
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_assigned_to_one_goal(goal_id):
+
+
+    goal = validate_goal(goal_id)
+
+    tasks_response = []
+    for task in goal.tasks:
+        tasks_response.append(task.to_dict())
+
+    return jsonify({
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }), 200
+
+
