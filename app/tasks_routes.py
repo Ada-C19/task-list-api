@@ -21,8 +21,10 @@ def validate_model(cls, model_id):
 
 def send_slack_message_for_completed_task(task_title):    
     slack_api_token = current_app.config["SLACK_API_TOKEN"]
-    slack_api_url = current_app.config["SLACK_API_URL"]
-    slack_channel = current_app.config["SLACK_CHANNEL"]
+    # slack_api_url = current_app.config["SLACK_API_URL"]
+    # slack_channel = current_app.config["SLACK_CHANNEL"]
+    slack_api_url = "https://slack.com/api/chat.postMessage"
+    slack_channel = "task-notifications"
 
     headers = {
         "Authorization": f"Bearer {slack_api_token}",
