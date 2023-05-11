@@ -20,9 +20,18 @@ def create_goal():
 
 @goal_bp.route("", methods=["GET"])
 def get_all_goals():
-    goals = Goal.query.all()
+    goal_query = Goal.query
+
+    sort_query = request.args.get("sort")
+    title_query = request.args.get("title")
+
+    if sort_query == "title":
+        goal_query = goal_query.order_by(Goal.title)
+
+    if title_query:
+        goal_query = goal_query.filter(Goal.title.ilike(f"%{title_query}%"))
     
-    goals_response = [goal.to_dict() for goal in goals]
+    goals_response = [goal.to_dict() for goal in goal_query]
 
     return jsonify(goals_response)
 

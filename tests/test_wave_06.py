@@ -117,3 +117,76 @@ def test_get_task_includes_goal_id(client, one_task_belongs_to_one_goal):
             "is_complete": False
         }
     }
+
+
+### Tests for extra features
+
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_get_task_by_title(client, three_tasks):
+    # Act
+    response = client.get("/tasks?title=garden")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 1
+    assert response_body == [
+        {
+            "id": 1,
+            "title": "Water the garden 🌷",
+            "description": "",
+            "is_complete": False}
+    ]
+
+
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_get_tasks_sort_by_id(client, three_tasks):
+    # Act
+    response = client.get("/tasks?sort=id")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "id": 1,
+            "title": "Water the garden 🌷",
+            "description": "",
+            "is_complete": False},
+        {
+            "id": 2,
+            "title": "Answer forgotten email 📧",
+            "description": "",
+            "is_complete": False},
+        {
+            "id": 3,
+            "title": "Pay my outstanding tickets 😭",
+            "description": "",
+            "is_complete": False},
+    ]
+
+
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_get_goals_sort_by_title(client, three_goals):
+    # Act
+    response = client.get("/goals?sort=title")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "id": 2,
+            "title": "Stay on top of weekly routine"
+        },
+        {
+            "id": 3,
+            "title": "Take care of administrative tasks"
+        },
+        {
+            "id": 1,
+            "title": "Work on the the garden 🌷"
+        }
+    ]

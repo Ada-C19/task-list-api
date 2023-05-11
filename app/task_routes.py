@@ -32,6 +32,8 @@ def get_all_tasks():
         task_query = task_query.order_by(asc(Task.title))
     elif sort_query == "desc":
         task_query = task_query.order_by(desc(Task.title))
+    elif sort_query == "id":
+        task_query = task_query.order_by(Task.task_id)
 
     if title_query:
         task_query = task_query.filter(Task.title.ilike(f"%{title_query}%"))
