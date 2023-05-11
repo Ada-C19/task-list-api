@@ -67,7 +67,7 @@ def create_goal_with_tasks(goal_id):
     validated_task_ids = []
     for task_id in task_ids:
         current_task = validate_model(Task, task_id)
-        current_task.goal_id = goal.goal_id
+        current_task.goal = goal
         validated_task_ids.append(current_task.task_id)
     
     db.session.commit()
