@@ -4,6 +4,7 @@ from app import db
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
+    tasks = db.relationship("Task", back_populates='goal', lazy=True)
 
     def to_dict(self):
         goal_as_dict = {}
@@ -12,10 +13,18 @@ class Goal(db.Model):
         
         return goal_as_dict
 
+    def to_dict_with_tasks(self):
+        return {
+            "id": self.goal_id,
+            "title": self.title,
+            "tasks": [task.to_dict() for task in self.tasks]
+        }
 
+    
     @classmethod
     def from_dict(cls, goal_data):
-        new_goal = cls(title=goal_data["title"])
-        
+        new_goal = Goal(title=goal_data["title"])
+
         return new_goal
+
 

@@ -41,7 +41,7 @@ def create_task():
             "is_complete": (new_task.completed_at != None)}}, 201
 
 @tasks_bp.route("",methods=["GET"])
-def read_all_tasks():
+def handle_tasks():
 
     sort_query = request.args.get("sort")
 
@@ -58,7 +58,7 @@ def read_all_tasks():
     return jsonify(tasks_response), 200
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def read_one_task(task_id):
+def handle_task(task_id):
     task = validate_model(Task, task_id)
     result = {
         "task":{
@@ -68,7 +68,16 @@ def read_one_task(task_id):
             "is_complete": (task.completed_at != None)}
         }
 
+    if task.goal_id != None:
+        result["task"]["goal_id"] = task.goal_id
+        
     return result, 200
+
+    # task = get_valid_item_by_id(Task, task_id)
+
+    # if task.goal_id:
+    #     return make_response({"task": task.to_dict_with_goal_id()}, 200)
+    # return make_response({"task": task.to_dict()}, 200)
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -140,6 +149,7 @@ def create_goal():
 
     return {"goal": new_goal.to_dict()}, 201
 
+
 @goals_bp.route("", methods=['GET'])
 def handle_goals():
     title_query = request.args.get("sort")
@@ -167,8 +177,7 @@ def get_valid_item_by_id(model, id):
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def handle_goal(goal_id):
-    goal = get_valid_item_by_id(Goal, goal_id)
-    goal.query.get(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     return {"goal":{
         "id": goal.goal_id,
@@ -192,3 +201,25 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {"details": f"goal {goal_id} \"{goal.title}\" successfully deleted"}
+
+@goals_bp.route("/<goal_id>/tasks", methods=['GET'])
+def handle_all_tasks_of_one_goal(goal_id):
+    goal = get_valid_item_by_id(Goal, goal_id)
+    goal_response = goal.to_dict_with_tasks()
+
+    return make_response(goal_response, 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task_in_goal_type(goal_id):
+    goal = get_valid_item_by_id(Goal, goal_id)
+    task_ids = request.json.get("task_ids", [])
+
+    for task_id in task_ids:
+        task = get_valid_item_by_id(Task, task_id)
+        task.goal_id = goal_id
+
+    db.session.commit()
+
+    return make_response({"id": int(goal_id), "task_ids": task_ids}, 200)
+
+
