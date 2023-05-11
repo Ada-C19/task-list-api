@@ -39,19 +39,41 @@ def validate_model(cls, model_id):
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
 
-    title_query = request.args.get("title")
+    sort_query = request.args.get("sort")
 
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
 
-    if title_query:
-        tasks = Task.query.filter_by(title=title_query)
-    else:
-        tasks = Task.query.all()
+    # else:
+        # tasks = Task.query.all()
     
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_dict())
 
     return jsonify(tasks_response), 200
+
+
+
+
+# @tasks_bp.route("", methods=["GET"])
+# def get_all_tasks():
+
+#     title_query = request.args.get("title")
+
+#     if title_query:
+#         tasks = Task.query.filter_by(title=title_query)
+#     else:
+#         tasks = Task.query.all()
+    
+#     tasks_response = []
+#     for task in tasks:
+#         tasks_response.append(task.to_dict())
+
+#     return jsonify(tasks_response), 200
 
 
 
@@ -63,7 +85,6 @@ def get_one_task(model_id):
         return {"task": task.to_dict()}, 200
     
     else:
-        
         return {'details': 'Invalid data'}, 404
     
 
@@ -99,3 +120,10 @@ def delete_task(model_id):
 
     message = {"details": f"Task 1 \"{task.title}\" successfully deleted"}
     return make_response(message, 200)
+
+
+#---------------------------------------------
+
+@tasks_bp.route("/tasks?sort=asc", methods={"GET"})
+def get_sorted_array():
+    task = validate_model(Task, model_id)
