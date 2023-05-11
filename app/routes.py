@@ -70,6 +70,14 @@ def update_task(task_id):
 
     return make_response({"task": task.to_dict()}, 200)
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()}, 200)
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(task_id)
