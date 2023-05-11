@@ -2,6 +2,8 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
+from sqlalchemy.types import DateTime
+from sqlalchemy.sql.functions import now
 
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
 
@@ -85,12 +87,15 @@ def delete_task(task_id):
 
 @task_list_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
-    task = validate_model_task(Task, task_id)
-    
     request_body = request.get_json()
-    # NoneType object not subscriptable
-    # can't access the index because it is None and technically doesn't exist
-    task.completed_at = request_body["completed_at"]
+    
+    try:
+        task = Task.query.get(task_id)
+        task.completed_at = now()
+    except:
+        return abort(make_response({"message": f"{task_id} not found"}, 404))
+
+    db.session.commit()
 
     response_body = {
         "task": task.task_to_dict()
@@ -98,4 +103,21 @@ def mark_task_complete(task_id):
 
     return jsonify(response_body)
 
+@task_list_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    request_body = request.get_json()
 
+    try:
+        task=Task.query.get(task_id)
+        task.completed_at = None
+    except:
+        response_body = abort(make_response({"message": f"{task_id} not found"}, 404))
+        return response_body
+    
+    db.session.commit()
+
+    response_body = {
+        "task": task.task_to_dict()
+    }
+
+    return jsonify(response_body)

@@ -30,11 +30,3 @@ class Task(db.Model):
         task_as_dict["is_complete"] = self.completed_at != None
 
         return task_as_dict
-    
-    def task_complete(self):
-        if self.completed_at == None:
-            self.is_complete = False
-        else:
-            self.is_complete = True
-
-        return self.is_complete
