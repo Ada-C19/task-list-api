@@ -28,15 +28,23 @@ def create_goal():
 # Get all saved goals or zero saved goals
 @goal_list_bp.route("", methods=["GET"])
 def get_goals():
-    # get all goals
-    goals = Goal.query.all()
-    
     # initialize list of goals
     goals_response = []
     
+    # get param value
+    goal_title_query = request.args.get("filter")
+    
+    # get goals matching param value if it exists
+    if goal_title_query:
+        goals = Goal.query.filter_by(title=goal_title_query)
+    
+    # get all goals if no param value
+    else:
+        goals = Goal.query.all()
+    
     # loop thru each goal
     for goal in goals:
-        # return goal dictionary and add it to list
+        # return goal dict and add it to list
         goals_response.append(goal.to_dict())
     
     # return list of goal dicts if they exist or return empty list if no goals    

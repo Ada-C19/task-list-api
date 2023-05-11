@@ -6,33 +6,35 @@ import requests, os
 
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
 
-### Get Tasks: No Saved Tasks
-### Get Tasks: All Saved Tasks
-### Sorting Tasks: By Title, Ascending
-### Sorting Tasks: By Title, Descending
+### Get all saved tasks or zero saved tasks
+### Sort Tasks By Title, Ascending
+### Sort Tasks By Title, Descending
 @task_list_bp.route("", methods=["GET"])
 def get_tasks():
-    # get all tasks 
-    tasks = Task.query.all()
     # initialize list of tasks
     tasks_response = []
-    # get sort param value if tasks exist
-    if len(tasks) != 0:
-        sort_query = request.args.get("sort")
-        # sort tasks ascending if sort is asc
-        if sort_query == "asc":
-            tasks = Task.query.order_by(Task.title.asc())
-        
-        # sort tasks descending if sort is desc   
-        else:
-            tasks = Task.query.order_by(Task.title.desc())
-        
-        # loop thru each task      
-        for task in tasks:
-            # return task dict and add it to list
-            tasks_response.append(task.to_dict())
+
+    # get sort param value
+    sort_query = request.args.get("sort")
     
-    # return list of task dicts    
+    # sort tasks ascending if sort is asc
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title.asc())
+        
+    # sort tasks descending if sort is desc   
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    
+    # get all tasks if no param value
+    else:
+        tasks = Task.query.all()
+        
+    # loop thru each task      
+    for task in tasks:
+        # return task dict and add it to list
+        tasks_response.append(task.to_dict())
+
+    # return list of task dicts if they exist or empty list if no tasks 
     return jsonify(tasks_response)
 
 ### Create a Task: Valid Task With `null` `completed_at`
@@ -151,7 +153,6 @@ def validate_item (model, item_id):
     
     return item    
     
-
     
 
     
