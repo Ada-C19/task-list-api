@@ -5,6 +5,7 @@ from app.models.task import Task
 from datetime import datetime
 
 
+
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @tasks_bp.route("", methods = ["POST"])
@@ -21,9 +22,6 @@ def create_tasks():
     except KeyError as e:
         message = "Invalid data"
         return make_response({"details": message}, 400)
-
-    # except KeyError as e:
-    #     abort(make_response(f"Invalid request. Missing required value: {e}", 400))
 
 @tasks_bp.route("", methods = ["GET"])
 def read_all_tasks():
@@ -97,3 +95,20 @@ def get_sorted_tasks(query_params):
     else:
         return Task.query.filter_by(**query_params).order_by(Task.id.asc()).all()
 
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    task = validate_model(Task, task_id)
+    task.is_complete = True
+    task.completed_at = datetime.now()
+    db.session.commit()
+
+    message = Task.generate_message(task)
+    return make_response(jsonify(message), 200)
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    task.is_complete = False
+    task.completed_at = None
+    db.session.commit()
+    message = Task.generate_message(task)
+    return make_response(jsonify(message), 200)
