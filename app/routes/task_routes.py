@@ -55,7 +55,7 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {"task": task.to_dict()} 
+    return {"task": task.to_dict()}, 200
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_as_complete(task_id): 
@@ -73,7 +73,7 @@ def update_task_as_complete(task_id):
     }
     requests.post(path, query_params)
 
-    return {"task" : task.to_dict()}
+    return {"task" : task.to_dict()}, 200
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_as_incomplete(task_id): 
@@ -83,7 +83,7 @@ def update_task_as_incomplete(task_id):
 
     db.session.commit()
 
-    return {"task" : task.to_dict()}
+    return {"task" : task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id): 
@@ -92,7 +92,7 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return {"details": f'Task {task_id} "{task.title}" successfully deleted'}
+    return {"details": f'Task {task_id} "{task.title}" successfully deleted'}, 200
 
 def validate_item(model, item_id):
     try: 
@@ -103,6 +103,6 @@ def validate_item(model, item_id):
     model = model.query.get(item_id)
 
     if not model: 
-        abort(make_response({"msg": f"{item_id} not found"}, 404))
+        abort(make_response({"msg": f"id: {item_id} not found"}, 404))
     
     return model 

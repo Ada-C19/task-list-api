@@ -61,7 +61,7 @@ def read_one_goal(goal_id):
 def get_tasks_for_specific_goal(goal_id): 
     goal = validate_item(Goal, goal_id)
 
-    tasks = [task.to_dict() for task in goal.tasks]
+    tasks = [task.to_dict() for task in goal.tasks  ]
 
     result = goal.to_dict()
     result['tasks'] = tasks
