@@ -113,7 +113,7 @@ def mark_complete_on_incomplete_task(task_id):
 
     data = {
         "channel": "task-notifications",
-        "text": f"Someone completed the task '{task.title}'"
+        "text": f"Someone completed the task '{task.title}' :tada:"
     }
     url = "https://slack.com/api/chat.postMessage"
 
