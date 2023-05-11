@@ -1,3 +1,9 @@
-body {
-    background-color: pink;
-}
+body{ 
+    background:black; 
+    color:pink; 
+    margin-top: 5px; 
+} 
+.button{ 
+    color:mediumaquamarine; 
+} 
+.mark{font-size: 10px;} 

@@ -1,43 +1,31 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>KaTasks</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-{% extends "bootstrap/base.html" %}
-
-{% block title %}Bookshop{% endblock %}
-
-{% block navbar %}
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">Bookshop</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-{% endblock %}
-    </body>
-</html>
-
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <title>Todo App</title> 
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}"> 
+</head> 
+<body> 
+    <h1>Todo List</h1> 
+    <div>Add a new todo item: 
+        <form action="{{ url_for('add') }}" method="POST"> 
+            <input type="text" name="todoitem"> 
+            <input type="submit" value="Add Item" class="button"> 
+        </form> 
+    </div> 
+    <div> 
+        <h2>Incomplete Items</h2> 
+        <ul> 
+            {% for todo in incomplete %} 
+            <li style="font-size: 30pt" class='mark'>{{ todo.name }} <a href="{{ url_for('complete', id=todo.task_id) }}">Mark As Complete</a></li> 
+            {% endfor %}     
+        </ul> 
+        <h2>Completed Items</h2> 
+        <ul> 
+            {% for todo in complete %} 
+            <li style="font-size: 30pt">{{ todo.name }}</li> 
+            {% endfor %} 
+        </ul> 
+    </div> 
+</body> 
+</html> 
