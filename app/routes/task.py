@@ -67,19 +67,10 @@ def validate_item(model, item_id):
 
 @task_bp.route("/<task_id>/<complete_status>", methods=["PATCH"])
 def mark_complete(task_id, complete_status):
-    slack_bot_token = os.environ['SLACK_BOT_TOKEN']
-    slack_channel = 'task-notifications'
-    text = f"Task {task.description} completed"
-    headers = {'Authorization': f"Bearer {slack_bot_token}"}
-    data = {
-        'channel': slack_channel,
-        'text': text
-    }
     task = validate_item(Task, task_id)
     if complete_status == "mark_complete":
         task.completed_at = datetime.now()
-        requests.post('https://slack.com/api/chat.postMessage', headers=headers, json=data)
-        # requests.post("https://slack.com/api/chat.postMessage",json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"})
+        requests.post("https://slack.com/api/chat.postMessage", json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"token": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"})
     elif complete_status == "mark_incomplete":
         task.completed_at = None
     db.session.commit()
