@@ -43,7 +43,6 @@ def get_goal_by_id(goal_id):
 @goals_bp.route('/<goal_id>', methods=['PUT'])
 def replace_goal(goal_id):
     goal = valid.validate_id(Goal, goal_id)
-    
     request_body = request.get_json()
     valid_request = valid.validate_entry(Goal, request_body)
     
@@ -72,8 +71,7 @@ def create_task_assigned_to_specific_goal(goal_id):
     request_body = request.get_json()
     
     valid_request = valid.validate_entry(Task, request_body)
-    
-    new_task = Task.from_dict_with_parent(valid_request, goal_id)
+    new_task = Task.from_dict(valid_request)
     
     db.session.add(new_task)
     db.session.commit()
@@ -85,7 +83,7 @@ def create_list_of_tasks_to_goal(goal_id):
     valid.validate_id(Goal, goal_id)
     request_body = request.get_json()
 
-    tasks_response = [Task.from_dict_with_parent(task, goal_id) for task in request_body if valid.validate_entry(Task, task)]
+    tasks_response = [Task.from_dict(task) for task in request_body if valid.validate_entry(Task, task)]
     
     db.session.add_all(tasks_response)
     db.session.commit()
