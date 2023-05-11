@@ -1,5 +1,5 @@
-from app.models.goal import Goal
 import pytest
+from app.models.goal import Goal
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -128,6 +128,8 @@ def test_delete_goal(client, one_goal):
     # Check that the goal was deleted
     response = client.get("/goals/1")
     assert response.status_code == 404
+    assert response_body == {"details": "Goal 1 \"Build a habit of going outside daily\" successfully deleted"}
+    assert Goal.query.get(1) == None
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
