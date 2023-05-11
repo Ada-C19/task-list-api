@@ -94,7 +94,7 @@ def mark_task_as_completed(task_id):
         "text": f"Someone just completed the task {updated_task.title}"
         }, 
         headers={
-            "Authorization": ("Bearer " + os.environ.get("SLACK_BOT_TOKEN"))
+            "Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"
         })
 
     return {
