@@ -6,19 +6,16 @@ class Goal(db.Model):
     title = db.Column(db.String)
 
     def to_dict(self):
-        goal_dict = dict(
-            id = self.task_id,
+        return dict(
+            id = self.goal_id,
             title = self.title,
         )
-        if self.tasks:
-            goal_dict["tasks"] = self.tasks
-
-        return goal_dict
 
 
 
     @classmethod
-    def from_dict(cls,task_data):
+    def from_dict(cls, goal_data):
         new_goal = Goal(
-            title = task_data["title"]
+            title = goal_data["title"]
         )
+        return new_goal

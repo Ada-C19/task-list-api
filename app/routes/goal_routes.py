@@ -14,7 +14,7 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 def create_Goal():
         request_body = request.get_json()
         try:
-            new_goal = Goal.from_dict(request_body)
+            new_goal = Goal(title=request_body["title"])
         except KeyError:
             return {
                 "details": "Invalid data"
@@ -22,7 +22,7 @@ def create_Goal():
         db.session.add(new_goal)
         db.session.commit()
 
-        return {f"Goal": new_goal.to_dict()}, 201
+        return {f"goal": new_goal.to_dict()}, 201
 
 #GET ALL goals endpoint
 @goals_bp.route("", methods=["GET"])
@@ -33,8 +33,8 @@ def read_all_goals():
     return jsonify(goal_post), 200
 #GETS A Goal
 @goals_bp.route("/<goal_id>", methods=["GET"])
-def handle_Goal(Goal_id):
-    goal = validate_model(Goal, Goal_id)
+def handle_Goal(goal_id):
+    goal = validate_model(Goal, goal_id)
     
     return {f"goal": goal.to_dict()}, 200
 
@@ -82,4 +82,4 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return make_response({'details': f'Goal {goal.Goal_id} "{goal.title}" successfully deleted'}, 200)
+    return make_response({'details': f'Goal {goal.goal_id} "{goal.title}" successfully deleted'}, 200)
