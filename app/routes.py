@@ -76,7 +76,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(Task,task_id)
+    task = validate_task(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -87,7 +87,7 @@ def delete_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_as_complete(task_id):
-    task = validate_task(Task,task_id)
+    task = validate_task(Task, task_id)
 
     if task.completed_at is not None:
         return {"task": task.to_dict()}, 200
@@ -106,9 +106,8 @@ def mark_as_complete(task_id):
     return {"task": task.to_dict()}, 200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-
 def mark_as_incomplete(task_id):
-    task = validate_task(Task,task_id)
+    task = validate_task(Task, task_id)
 
     if task.completed_at is None:
         return {"task": task.to_dict()}, 200
