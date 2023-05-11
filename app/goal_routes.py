@@ -1,6 +1,8 @@
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+from app.task_routes import validate_task
 # import datetime
 # import requests
 # from app import token 
@@ -82,3 +84,60 @@ def delete_one_goal(id):
     db.session.commit()
     
     return make_response(jsonify(deleted_response), 200)
+
+@goal_bp.route("/<id>/tasks", methods=["POST"])
+def add_tasks_to_goal(id):
+    goal = validate_goal(id)
+    goal_data = request.get_json()
+    task_ids = goal_data.get("task_ids", [])
+    
+    new_tasks = [validate_task(task_id) for task_id in task_ids]
+    
+    goal.tasks = new_tasks
+    
+    db.session.commit()
+    
+    updated_goal = validate_goal(id)
+    
+    return make_response(jsonify({"id": updated_goal.goal_id, "task_ids": task_ids}), 200)
+    
+@goal_bp.route("/<id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(id):
+    goal = validate_goal(id)
+    # goal_data = request.get_json()
+    tasks = goal.tasks
+    
+    task_list = []
+    
+    for task in tasks:
+        task_dict = task.to_dict()
+        task_list.append(task_dict)
+        
+    return jsonify({"goal_id": goal.goal_id,"tasks": task_list }, 200)
+
+@goal_bp.route("/<id>/tasks", methods=["GET"])
+def get_goal_no_matching_tasks(id):
+    goal = validate_goal(id)
+    tasks = goal.tasks
+    task_list = []
+    
+    for task in tasks:
+        task_dict = task.to_dict()
+        task_list.append(task_dict)
+        
+    return jsonify(task_list)
+    
+    
+    # goal = validate_goal(id)
+    # tasks = goal.tasks
+
+    # task_list = []
+    # for task in tasks:
+    #     task_dict = task.to_dict()
+    #     task_list.append(task_dict)
+
+    # return jsonify({"id": goal.goal_id, "title": goal.title, "tasks": task_list})
+
+@goal_bp.route("/<id>/tasks", methods=["GET"])
+def get_no_matching_goal_tasks(id):
+    abort(404, description="Goal not found")
