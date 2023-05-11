@@ -6,13 +6,19 @@ class Task(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
+    goal = db.relationship("Goal", back_populates="tasks")
+    __tablename__ = "task"
 
     def to_dict(self):
         task_dict = dict(
                 id = self.id,
                 title = self.title,
                 description = self.description
-            )   
+            )
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
+
         
         if self.completed_at:
             task_dict["is_complete"] = True
