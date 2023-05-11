@@ -4,8 +4,9 @@ from app.models.task import Task
 import datetime
 import os
 from dotenv import load_dotenv
-from slack_sdk import WebClient
+#from slack_sdk import WebClient
 from app.routes.routes import handle_id_request
+import requests 
 
 
 tasks_bp = Blueprint ("tasks", __name__, url_prefix="/tasks")
@@ -82,13 +83,21 @@ def finished_task(task_id):
     updated_task.completed_at = datetime.datetime.utcnow()
     db.session.commit()
     
-    slack_token = os.environ["SLACK_BOT_TOKEN"]
-    client = WebClient(token=slack_token)
+    #slack_token = os.environ["SLACK_BOT_TOKEN"]
 
-    result = client.chat_postMessage(
-        channel="task-notifications", 
-        text=f"Someone just completed the task {updated_task.title}"
-    )
+    url = "https://slack.com/api/chat.postMessage"
+    token = os.environ.get("SLACK_BOT_TOKEN")
+    data ={ "channel": "task-notifications",
+           "text":f"Someone just completed a task {updated_task.title}",
+           "token": token
+    }
+
+    response = requests.post(url, data=data)
+
+    # result = client.chat_postMessage(
+    #     channel="task-notifications", 
+    #     text=f"Someone just completed the task {updated_task.title}"
+    # )
 
     task_response = updated_task.to_dict()
 
