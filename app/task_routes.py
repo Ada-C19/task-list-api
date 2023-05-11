@@ -11,12 +11,13 @@ tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    check_task_data(request_body)
-
-    new_task = Task.from_dict(request_body)
-
-    db.session.add(new_task)
-    db.session.commit()
+    
+    try:
+        new_task = Task.from_dict(request_body)
+        db.session.add(new_task)
+        db.session.commit()
+    except KeyError:
+        return abort(make_response({"details": "Invalid data"}, 400))
 
     return make_response({"task": new_task.to_dict()}, 201)
 
@@ -98,9 +99,3 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
-
-
-# Helper Functions
-def check_task_data(request):
-    if "title" not in request or "description" not in request:
-        return abort(make_response({"details": "Invalid data"}, 400))
