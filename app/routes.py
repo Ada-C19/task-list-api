@@ -44,8 +44,6 @@ def create_task():
     return make_response(jsonify(response), 201)
 
 
-
-
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
     sort = request.args.get("sort")
@@ -71,9 +69,11 @@ def get_tasks():
 
 
 
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task(task_id):
     task = validate_model(Task, task_id)
+    goal_id = task.goal_id if task.goal_id else None
 
     response = {
         "task": {
@@ -83,6 +83,9 @@ def get_task(task_id):
             "is_complete": False
         }
     }
+
+    if goal_id:
+        response["task"]["goal_id"] = goal_id
 
     return jsonify(response)
 
@@ -461,3 +464,90 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response({"details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"}, 200)
+
+#relationships start here:@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def associate_tasks_with_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    if not request_body:
+        return make_response({"details": "Invalid data"}, 400)
+
+    task_ids = request_body.get("task_ids")
+
+    if not task_ids or not isinstance(task_ids, list):
+        return make_response({"details": "Invalid data"}, 400)
+
+    tasks = Task.query.filter(Task.task_id.in_(task_ids)).all()
+
+    if len(tasks) != len(task_ids):
+        return make_response({"details": "Invalid task IDs"}, 400)
+
+    for task in tasks:
+        task.goal_id = goal.goal_id
+
+    db.session.commit()
+
+    response = {
+        "id": goal.goal_id,
+        "task_ids": task_ids
+    }
+
+    return make_response(jsonify(response), 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    tasks = Task.query.filter_by(goal_id=goal.goal_id).all()
+
+    response = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": []
+    }
+
+    for task in tasks:
+        response["tasks"].append({
+            "id": task.task_id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False  # Modify this based on your task model
+        })
+
+    return make_response(jsonify(response), 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def associate_tasks_with_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+
+    if goal is None:
+        return make_response(jsonify({"error": "Goal not found"}), 404)
+
+    request_body = request.get_json()
+
+    if not request_body:
+        return make_response(jsonify({"details": "Invalid data"}), 400)
+
+    task_ids = request_body.get("task_ids")
+
+    if not task_ids or not isinstance(task_ids, list):
+        return make_response(jsonify({"details": "Invalid data"}), 400)
+
+    tasks = Task.query.filter(Task.task_id.in_(task_ids)).all()
+
+    if len(tasks) != len(task_ids):
+        return make_response(jsonify({"details": "Invalid task IDs"}), 400)
+
+    for task in tasks:
+        task.goal_id = goal.goal_id
+
+    db.session.commit()
+
+    response = {
+        "id": goal.goal_id,
+        "task_ids": task_ids
+    }
+
+    return make_response(jsonify(response), 200)
