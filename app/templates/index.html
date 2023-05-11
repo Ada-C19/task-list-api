@@ -8,16 +8,17 @@
 <body> 
     <h1>Todo List</h1> 
     <div>Add a new todo item: 
-        <form action="{{ url_for('add') }}" method="POST"> 
+        <!-- <form action="{{ url_for('tasks_bp.add') }}" method="POST"> 
             <input type="text" name="todoitem"> 
             <input type="submit" value="Add Item" class="button"> 
-        </form> 
+        </form>  -->
     </div> 
     <div> 
         <h2>Incomplete Items</h2> 
         <ul> 
             {% for todo in incomplete %} 
-            <li style="font-size: 30pt" class='mark'>{{ todo.name }} <a href="{{ url_for('complete', id=todo.task_id) }}">Mark As Complete</a></li> 
+            <li style="font-size: 30pt" class='mark'>{{ todo.name }} </li> 
+            <!-- <a href="{{ url_for('complete', id=todo.task_id) }}">Mark As Complete</a> -->
             {% endfor %}     
         </ul> 
         <!-- <h2>Completed Items</h2> 
