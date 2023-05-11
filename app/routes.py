@@ -2,6 +2,9 @@ from flask import Blueprint, jsonify, request, abort, make_response
 from app import db
 from app.models.task import Task
 import datetime
+import os
+import requests
+from slack_sdk import WebClient
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -81,6 +84,9 @@ def update_task_completed_at(task_id):
     task.completed_at = datetime.date.today()
 
     db.session.commit()
+
+    client = WebClient(token=os.environ.get("SLACK_TOKEN"))
+    client.chat_postMessage(channel="task-notifications", text=f"Someone just completed the task {task.title}")
 
     return {"task": task.to_dict()}, 200
 
