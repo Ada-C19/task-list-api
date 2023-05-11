@@ -4,6 +4,17 @@
     <meta charset="UTF-8"> 
     <title>Todo App</title> 
     <!-- <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">  -->
+    <style>
+        body{ 
+    background:black; 
+    color:pink; 
+    margin-top: 5px; 
+} 
+.button{ 
+    color:mediumaquamarine; 
+} 
+.mark{font-size: 10px;} 
+    </style>
 </head> 
 <body> 
     <h1>Todo List</h1> 
@@ -17,7 +28,7 @@
         <h2>Incomplete Items</h2> 
         <ul> 
             {% for todo in incomplete %} 
-            <li style="font-size: 30pt" class='mark'>{{ todo.name }} </li> 
+            <li style="font-size: 30pt" class='mark'>{{ todo.title }} </li> 
             <!-- <a href="{{ url_for('complete', id=todo.task_id) }}">Mark As Complete</a> -->
             {% endfor %}     
         </ul> 
