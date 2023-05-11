@@ -91,14 +91,3 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response({"details": f"Goal {goal.id} \"{goal.title}\" successfully deleted"})
-
-
-
-
-
-
-
-# Helper Functions
-def check_goal_data(request):
-    if "title" not in request:
-        return abort(make_response({"details": "Invalid data"}, 400))
