@@ -57,6 +57,25 @@ def read_one_saved_goal(goal_id):
         }
     }
 
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return make_response(
+        {
+            "goal": {
+                "id": goal.goal_id,
+                "title": goal.title,
+            }
+        }, 200
+    )
+
 
 def validate_goal(goal_id):
     goal = Goal.query.get(goal_id)
