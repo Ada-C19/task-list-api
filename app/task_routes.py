@@ -1,8 +1,10 @@
 from app import db
 from datetime import datetime
 from app.models.task import Task
-from app.helper import validate_model
+from app.helper import validate_model, post_slack
 from flask import Blueprint, jsonify, abort, make_response, request
+import os
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -60,8 +62,8 @@ def patch_complete_task(task_id):
     if not task.completed_at:
         task.completed_at = datetime.now().isoformat()
 
-
     db.session.commit()
+    post_slack(task.title)
     return make_response(jsonify({"task": task.validate_complete()}), 200)
 
 @tasks_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
@@ -69,6 +71,8 @@ def patch_incomplete_task(task_id):
     task = validate_model(Task, task_id)
     task.completed_at = None
     db.session.commit()
+    
+
     return make_response(jsonify({"task": task.validate_complete()}), 200)
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
