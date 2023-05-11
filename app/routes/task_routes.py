@@ -31,7 +31,8 @@ def get_tasks():
         for task in tasks:
             # return task dict and add it to list
             tasks_response.append(task.to_dict())
-        
+    
+    # return list of task dicts    
     return jsonify(tasks_response)
 
 ### Create a Task: Valid Task With `null` `completed_at`
@@ -53,6 +54,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
     
+    # return dict of task dicts
     return {"task": new_task.to_dict()}, 201
             
 ### Get One Task
@@ -65,9 +67,9 @@ def get_one_task(task_id):
     if task.goal is None:
             return {"task": task.to_dict() }
     else:
+        # otherwise, return add goal_id:value pair and return
+        # dict of task dicts
         task_with_goal = task.to_dict()
-        # Ask does it need to be task.goal.goal_id?
-        # otherwise, return task dict with goal_id:value pair
         task_with_goal["goal_id"] = task.goal_id
         return {"task": task_with_goal}
     
@@ -87,6 +89,7 @@ def update_task(task_id):
     # commit updated task
     db.session.commit()
     
+    # return dict of task dicts
     return {"task": task.to_dict()}
 
 ### Delete Task
@@ -129,6 +132,7 @@ def mark_comp_or_incomp(task_id, mark_status):
     # commit changes
     db.session.commit()
     
+    # return dict of task dicts
     return {"task": task.to_dict()} 
     
 ### No matching Task or Goal: Get, Update, and Delete

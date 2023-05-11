@@ -22,6 +22,7 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
     
+    # return dict of goal dicts
     return {"goal": new_goal.to_dict() }, 201
     
 # Get all saved goals or zero saved goals
@@ -38,7 +39,7 @@ def get_goals():
         # return goal dictionary and add it to list
         goals_response.append(goal.to_dict())
     
-    # return list of goals if they exist or return empty list if no goals    
+    # return list of goal dicts if they exist or return empty list if no goals    
     return jsonify(goals_response)
 
 # Get one goal
@@ -47,6 +48,7 @@ def get_one_goal(goal_id):
     # return goal if goal_id valid and exists
     goal = validate_item(Goal, goal_id)
     
+    # return dict of goal dicts
     return {"goal": goal.to_dict()}
     
 # Update goal
@@ -64,6 +66,7 @@ def update_goal(goal_id):
     # commit updated goal
     db.session.commit()
     
+    # return dict of goal dicts
     return {"goal": goal.to_dict()}
     
 # Delete goal
@@ -93,19 +96,13 @@ def post_task_ids_to_goal(goal_id):
     
     # loop thru each task ID
     for task_id in task_ids_list:
-        # get task w/ each task ID
-        task = Task.query.get(task_id)
-        # create new task and attach to goal if it doesn't exist
-        if not task:
-            new_task = Task(task_id=task_id, 
-                            goal=goal)
-            # add new task
-            db.session.add(new_task)
+        # return task if task_id valid and exists
+        task = validate_item(Task, task_id)
         
-        # attach task to goal if task already exists    
+        # attach task to goal
         task.goal = goal
         
-        # commit tasks attached to goal                 
+        # commit task attached to goal                 
         db.session.commit()
     
     return {"id": goal.goal_id,
@@ -119,7 +116,6 @@ def get_tasks_for_goal(goal_id):
     # return goal if goal_id valid and exists
     goal = validate_item(Goal, goal_id)
     
-    # Ask instructor how to jsonify this list w/o causing errors???
     # initialize list of tasks
     tasks_response = []
     #jsonify(tasks_response)
@@ -138,6 +134,7 @@ def get_tasks_for_goal(goal_id):
     # add tasks:value pair to goal dictionary
     goal_with_tasks["tasks"] = tasks_response
     
+    # return goal dict w/ task dicts
     return goal_with_tasks
 
 # No matching Goal or Task: Get, Update, and Delete
