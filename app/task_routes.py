@@ -165,4 +165,4 @@ def add():
 
 @tasks_bp.route('/test/')
 def test_page():
-        return '<h1>Testing the Flask Application Factory Pattern</h1>'
+        return render_template('test.html')
