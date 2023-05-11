@@ -19,11 +19,11 @@ def validate_task(cls,task_id):
         abort(make_response({"message":f"{cls.__name__} {task_id} not found"}, 404))
     return task
 
-def get_valid_item_by_id(validate_task,task_id):
-    try:
-        task_id = int(id)
-    except:
-        abort(make_response({'msg': f"Invalid id '{id}"}, 400))
+# def get_valid_item_by_id(validate_task,task_id):
+#     try:
+#         task_id = int(id)
+#     except:
+#         abort(make_response({'msg': f"Invalid id '{id}"}, 400))
 
 # POST request to create new task
 @tasks_bp.route("", methods=['POST'])
@@ -59,7 +59,6 @@ def get_all_tasks():
     return jsonify(tasks_response), 200
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
-
 def get_by_id(task_id):
     task = validate_task(Task, task_id)
 
@@ -81,13 +80,6 @@ def update_task(task_id):
     task_to_update.title = request_body["title"]
     task_to_update.description = request_body["description"]
    
-
-    
-    # slack = os.environ.get("slack_token")
-    # client = WebClient(token=slack)
-
-    # result = client.chat_postMessage(channel="task-notifications",
-    #     text=f"Someone just completed the task {task_to_update.title}")
 
     db.session.commit()
     
@@ -116,10 +108,13 @@ def mark_as_complete(task_id):
     else:
         task.completed_at = datetime.utcnow()
 
-    response = requests.post("https://slack.com/api/chat.postMessage", headers={"Authorization": "Bearer" + os.environ.get("SLACK_TOKEN")}, json={"channel": "text-notifications", "text": f"Someone just completed the task {task.title}"})
 
     db.session.commit()
-    db.session.commit()
+    slack = os.environ.get("SLACK_TOKEN")
+    client = WebClient(token=slack)
+
+    result = client.chat_postMessage(channel="task-notifications",
+    text=f"Someone just completed the task {task.title}")
 
     return make_response({"task": task.to_dict()}, 200)
 
