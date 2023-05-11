@@ -41,5 +41,17 @@ class Task(db.Model):
                 description=request_body['description'],
                 is_complete=request_body.get('is_complete', False),
                 completed_at=request_body.get('completed_at', None),
-                author_id=request_body.get('author_id', None)
+                goal_id=request_body.get('goal_id', None))
         return task
+    
+    ### temporal function: above from_dict needs to be refactored and it dependecies fixed accordingly. no time rn..
+    @classmethod
+    def from_dict_with_parent(cls, request_body, parent_id):
+        task = cls(
+                title=request_body['title'],
+                description=request_body['description'],
+                is_complete=request_body.get('is_complete', False),
+                completed_at=request_body.get('completed_at', None),
+                goal_id=parent_id)
+        return task
+    
