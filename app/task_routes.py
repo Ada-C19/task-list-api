@@ -108,6 +108,24 @@ def mark_complete(task_id):
             "id": task.task_id,
             "title": task.title,
             "description": task.description,
-            "is_complete": task.is_complete 
+            "is_complete": task.is_completem 
+        }
+    })
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_task(task_id)
+    
+    task.completed_at = None
+    task.is_complete = False
+    
+    db.session.commit()
+    
+    return make_response({
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
         }
     })
