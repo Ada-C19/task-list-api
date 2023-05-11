@@ -30,10 +30,8 @@ def list_all_tasks():
         tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.order_by(Task.title.asc()).all()
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
 
+    tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response)
 
 
