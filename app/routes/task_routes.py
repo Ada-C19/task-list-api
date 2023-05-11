@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
-from app.routes_helpers import validate_model, create_msg_slack
+from app.routes.routes_helpers import validate_model, create_msg_slack
 import datetime
 
 
