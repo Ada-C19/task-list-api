@@ -19,5 +19,5 @@ class Goal(db.Model):
         return cls(
             title=request_body["title"]
             )
-
+    
     

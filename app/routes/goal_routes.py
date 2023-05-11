@@ -27,3 +27,4 @@ def update_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=['DELETE'])
 def delete_goal(goal_id):
     return delete_instance(Goal, goal_id)
+

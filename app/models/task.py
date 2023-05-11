@@ -27,4 +27,3 @@ class Task(db.Model):
             goal_id=request_body.get("goal_id")
         )
 
-

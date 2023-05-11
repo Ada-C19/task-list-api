@@ -4,6 +4,7 @@ from app.models.goal import Goal
 from app import db
 from datetime import timezone, datetime
 from http import HTTPStatus
+from sqlalchemy import asc, desc
 
 
 def validate_id(cls, model_id):
@@ -47,11 +48,26 @@ def create_instance(cls):
 
 
 def get_all_instances(cls):
-    instances = cls.query.all()
+    sort_order = request.args.get("sort")
+
+    instances = cls.query
+
+    title_query = request.args.get("title")
+    if title_query:
+        instances = instances.filter_by(title=title_query)
+
+    if sort_order == "asc":
+        instances = instances.order_by(asc(cls.title))
+    elif sort_order == "desc":
+        instances = instances.order_by(desc(cls.title))
 
     instance_list = [instance.to_json() for instance in instances]
 
     return make_response(jsonify(instance_list), HTTPStatus.OK)
+
+
+
+	
 
 
 def get_one_instance(cls, model_id):
