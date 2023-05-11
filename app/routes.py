@@ -1,21 +1,13 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
+from app.routes_helpers import validate_model, create_msg_slack
+import datetime
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-#VALIDATE TASKS
-def validate_model(cls, model_id):
-    try:
-        model_id = int(model_id)
-    except:
-        abort(make_response({"message":f"{model_id} invalid"}, 400))
-    
-    model = cls.query.get(model_id)
 
-    if not model:
-        abort(make_response({"message":f"There's no {model_id} sorry."}, 404))
-    return model
 
 
 #POST endpoint CREATES A NEW TASK
@@ -33,9 +25,9 @@ def create_task():
 
         return {f"task": new_task.to_dict()}, 201
 
-#GET THE TASKS
+#GET ALL TASKS endpoint
 @tasks_bp.route("", methods=["GET"])
-def get_all_tasks():
+def read_all_tasks():
     sort = request.args.get("sort")
 
     if sort == "asc":
@@ -44,12 +36,12 @@ def get_all_tasks():
         tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
-        
+
     task_force = [task.to_dict() for task in tasks]
     return jsonify(task_force), 200
-
+#GETS A TASK
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def handle_tasks(task_id):
+def handle_task(task_id):
     task = validate_model(Task, task_id)
     
     return {f"task":task.to_dict()}, 200
@@ -66,6 +58,29 @@ def update_task(task_id):
     db.session.commit()
 
     return {"task": task.to_dict()}
+
+#MARK AS COMPLETE PATCH
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = datetime.datetime.now()
+
+    db.session.commit()
+    create_msg_slack(task)
+
+    return {"task": task.to_dict()}, 200
+
+#MARK AS INCOMPLETE PATCH endpoint
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_model(Task, task_id)
+
+    task.completed_at = None
+
+    db.session.commit()
+
+    return {"task": task.to_dict()}, 200
 
 #DELETES A TASK
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
