@@ -108,7 +108,7 @@ def mark_complete_on_incomplete_task(task_id):
     db.session.commit()
 
     headers = {
-        "Authorization": "Bearer " + os.environ.get("SLACK_API_TOKEN")
+        "Authorization": "Bearer " + f'{os.environ.get("SLACK_API_TOKEN")}'
     }
 
     data = {
