@@ -1,12 +1,14 @@
 #/task-list-api/app/routes.py
 from flask import Blueprint, request, jsonify
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from datetime import datetime
 from slack import send_slack_notification
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
@@ -89,3 +91,50 @@ def mark_incomplete(task_id):
         return jsonify(task=task.to_dict()), 200
     else:
         return jsonify(details="Task not found"), 404
+    
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_data = request.get_json()
+
+    if "title" not in request_data:
+        return jsonify(details="Invalid data"), 400
+
+    new_goal = Goal(title=request_data["title"])
+    db.session.add(new_goal)
+    db.session.commit()
+    return jsonify(goal=new_goal.to_dict()), 201
+
+@goals_bp.route("", methods=["GET"])
+def get_goals():
+    goals = Goal.query.all()
+    goals_response = [goal.to_dict() for goal in goals]
+    return jsonify(goals_response), 200
+
+@goals_bp.route("/<int:goal_id>", methods=["GET"])
+def get_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal:
+        return jsonify(goal=goal.to_dict()), 200
+    else:
+        return jsonify(details="Goal not found"), 404
+
+@goals_bp.route("/<int:goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal:
+        request_data = request.get_json()
+        goal.title = request_data.get("title", goal.title)
+        db.session.commit()
+        return jsonify(goal=goal.to_dict()), 200
+    else:
+        return jsonify(details="Goal not found"), 404
+
+@goals_bp.route("/<int:goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if goal:
+        db.session.delete(goal)
+        db.session.commit()
+        return jsonify(details=f'Goal {goal_id} "{goal.title}" successfully deleted'), 200
+    else:
+        return jsonify(details="Goal not found"), 404
