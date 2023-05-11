@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full motion-safe:scroll-smooth">
+  <head>
+    <title>Liz - Task List API :)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta name="description" content="Task List API Project for Ada Developers Academy. Backend built using flasky and postgresql. Front-end using html, css, and vanilla js.">
+    <link rel="canonical" href="https://liz-task-list-api.onrender.com/">
+    <meta property="og:title" content="Liz - Task List API :)">
+    <meta property="og:description" content="Task List API Project for Ada Developers Academy. Backend built using flasky and postgresql. Front-end using html, css, and vanilla js.">
+    <meta property="og:url" content="https://liz-task-list-api.onrender.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://liz-task-list-api.onrender.com/static/favicon/android-icon-192x192.png">
+    <meta property="og:image:width" content="192">
+    <meta property="og:image:height" content="192">
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='favicon/apple-icon-57x57.png')}}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='favicon/apple-icon-60x60.png')}}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='favicon/apple-icon-72x72.png')}}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('static', filename='favicon/apple-icon-76x76.png')}}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ url_for('static', filename='favicon/apple-icon-114x114.png')}}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ url_for('static', filename='favicon/apple-icon-120x120.png')}}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ url_for('static', filename='favicon/apple-icon-144x144.png')}}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon/apple-icon-152x152.png')}}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-icon-180x180.png')}}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='favicon/android-icon-192x192.png')}}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png')}}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ url_for('static', filename='favicon/favicon-96x96.png')}}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png')}}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon/manifest.json')}}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+  </head>
+  <body class="h-full min-h-screen overflow-x-hidden w-screen text-base bg-default text-default" style="background-image: linear-gradient(rgba(21, 0, 63, 0.396), rgba(0, 0, 0, 0.462)), url({{ url_for('static', filename='color-morph.svg') }});">
+
+    <div class="bg-black bg-opacity-30 rounded-xl mx-auto my-10" style="height: fit-content; width: 80vw; max-width: 800px; padding-bottom: 10px;">
+        <ul class="relative flex text-center text-neutral-50 text-3xl font-extrabold tracking-widest uppercase">
+          <li id="tasks-tab" class="px-2 w-1/2 tab rounded-t-xl active hover:underline pb-2"><a class="gradient-outline p-2" href="#">
+            <svg class="h-14 mx-auto -mt-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M17.75 2.001a2.25 2.25 0 0 1 2.245 2.096L20 4.25v10.128c-.12.08-.235.174-.341.28l-3.409 3.408l-.908-.91a2.242 2.242 0 0 0-1.5-.657h2.408a.75.75 0 1 0 0-1.5h-5.004a.75.75 0 0 0 0 1.5h2.413a2.25 2.25 0 0 0-1.5 3.838L13.817 22H6.25a2.25 2.25 0 0 1-2.245-2.096L4 19.75V4.251a2.25 2.25 0 0 1 2.096-2.245l.154-.005h11.5ZM9 7.751a1 1 0 1 0-2 0a1 1 0 0 0 2 0ZM11.246 7a.75.75 0 0 0 0 1.5h5.004a.75.75 0 1 0 0-1.5h-5.004Zm-.75 4.75c0 .414.336.75.75.75h5.004a.75.75 0 1 0 0-1.5h-5.004a.75.75 0 0 0-.75.75ZM9 11.75a1 1 0 1 0-2 0a1 1 0 0 0 2 0Zm0 3.998a1 1 0 1 0-2 0a1 1 0 0 0 2 0Zm7.25 4.441l4.47-4.47a.75.75 0 1 1 1.06 1.061l-5 5a.75.75 0 0 1-1.06 0l-2.5-2.501a.75.75 0 0 1 1.06-1.06l1.97 1.97Z"></path></svg>
+            Tasks</a></li>
+          <li id="goals-tab" class="px-2 w-1/2 tab rounded-t-xl hover:underline pb-2"><a class="gradient-outline p-2" href="#">
+            <svg class="h-14 mx-auto -mt-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10c0-1.16-.21-2.31-.61-3.39l-1.6 1.6c.14.59.21 1.19.21 1.79a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8c.6 0 1.2.07 1.79.21L15.4 2.6C14.31 2.21 13.16 2 12 2m7 0l-4 4v1.5l-2.55 2.55C12.3 10 12.15 10 12 10a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2c0-.15 0-.3-.05-.45L16.5 9H18l4-4h-3V2m-7 4a6 6 0 0 0-6 6a6 6 0 0 0 6 6a6 6 0 0 0 6-6h-2a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4V6Z"></path></svg>
+            Goals</a></li>
+        </ul>
+        <div class="w-full h-px bg-neutral-100"></div>
+        <div id="tasks-container" class="pt-1 text-white container mx-auto w-full ml-0">
+          <svg id="task-loading" class="h-24 w-96 mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="18" cy="12" r="0" fill="currentColor"><animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate></circle><circle cx="12" cy="12" r="0" fill="currentColor"><animate attributeName="r" begin=".33" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate></circle><circle cx="6" cy="12" r="0" fill="currentColor"><animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate></circle></svg>
+
+          <table id="tasks-table" style="width: 80vw; max-width: 800px;">
+          </table>
+            <button id="add-task-btn" onclick="showModal('add-task')"><span class="mx-auto">New Task</span></button>
+        </div>
+        <div id="goals-container" class="hidden pt-1 text-white container mx-auto w-full ml-0">
+          <table id="goals-table" style="width: 80vw; max-width: 800px;">
+          </table>
+            <button id="add-goal-btn" onclick="showModal('add-goal')" class="mb-10 pb-10"><span class="mx-auto">New Goal</span></button>
+        </div>
+    </div>
+    <p>Made with ❤️ by <a href="https://github.com/lissetet" target="_blank" class="link">Liz</a></p>
+    <p>For <a href="https://adadevelopersacademy.org/" target="_blank" class="link">Ada Developers Academy</a> - <a href="https://github.com/Ada-C19/task-list-api" target="_blank" class="link">Task List API Project</a></p>
+
+    <section id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center flex-wrap py-20 bg-neutral-500 bg-opacity-80 overflow-y-auto">
+      <div class="container px-4 mx-auto">
+        <div class="pt-10 px-6 pb-12 text-center max-w-lg mx-auto bg-white border rounded-xl shadow-3xl">
+          <svg id="modal-svg" class="h-14 mx-auto text-neutral-500 mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"></svg>
+          <h3 class="font-heading mb-2 text-xl font-semibold" id="modal-title"></h3>
+          <p class="mb-6 text-neutral-500" id="modal-subtitle"></p>
+
+          <div class="m-auto bg-opacity-70 rounded-lg p-2 max-w-md w-11/12">
+            <input type="hidden" id="item-id">
+            <input type="hidden" id="item-type">
+            <div class="form__group hidden" id="title-group">
+              <input type="text" id="title" class="form__field" placeholder="Title">
+              <label for="title" class="form__label">Title</label>
+            </div>
+
+            <div class="form__group hidden" id="description-group">
+              <textarea id="description" class="form__field" placeholder="Description" rows="6"></textarea>
+              <label for="description" class="form__label">Description</label>
+            </div>
+            <label for="tasks-select">Select goal tasks:</label>
+            <select id="tasks-select" name="tasks-select" multiple class="hidden w-full border rounded bg-neutral-50 mt-4">
+            </select>
+            <p class="mt-2 text-neutral-500 text-center w-full text-xs hidden" id="select-disclaimer">Selected items are already associated with the goal. Unselect to remove association. To add, select tasks which should be associated with the goal. </p>
+
+          </div>
+          <div class="flex flex-wrap justify-center -m-1 mt-6">
+            <div class="w-auto p-1"><button class="inline-flex px-5 py-2.5 text-sm font-medium border border-neutral-200 hover:border-neutral-300 rounded-full" onclick="hideModal()">Cancel</button></div>
+            <div class="w-auto p-1"><button id="confirm-btn" class="inline-flex px-5 py-2.5 text-sm text-neutral-50 font-medium rounded-full transition duration-300">Confirm</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="goal-details" class="hidden fixed inset-0 z-50 flex items-center justify-center flex-wrap py-20 bg-neutral-500 bg-opacity-80 overflow-y-auto">
+      <div class="container mx-auto">
+        <div class="pt-10 pb-12 max-w-lg mx-auto bg-white border rounded-xl shadow-3xl" style="height: fit-content; width: 80vw; max-width: 800px;">
+          <svg id="modal-svg" class="h-14 mx-auto text-neutral-500 mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10c0-1.16-.21-2.31-.61-3.39l-1.6 1.6c.14.59.21 1.19.21 1.79a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8c.6 0 1.2.07 1.79.21L15.4 2.6C14.31 2.21 13.16 2 12 2m7 0l-4 4v1.5l-2.55 2.55C12.3 10 12.15 10 12 10a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2c0-.15 0-.3-.05-.45L16.5 9H18l4-4h-3V2m-7 4a6 6 0 0 0-6 6a6 6 0 0 0 6 6a6 6 0 0 0 6-6h-2a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4V6Z"></path>
+          </svg>
+          <h3 class="font-heading mb-2 text-xl font-semibold text-center" id="goal-modal-title"></h3>
+          <p class="mb-6 text-neutral-500 text-center w-full" id="goal-modal-subtitle">Editing/deleting here will update the tasks table.</p>
+          <div id="tasks-container" class="pt-1 container mx-auto w-full ml-0">
+            <svg id="goal-detail-loading" class="h-24 w-96 mx-auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="18" cy="12" r="0" fill="currentColor"><animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate></circle><circle cx="12" cy="12" r="0" fill="currentColor"><animate attributeName="r" begin=".33" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate></circle><circle cx="6" cy="12" r="0" fill="currentColor"><animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate></circle></svg>
+            <p id="no-tasks-found" class="mx-auto w-full text-center">No tasks found</p>
+            <table class="ml-0" id="goal-modal-table" style="width: 80vw; max-width: 800px;">
+            </table>
+          </div>
+          <div class="flex flex-wrap justify-center -m-1 mt-6">
+            <div class="w-auto p-1"><button class="inline-flex py-2.5 text-sm font-medium border border-neutral-200 hover:border-neutral-300 rounded-full px-24" onclick="hideGoalDetails()">Done</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+  <script src="{{ url_for('static', filename='index.js') }}"></script>
+</html>
