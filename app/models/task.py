@@ -15,8 +15,7 @@ class Task(db.Model):
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'is_complete': self.is_complete,
-            'goal_id': self.goal_id
+            'is_complete': self.is_complete
             }
     
     #returns all the attributes that must be passed in order to create a record. All not nullable instance variables accept id.'
@@ -26,16 +25,6 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, request_body):
-        # if  not 'completed_at' in request_body:
-        #     task = cls(
-        #             title=request_body['title'],
-        #             description=request_body['description'])
-        # else:
-        #     task = cls(
-        #             title=request_body['title'],
-        #             description=request_body['description'],
-        #             is_complete=request_body['is_complete'],
-        #             completed_at=request_body['completed_at']) #func.now()??
         task = cls(
                 title=request_body['title'],
                 description=request_body['description'],
@@ -44,7 +33,17 @@ class Task(db.Model):
                 goal_id=request_body.get('goal_id', None))
         return task
     
-    ### temporal function: above from_dict needs to be refactored and it dependecies fixed accordingly. no time rn...
+    ### temporal function: above to_dict and from_dict needs to be refactored and it dependecies fixed accordingly. no time rn...
+    # @classmethod
+    # def to_dict_with_goal_id(cls, request_body):
+    #     if request_body['goal_id']:    
+    #         return {
+    #             'id': cls.id,
+    #             'title': cls.title,
+    #             'description': cls.description,
+    #             'is_complete': cls.is_complete,
+    #             'goal_id': cls.goal_id}
+        
     @classmethod
     def from_dict_with_parent(cls, request_body, parent_id):
         task = cls(
