@@ -129,6 +129,157 @@ def delete_task(task_id):
 
     return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"}, 200)
 
+#FIRST TRY
+
+# SLACKBOT_TOKEN = os.environ.get("SLACKBOT_TOKEN")
+
+# @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+# def mark_task_complete(task_id):
+#     task = validate_model(Task, task_id)
+
+#     if task.completed_at:
+#         response = {
+#             "task": {
+#                 "id": task.task_id,
+#                 "title": task.title,
+#                 "description": task.description,
+#                 "is_complete": True
+#             }
+#         }
+#     else:
+#         task.completed_at = datetime.now()
+#         db.session.commit()
+#         send_slack_notification(task.title)
+#         response = {
+#             "task": {
+#                 "id": task.task_id,
+#                 "title": task.title,
+#                 "description": task.description,
+#                 "is_complete": True
+#             }
+#         }
+
+#     return jsonify(response)
+
+# @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+# def mark_incomplete(task_id):
+#     task = validate_model(Task, task_id)
+
+#     if task.completed_at is None:
+#         response = {
+#             "task": {
+#                 "id": task.task_id,
+#                 "title": task.title,
+#                 "description": task.description,
+#                 "is_complete": False
+#             }
+#         }
+#         return make_response(jsonify(response), 200)
+
+#     task.completed_at = None
+#     db.session.commit()
+
+#     response = {
+#         "task": {
+#             "id": task.task_id,
+#             "title": task.title,
+#             "description": task.description,
+#             "is_complete": False
+#         }
+#     }
+
+#     return make_response(jsonify(response), 200)
+
+# def send_slack_notification(task_title):
+#     url = "https://slack.com/api/chat.postMessage"
+#     headers = {
+#         "Authorization": "Bearer " + SLACKBOT_TOKEN
+#     }
+#     data = {
+#         "channel": "api_test_channel",
+#         "text": f"Someone just completed the task {task_title}"
+#     }
+#     response = requests.post(url, headers=headers, json=data)
+#     response.raise_for_status()
+#     print(response.json())  # Print the response for debugging purposes
+#     print(SLACKBOT_TOKEN)
+
+
+# #Second try
+# # @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+# def mark_task_complete(task_id):
+#     task = validate_model(Task, task_id)
+
+#     if task.completed_at:
+#         response = {
+#             "task": {
+#                 "id": task.task_id,
+#                 "title": task.title,
+#                 "description": task.description,
+#                 "is_complete": True
+#             }
+#         }
+#     else:
+#         task.completed_at = datetime.now()
+#         db.session.commit()
+#         send_slack_notification(task.title)
+#         response = {
+#             "task": {
+#                 "id": task.task_id,
+#                 "title": task.title,
+#                 "description": task.description,
+#                 "is_complete": True
+#             }
+#         }
+
+#     return jsonify(response)
+
+
+# @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+# def mark_incomplete(task_id):
+#     task = validate_model(Task, task_id)
+
+#     if task.completed_at is None:
+#         response = {
+#             "task": {
+#                 "id": task.task_id,
+#                 "title": task.title,
+#                 "description": task.description,
+#                 "is_complete": False
+#             }
+#         }
+#         return make_response(jsonify(response), 200)
+
+#     task.completed_at = None
+#     db.session.commit()
+
+#     response = {
+#         "task": {
+#             "id": task.task_id,
+#             "title": task.title,
+#             "description": task.description,
+#             "is_complete": False
+#         }
+#     }
+
+#     return make_response(jsonify(response), 200)
+
+
+# def send_slack_notification(task_title):
+#     url = "https://slack.com/api/chat.postMessage"
+#     headers = {
+#         "Authorization": "Bearer " + SLACKBOT_TOKEN
+#     }
+#     data = {
+#         "channel": "api_test_channel",
+#         "text": f"Someone just completed the task {task_title}"
+#     }
+#     response = requests.post(url, headers=headers, json=data)
+#     response.raise_for_status()
+#     print(SLACKBOT_TOKEN)
+
+# EMBED try--immediately after implementation, tests ran green
+
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
     task = validate_model(Task, task_id)
@@ -145,7 +296,19 @@ def mark_task_complete(task_id):
     else:
         task.completed_at = datetime.now()
         db.session.commit()
-        send_slack_notification(task.title)
+
+        # Send Slack notification
+        url = "https://slack.com/api/chat.postMessage"
+        headers = {
+            "Authorization": "Bearer " + SLACKBOT_TOKEN
+        }
+        data = {
+            "channel": "api_test_channel",
+            "text": f"Someone just completed the task {task.title}"
+        }
+        response_slack = requests.post(url, headers=headers, json=data)
+        response_slack.raise_for_status()
+
         response = {
             "task": {
                 "id": task.task_id,
@@ -156,6 +319,7 @@ def mark_task_complete(task_id):
         }
 
     return jsonify(response)
+
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
@@ -175,6 +339,18 @@ def mark_incomplete(task_id):
     task.completed_at = None
     db.session.commit()
 
+    # Send Slack notification
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": "Bearer " + SLACKBOT_TOKEN
+    }
+    data = {
+        "channel": "api_test_channel",
+        "text": f"Someone just marked the task {task.title} as incomplete"
+    }
+    response_slack = requests.post(url, headers=headers, json=data)
+    response_slack.raise_for_status()
+
     response = {
         "task": {
             "id": task.task_id,
@@ -186,18 +362,7 @@ def mark_incomplete(task_id):
 
     return make_response(jsonify(response), 200)
 
-def send_slack_notification(task_title):
-    url = "https://slack.com/api/chat.postMessage"
-    headers = {
-        "Authorization": "Bearer " + SLACKBOT_TOKEN
-    }
-    data = {
-        "channel": "api_test_channel",
-        "text": f"Someone just completed the task {task_title}"
-    }
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
-    print (SLACKBOT_TOKEN)
+
 
 
 #GOALS routes to begin here:
@@ -242,18 +407,20 @@ def create_goal():
         return make_response({"details": "Invalid data"}, 400)
 
     goal = Goal(title=title)
-    db.session.commit()
+    db.session.add(goal)  # Add the goal object to the session
+    db.session.commit()  # Commit the changes to assign a goal_id
 
     response = {
         "goal": {
-            "id": goal.goal_id,
+            "id": goal.goal_id,  # Now goal.goal_id will have a value
             "title": goal.title
         }
     }
 
     return make_response(jsonify(response), 201)
 
-@goals_bp.route("/<int:goal_id>", methods=["PUT"])
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
@@ -274,7 +441,7 @@ def update_goal(goal_id):
 
     response = {
         "goal": {
-            "id": goal.goal_id,
+            "goal_id": goal.goal_id,
             "title": goal.title,
             "description": goal.description,
             "is_complete": False
@@ -282,6 +449,7 @@ def update_goal(goal_id):
     }
 
     return make_response(jsonify(response), 200)
+
 
 
 

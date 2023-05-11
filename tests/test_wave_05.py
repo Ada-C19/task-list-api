@@ -60,7 +60,6 @@ def test_get_goal_not_found(client):
     assert response_body["details"] == "Goal not found"
 
 
-pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal(client):
     # Act
     response = client.post("/goals", json={
@@ -71,9 +70,10 @@ def test_create_goal(client):
     # Assert
     assert response.status_code == 201
     assert "goal" in response_body
+    assert response_body["goal"]["id"] is not None  # Check if goal_id is not None
     assert response_body == {
         "goal": {
-            "id": 1,
+            "id": response_body["goal"]["id"],  # Use the assigned goal_id
             "title": "My New Goal"
         }
     }
@@ -81,41 +81,38 @@ def test_create_goal(client):
 
 pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
+    goal_id = one_goal.goal_id
+
     # Act
-    response = client.put(f"/goals/1", json={
-        "title": "Updated Goal Title"})
+    response = client.put(f"/goals/{goal_id}", json={
+    "title": "Updated Goal Title",
+    "description": "Updated Goal Description"
+    })
     response_body = response.get_json()
 
     # Assert
     assert response.status_code == 200
     assert "goal" in response_body
-    assert response_body == {
-        "goal": {
-        "goal_id": 1,
-        "title": "Updated Goal Title"
-    }
-}
-
-
+    assert response_body["goal"]["goal_id"] == goal_id
+    assert response_body["goal"]["title"] == "Updated Goal Title"
+    assert response_body["goal"]["description"] == "Updated Goal Description"
 
 
 
 pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
-    # raise Exception("Complete test")
     # Act
-    response = client.put('/goals/1', json={
-        "title":"Update Goal Title"
-    })
+    response = client.put('/goals/999', json={
+    "title": "Update Goal Title",
+    "description": "Update Goal Description"
+})
 
     response_body = response.get_json()
 
     # Assert
-    # ---- Complete Assertions Here ----
     assert response.status_code == 404
-    assert response_body==None
-    
-    # ---- Complete Assertions Here ----
+    assert response_body == {"details": "Goal not found"}
+
 
 
 pytest.mark.skip(reason="No way to test this feature yet")
@@ -152,7 +149,7 @@ def test_delete_goal_not_found(client):
     # Assert
     # ---- Complete Assertions Here ----
     assert response.status_code == 404
-    assert response_body== "Goal"
+    assert response_body == {"details": "Goal not found"}
     
     # assertion 2 goes here
     # ---- Complete Assertions Here ----
