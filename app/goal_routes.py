@@ -40,10 +40,8 @@ def add_tasks_to_goal(goal_id):
 # Read
 @goals_bp.route("", methods=["GET"])
 def list_all_goals():
-    goals_response = []
     goals = Goal.query.all()
-    for goal in goals:
-        goals_response.append(goal.to_dict())
+    goals_response = [goal.to_dict() for goal in goals]
 
     return jsonify(goals_response)
 
@@ -72,7 +70,6 @@ def update_goal(goal_id):
     request_body = request.get_json()
 
     goal.title = request_body["title"]
-
     db.session.commit()
 
     return make_response({"goal": goal.to_dict()})
