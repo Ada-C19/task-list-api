@@ -95,6 +95,17 @@ def read_all_tasks():
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
 
+    if task.goal_id:
+        return {
+        "task": {
+            "id": task.task_id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True if task.completed_at else False
+        }
+    }, 200
+
     return {
         "task": {
             "id": task.task_id,
@@ -228,11 +239,27 @@ def assign_tasks_to_goal(goal_id):
 @goal_bp.route("/<goal_id>/tasks", methods=['GET'])
 def read_goal_tasks(goal_id):
     goal = validate_model(Goal, goal_id)
+    tasklist = []
+
+    for task in goal.tasks:
+        tasklist.append({
+            "id": task.task_id,
+            "goal_id": goal.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True if task.completed_at else False
+        })
+    
+    print({
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasklist
+        })
 
     return {
         "id": goal.goal_id,
         "title": goal.title,
-        "tasks": goal.tasks
+        "tasks": tasklist
         }, 200
 
 @goal_bp.route("", methods=["GET"])
