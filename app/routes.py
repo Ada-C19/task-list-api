@@ -259,6 +259,6 @@ def assign_tasks_to_goal(goal_id):
 
     return {
     "id": goal.goal_id,
-    "task_ids": goal.tasks
+    "task_ids": goal.task_ids
     }
 
