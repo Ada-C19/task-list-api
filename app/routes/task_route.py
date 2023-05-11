@@ -1,26 +1,34 @@
+import requests
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
 from datetime import date
+import logging
+logging.basicConfig(level=logging.DEBUG)
+import json
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 # helper function
 
+
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
     except:
-        abort(make_response({"message": f"{cls.__name__} {model_id} is not valid."}, 400))
+        abort(make_response(
+            {"message": f"{cls.__name__} {model_id} is not valid."}, 400))
 
     model = cls.query.get(model_id)
 
     if not model:
-        abort(make_response({"message": f"{cls.__name__} {model_id} is not found."}, 404))
+        abort(make_response(
+            {"message": f"{cls.__name__} {model_id} is not found."}, 404))
 
     return model
 
 # route to get all tasks
+
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -41,6 +49,7 @@ def get_all_tasks():
 
 # route to create a new task
 
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -57,15 +66,17 @@ def create_task():
 
 # route to get a task by id
 
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task(task_id):
     task = validate_model(Task, task_id)
-    if task.goal: 
+    if task.goal:
         return jsonify({"task": task.to_dict_with_goal_id()}), 200
-        
+
     return jsonify({"task": task.to_dict()}), 200
 
 # route to update a task by id
+
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -81,6 +92,7 @@ def update_task(task_id):
 
 # route to delete a task by id
 
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
@@ -92,7 +104,7 @@ def delete_task(task_id):
 
 
 # route to mark Complete on an Incompleted Task
-@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])  #path param
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])  # path param
 def mark_complete_on_incomplete_task(task_id):
     task = validate_model(Task, task_id)
 
@@ -100,9 +112,24 @@ def mark_complete_on_incomplete_task(task_id):
 
     db.session.commit()
 
+    headers = {
+        # "Authorization": f'{os.environ.get("SLACK_API_TOKEN")}'
+        "Authorization": "Bearer xoxb-5269592245584-5242995041381-mAJRDv41nSrJzqFdr9DXyn8g"
+    }
+
+    data = {
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task {task.title}"
+    }
+    url = "https://slack.com/api/chat.postMessage"
+
+    response = requests.post(url, headers=headers, data=data)
+    print(response.text)
+
     return {"task": task.to_dict()}, 200
 
 # route to mark Incomplete on a Completed Task
+
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete_on_complete_task(task_id):
     task = validate_model(Task, task_id)
@@ -112,5 +139,3 @@ def mark_incomplete_on_complete_task(task_id):
     db.session.commit()
 
     return jsonify({"task": task.to_dict()}), 200
-
-
