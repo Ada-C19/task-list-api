@@ -5,13 +5,11 @@ from app import db
 from datetime import date
 import logging
 logging.basicConfig(level=logging.DEBUG)
-import json
 import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 # helper function
-
 
 def validate_model(cls, model_id):
     try:
@@ -29,7 +27,6 @@ def validate_model(cls, model_id):
     return model
 
 # route to get all tasks
-
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -50,7 +47,6 @@ def get_all_tasks():
 
 # route to create a new task
 
-
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -67,7 +63,6 @@ def create_task():
 
 # route to get a task by id
 
-
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task(task_id):
     task = validate_model(Task, task_id)
@@ -77,7 +72,6 @@ def get_task(task_id):
     return jsonify({"task": task.to_dict()}), 200
 
 # route to update a task by id
-
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -92,7 +86,6 @@ def update_task(task_id):
     return jsonify({"task": task.to_dict()}), 200
 
 # route to delete a task by id
-
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -113,10 +106,9 @@ def mark_complete_on_incomplete_task(task_id):
     task.completed_at = date.today()
 
     db.session.commit()
-    print(os.environ.get("SLACK_API_TOKEN"))
+
     headers = {
         "Authorization": "Bearer " + os.environ.get("SLACK_API_TOKEN")
-        # "Authorization": "Bearer xoxb-5269592245584-5242995041381-mAJRDv41nSrJzqFdr9DXyn8g"
     }
 
     data = {
