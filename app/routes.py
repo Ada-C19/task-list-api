@@ -176,7 +176,7 @@ def send_tasks_to_goal(goal_id):
 
     for task in tasks:
         if task.id in task_ids:
-            task.goal_id = goal_id
+            task.goal_id = goal.goal_id
     
     db.session.commit()
     return {"id": goal.goal_id, "task_ids": task_ids}, 200
