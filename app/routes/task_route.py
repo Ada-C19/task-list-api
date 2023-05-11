@@ -6,6 +6,7 @@ from datetime import date
 import logging
 logging.basicConfig(level=logging.DEBUG)
 import json
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -104,6 +105,7 @@ def delete_task(task_id):
 
 
 # route to mark Complete on an Incompleted Task
+
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])  # path param
 def mark_complete_on_incomplete_task(task_id):
     task = validate_model(Task, task_id)
@@ -111,19 +113,19 @@ def mark_complete_on_incomplete_task(task_id):
     task.completed_at = date.today()
 
     db.session.commit()
-
+    print(os.environ.get("SLACK_API_TOKEN"))
     headers = {
-        # "Authorization": f'{os.environ.get("SLACK_API_TOKEN")}'
-        "Authorization": "Bearer xoxb-5269592245584-5242995041381-mAJRDv41nSrJzqFdr9DXyn8g"
+        "Authorization": "Bearer " + os.environ.get("SLACK_API_TOKEN")
+        # "Authorization": "Bearer xoxb-5269592245584-5242995041381-mAJRDv41nSrJzqFdr9DXyn8g"
     }
 
     data = {
         "channel": "task-notifications",
-        "text": f"Someone just completed the task {task.title}"
+        "text": f"Someone completed {task.title}"
     }
     url = "https://slack.com/api/chat.postMessage"
 
-    response = requests.post(url, headers=headers, data=data)
+    response = requests.post(url, headers=headers, json=data)
     print(response.text)
 
     return {"task": task.to_dict()}, 200
