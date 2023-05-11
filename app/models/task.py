@@ -8,6 +8,7 @@ class Task(db.Model):
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
 
+
     @classmethod
     def show_required(cls):
         attributes = []
@@ -19,6 +20,7 @@ class Task(db.Model):
 
         return attributes
 
+
     @classmethod
     def from_dict(cls, data_dict):
         return cls(
@@ -26,6 +28,7 @@ class Task(db.Model):
             description=data_dict["description"],
             completed_at=None if not data_dict.get("completed_at") else data_dict["completed_at"]
         )
+
 
     def to_dict(self):
         return dict(
