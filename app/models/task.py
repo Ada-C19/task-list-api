@@ -22,13 +22,21 @@ class Task(db.Model):
             is_complete = True
         else:
             is_complete = False
-    
-        return {
-            "id": self.task_id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": is_complete
-            }
+        if self.goal_id: 
+            return {
+                "id": self.task_id,
+                "goal_id": self.goal_id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": is_complete
+                }
+        else:
+            return {
+                "id": self.task_id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": is_complete
+                }
     
     @classmethod
     def from_dict(cls, data_dict):

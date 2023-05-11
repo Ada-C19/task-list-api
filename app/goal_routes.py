@@ -49,20 +49,38 @@ def delete_goal(goal_id):
 ##### ONE_TO_MANY_ROUTES#####
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def create_tasks_to_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
-    request_body = request.get_json()
-    task_list = request_body.get("task_ids")
-    new_task_ids = []
-    for task in task_list:
-        task = validate_model(Task, task)
-        task.goal = goal
-        new_task_ids.append(task)
+def post_tasks_to_goal(goal_id):
+    try:
+        goal = validate_model(Goal, goal_id)
+        request_body = request.get_json()
+        task_list = request_body.get("task_ids")
+        new_task_ids = []
+        for task in task_list:
+            task = validate_model(Task, task)
+            task.goal_id = goal.goal_id
+            new_task_ids.append(task.task_id)
 
-    # db.session.add(new_task_ids)
-    db.session.commit()
+        db.session.commit()
+        return make_response(jsonify({"id": goal.goal_id, "task_ids": new_task_ids}), 200)
+    
+    except KeyError as error:
+        abort(make_response({"details": "Data not found"}, 404))
 
-    return make_response(jsonify({"id": goal.goal_id, "task_ids": new_task_ids}), 200)
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_tasks_for_specific_goal(goal_id):
+    try:
+        goal = validate_model(Goal, goal_id)
+        tasks_response = []
+        # tasks_response = [{"tasks": task.task_id for task in goal.tasks}]
+        for task in goal.tasks:
+            tasks_response.append(task.validate_complete())
+        return jsonify({"id": goal.goal_id, "tasks": tasks_response, "title": goal.title}), 200
+    
+    except KeyError as error:
+        abort(make_response({"details": "Data not found"}, 404))
+
+
+    
 
 
 
