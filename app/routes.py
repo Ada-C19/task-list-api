@@ -253,12 +253,20 @@ def delete_one_goal(goal_id):
 def assign_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
-    goal.tasks = request_body["task_ids"]
 
+    task_list = request_body["task_ids"]
+    for task_id in task_list:
+        task = validate_model(Task, task_id)
+        task.goal_id = goal.goal_id
+        task.goal = goal
+
+        
+        
+    # db.session.add(tasks_list)
     db.session.commit()
 
     return {
     "id": goal.goal_id,
-    "task_ids": goal.task_ids
+    "task_ids": task_list
     }
 
