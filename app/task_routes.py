@@ -45,6 +45,28 @@ def read_all_tasks():
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
 
+    if task.goal_id:
+        if not task.completed_at:
+            return make_response({
+                    "task": {
+                        "id": task.id,
+                        "goal_id": task.goal_id,
+                        "title": task.title,
+                        "description": task.description,
+                        "is_complete": False
+                    }
+            }, 200)
+        else:
+            return make_response({
+                "task": {
+                    "id": task.id,
+                    "goal_id": task.goal_id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": True
+                }
+            }, 200)
+
     return make_response(task.to_dict(), 200)
  
 
