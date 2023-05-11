@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
+from datetime import datetime
 from app import db
 
 task_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
@@ -47,7 +48,7 @@ def get_all_tasks():
 
     task_response = [Task.to_dict(task) for task in tasks]
 
-    return jsonify(task_response), 200
+    return make_response(jsonify(task_response), 200)
 
 
 @task_bp.route("/<task_id>", methods=["GET"])
@@ -77,6 +78,26 @@ def update_task(task_id):
         }
         })
 
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_as_complete(task_id):
+    task = validate_task(task_id)
+    if task.completed_at is not None:
+        return make_response({"task": task.to_dict()}, 200)
+    task.completed_at = datetime.utcnow()
+    db.session.commit()
+
+    #request to Slack wave 04
+    
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_as_incomplete(task_id):
+    task = validate_task(task_id)
+    if task.completed_at is None:
+        return make_response({"task": task.to_dict()}, 200)
+    task.completed_at = None
+    db.session.commit()
+    return make_response({"task": task.to_dict()}, 200)
 
 #DELETE TASK
 @task_bp.route("/<task_id>", methods=["DELETE"])
