@@ -9,19 +9,27 @@ class Task(db.Model):
     is_complete = db.Column(db.Boolean)
 
     def to_dict(self):
-        random_bool = True
-        if self.is_complete == True:
-            random_bool = True
+        if self.completed_at:
+            return dict(
+                id=self.task_id,
+                title=self.title,
+                description=self.description,
+                is_complete=True
+            )
+        
+        if not self.completed_at:
+            return dict(
+                id=self.task_id,
+                title=self.title,
+                description=self.description,
+                is_complete=False
+            )
         else:
-            random_bool = False
-        return dict(
-            id=self.task_id,
-            title=self.title,
-            description=self.description,
-            # In the Wave 1 test, they don't want completed_at in the response
-            # completed_at=self.completed_at,
-            # In the Wave 1 test, it wants is_complete to come back as True/False... in the db, this might be stored as "None" depending on the task
-            is_complete=random_bool
+            return dict(
+                id=self.task_id,
+                title=self.title,
+                description=self.description,
+                is_complete=False
         )
     
     @classmethod
