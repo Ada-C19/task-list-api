@@ -8,7 +8,7 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
     goal = db.relationship("Goal", back_populates="tasks")
-    __tablename__ = "task"
+    # __tablename__ = "task"
 
     def to_dict(self):
         task_dict = dict(

@@ -4,7 +4,7 @@ class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
-    __tablename__ = "goal"
+    # __tablename__ = "goal"
 
     def to_dict(self):
         return dict(
