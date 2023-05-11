@@ -10,3 +10,9 @@ class Goal(db.Model):
         goal_as_dict["id"] = self.goal_id
         goal_as_dict["title"] = self.title
         return goal_as_dict
+    
+    @classmethod
+    def from_dict(cls, data_dict):
+        return cls(
+            title = data_dict["title"]
+        )
