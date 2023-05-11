@@ -225,6 +225,16 @@ def assign_tasks_to_goal(goal_id):
         "task_ids": response_tasklist
         }, 200
 
+@goal_bp.route("/<goal_id>/tasks", methods=['GET'])
+def read_goal_tasks(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": goal.tasks
+        }, 200
+
 @goal_bp.route("", methods=["GET"])
 def read_all_goals():
     # querries
