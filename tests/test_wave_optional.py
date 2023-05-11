@@ -1,6 +1,6 @@
 def test_get_task_by_title(client, three_tasks):
     # Act
-    response = client.get("/tasks?title=Answer")
+    response = client.get("/tasks?title=answer")
     response_body = response.get_json()
 
     # Assert
