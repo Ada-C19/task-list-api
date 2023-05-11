@@ -44,7 +44,7 @@ class Task(db.Model):
                 goal_id=request_body.get('goal_id', None))
         return task
     
-    ### temporal function: above from_dict needs to be refactored and it dependecies fixed accordingly. no time rn..
+    ### temporal function: above from_dict needs to be refactored and it dependecies fixed accordingly. no time rn...
     @classmethod
     def from_dict_with_parent(cls, request_body, parent_id):
         task = cls(
