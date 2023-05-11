@@ -13,10 +13,7 @@ class Goal(db.Model):
         return dict(id=self.goal_id,
                     title=self.title)
     
-    def add_goal_key(self, dict_data):
-        return {"goal":dict_data}
-    
-    def add_keys_one_to_many(self, dict_data):
+    def add_goal_keys(self, dict_data):
         return {
         "id": self.goal_id,
         "title": self.title,

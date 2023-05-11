@@ -86,7 +86,6 @@ def test_create_task(client):
         }
     }
     
-    assert new_task
     assert new_task.title == "A Brand New Task"
     assert new_task.description == "Test Description"
     assert new_task.completed_at == None

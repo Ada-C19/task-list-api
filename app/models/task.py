@@ -1,5 +1,6 @@
 from app import db
 
+
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
@@ -24,9 +25,6 @@ class Task(db.Model):
             task_dict["goal_id"] = self.goal_id
         return task_dict         
 
-    @classmethod    
-    def add_task_key(cls, dict_data):
-        return {"task":dict_data}
     
 
 
