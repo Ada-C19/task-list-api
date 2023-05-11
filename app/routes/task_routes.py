@@ -33,6 +33,7 @@ def get_tasks():
     all_tasks = Task.query.all()
 
     response_list = [task.to_dict() for task in all_tasks]
+    
     if sort_by_query == "title":
         sort_key = get_title 
     elif sort_by_query == "id":
