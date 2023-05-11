@@ -6,7 +6,7 @@ from sqlalchemy import asc, desc
 # from .helper_functions import get_goal_instance, get_goal_by_id, update_goal_from_request, get_task_by_id
 from datetime import timezone, datetime
 
-from .helper_functions import create_instance, get_all_instances, get_one_instance
+from .helper_functions import create_instance, get_all_instances, get_one_instance, get_one_instance, delete_instance, update_instance
 
 goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
 
@@ -66,6 +66,11 @@ def get_one_goal(goal_id):
 #     goal = get_goal_by_id(goal_id)
 #     return make_response(jsonify({"goal": goal.to_json()})), 200
 
+
+@goals_bp.route("/<goal_id>", methods=['PUT'])
+def update_goal(goal_id):
+    return update_instance(Goal, goal_id)
+
 # @goals_bp.route("/<goal_id>", methods=['PUT'])
 # def update_goal(goal_id):
 #     goal = get_goal_by_id(goal_id)
@@ -76,6 +81,10 @@ def get_one_goal(goal_id):
 #     goal = updated_goal.to_json()
 
 #     return make_response(jsonify(goal=goal)), 200
+
+@goals_bp.route("/<goal_id>", methods=['DELETE'])
+def delete_goal(goal_id):
+    return delete_instance(Goal, goal_id)
 
 # @goals_bp.route("/<goal_id>", methods=['DELETE'])
 # def delete_goal(goal_id):

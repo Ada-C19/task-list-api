@@ -30,9 +30,9 @@ def generate_error_message(cls, model_id):
 
 
 def create_instance(cls):
-    request_body = request.get_json()
+    instance_info = request.get_json()
 
-    instance = cls.from_json(request_body)
+    instance = cls.from_json(instance_info)
 
     db.session.add(instance)
     db.session.commit()
@@ -53,6 +53,29 @@ def get_all_instances(cls):
 
 def get_one_instance(cls, model_id):
     instance = get_model_by_id(cls, model_id)
+    
+    instance = instance.to_json()
+    cls_type = cls.__name__.lower()
+    
+    return make_response(jsonify({cls_type: instance}), HTTPStatus.OK)
+
+
+def update_instance(cls, model_id):
+    instance = get_model_by_id(cls, model_id)
+    instance_info = request.get_json()
+
+    if 'title' in instance_info:
+        instance.title = instance_info['title']
+
+    if cls is Task:
+        if 'description' in instance_info:
+            instance.description = instance_info['description']
+        elif 'completed_at' in instance_info:
+            instance.completed_at = instance_info['completed_at']
+        else:
+            instance.completed_at = None
+
+    db.session.commit()
 
     instance = instance.to_json()
     cls_type = cls.__name__.lower()
@@ -60,87 +83,13 @@ def get_one_instance(cls, model_id):
     return make_response(jsonify({cls_type: instance}), HTTPStatus.OK)
 
 
+def delete_instance(cls, model_id):
+    instance = get_model_by_id(cls, model_id)
 
+    db.session.delete(instance)
+    db.session.commit()
 
+    message = f'{cls.__name__} {model_id} "{instance.title}" successfully deleted'
 
+    return make_response({"details" : message}, HTTPStatus.OK)
 
-
-
-# @tasks_bp.route("/<task_id>", methods=['PUT'])
-# def update_task(task_id):
-#     task = get_task_by_id(task_id)
-#     updated_task = update_task_from_request(task, request)
-
-#     db.session.commit()
-
-#     task = updated_task.to_json()
-
-#     return make_response(jsonify(task=task)), 200
-
-
-
-
-
-# def validate_data(request):
-#     instance_info = request.get_json()
-#     if not "title" in instance_info or not "description" in instance_info:
-#         abort(make_response({"details": "Invalid data"}, 400))
-#     instance_info["completed_at"] = instance_info.get("completed_at")
-#     return instance_info
-
-
-
-
-
-
-
- 
-
-# def update_task_from_request(task, request):
-#     task_info = request.get_json()
-
-#     if 'title' in task_info:
-#         task.title = task_info['title']
-#     if 'description' in task_info:
-#         task.description = task_info['description']
-#     if 'completed_at' in task_info:
-#         task.completed_at = task_info['completed_at']
-#     else:
-#         task.completed_at = None
-
-#     return task
-
-# def get_goal_instance(request):
-#     goal_info = validate_goal_data(request)
-#     return Goal.from_json(goal_info)
-
-# def validate_goal_id(goal_id):
-#     try:
-#         goal_id = int(goal_id)
-#     except:
-#         abort(make_response({"message": f"Invalid goal ID: {goal_id}"}, 400))
-
-#     return goal_id
-
-# def get_goal_by_id(goal_id):
-#     goal_id = validate_goal_id(goal_id)
-#     goal = db.session.get(Goal, goal_id)
-
-#     if not goal:
-#         abort(make_response({'message': f'Goal {goal_id} was not found.'}, 404))
-        
-#     return goal 
-
-# def update_goal_from_request(goal, request):
-#     goal_info = request.get_json()
-
-#     if 'title' in goal_info:
-#         goal.title = goal_info['title']
-
-#     return goal
-
-# def validate_goal_data(request):
-#     goal_info = request.get_json()
-#     if not "title" in goal_info:
-#         abort(make_response({"details": "Invalid data"}, 400))
-#     return goal_info
