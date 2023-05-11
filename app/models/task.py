@@ -7,6 +7,7 @@ class Task(db.Model):
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
     is_complete = db.Column(db.Boolean)
+    goal = db.relationship("Goal", back_populates="tasks")
 
     def to_dict(self):
         if self.completed_at:
