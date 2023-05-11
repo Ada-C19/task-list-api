@@ -41,15 +41,15 @@ def create_task():
 
 
 # GET SAVED TASKS
-@tasks_bp.route("", methods=["GET"])
-def get_saved_tasks():
-    tasks = Task.query.all()
-    tasks_list_response = []
+# @tasks_bp.route("", methods=["GET"])
+# def get_saved_tasks():
+#     tasks = Task.query.all()
+#     tasks_list_response = []
 
-    for task in tasks:
-        tasks_list_response.append(task.to_dict())
+#     for task in tasks:
+#         tasks_list_response.append(task.to_dict())
 
-    return jsonify(tasks_list_response)
+#     return jsonify(tasks_list_response)
 
 
 # GET ONE TASK
@@ -91,3 +91,25 @@ def delete_task(task_id):
 
     return jsonify(task_message)
 
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ WAVE 02 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Can this just replace GET SAVED TASKS???
+
+# SORT TASKS BY TITLE  
+@tasks_bp.route("", methods=["GET"])
+def sort_by_title():
+    # task_query = Task.query
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title)
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+    
+    task_response = [task.to_dict() for task in tasks]
+    
+    return jsonify(task_response)
