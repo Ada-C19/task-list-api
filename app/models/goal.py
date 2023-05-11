@@ -6,7 +6,7 @@ class Goal(db.Model):
     title = db.Column(db.String)
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
     
-    # create method to format responses
+    # create method to format responses for existing goal 
     def to_dict(self):
         return {
             "id": self.goal_id,
