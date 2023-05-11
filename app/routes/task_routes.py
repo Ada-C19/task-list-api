@@ -2,26 +2,23 @@ from app import db
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app.models.goal import Goal
-from sqlalchemy import asc, desc
-import requests
-import json
-from app.helper_functions import slack_mark_complete
+from app.helper_functions import slack_mark_complete, validate_model
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
+# goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
-def validate_model(cls, model_id):
-    try:
-        model_id = int(model_id)
-    except:
-        abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
+# def validate_model(cls, model_id):
+#     try:
+#         model_id = int(model_id)
+#     except:
+#         abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
 
-    model = cls.query.get(model_id)
+#     model = cls.query.get(model_id)
 
-    if not model:
-        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
+#     if not model:
+#         abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
 
-    return model
+#     return model
 
 # POST route for creating a task
 @tasks_bp.route("", methods=["POST"])
@@ -123,4 +120,4 @@ def update_incomplete_status(task_id):
     task_to_update.mark_incomplete(request_body)
 
     db.session.commit()
-    return jsonify({"task":task_to_update.to_json()}), 200 
+    return jsonify({"task":task_to_update.to_json()}), 200

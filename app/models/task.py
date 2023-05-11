@@ -1,6 +1,6 @@
 from app import db
+from app.models.goal import Goal
 from datetime import datetime
-import requests
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
