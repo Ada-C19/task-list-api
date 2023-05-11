@@ -185,7 +185,7 @@ def task_ids_to_a_goal(goal_id):
 
     for task_id in request_data["task_ids"]:
         task = validate_item(Task, task_id)
-        task.goal_id = goal_id
+        task.goal = goal
         
     db.session.commit()
 
