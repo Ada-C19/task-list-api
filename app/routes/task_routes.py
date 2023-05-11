@@ -1,11 +1,11 @@
-import datetime
+import requests
+import os
+from datetime import datetime
 from flask import Blueprint, jsonify, abort, make_response, request
+from dotenv import load_dotenv
 from app import db
 from app.models.task import Task
 from .routes_helpers import validate_model
-import requests
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -85,7 +85,7 @@ def mark_completed(id):
     task = validate_model(Task, id)
     prev_incomplete = True if not task.completed_at else False
 
-    task.completed_at = datetime.datetime.now()
+    task.completed_at = datetime.now()
     db.session.commit()
 
     if prev_incomplete:
