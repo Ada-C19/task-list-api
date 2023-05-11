@@ -3,7 +3,7 @@ from app.models.goal import Goal
 from app.helper import validate_model
 from flask import Blueprint, jsonify, abort, make_response, request
 
-goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
