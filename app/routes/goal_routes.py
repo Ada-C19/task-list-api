@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, abort, make_response, request
+from flask import Blueprint, jsonify, make_response, request
 from app.models.goal import Goal
 from app import db
 from sqlalchemy import asc, desc
-from .helper_functions import get_goal_instance, validate_goal_id, get_goal_by_id, update_goal_from_request
+from .helper_functions import get_goal_instance, get_goal_by_id, update_goal_from_request
 from datetime import timezone, datetime
 
 goals_bp = Blueprint('goals', __name__, url_prefix='/goals')

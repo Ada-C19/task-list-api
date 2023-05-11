@@ -4,8 +4,6 @@ from app.models.goal import Goal
 from app import db
 from datetime import timezone, datetime
 
-NOWTIME = datetime.now(timezone.utc)
-
 def get_task_instance(request):
     task_info = validate_data(request)
     return Task.from_dict(task_info)
