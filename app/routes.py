@@ -2,6 +2,12 @@ from app import db
 from app.models.task import Task
 from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
+from dotenv import load_dotenv
+import os
+import requests
+
+load_dotenv()
+API_TOKEN = os.environ.get("API_TOKEN")
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -99,7 +105,7 @@ def mark_task_complete(task_id):
         }
     
     db.session.commit()
-    
+    post_to_slack(task.title)
     return make_response(message, 200)
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
@@ -115,3 +121,14 @@ def mark_task_incomplete(task_id):
     db.session.commit()
     
     return make_response(message, 200)
+
+# badabingbadabot helper function
+def post_to_slack(task_title):
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    data = {
+        "channel": "api-test-channel",
+        "text": f"Someone just completed the task {task_title}"
+        }
+    response = requests.post(url, headers=headers, data=data)
+    return response
