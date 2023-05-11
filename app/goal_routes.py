@@ -1,6 +1,5 @@
 from app import db
 from app.models.goal import Goal
-from app.models.task import Task
 from app.helper_functions import validate_model, slack_bot_message
 from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import asc, desc
@@ -42,3 +41,14 @@ def read_one_goal(goal_id):
     goal = validate_model(goal_id)
 
     return make_response({"goal": goal.to_dict()}, 200)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(goal_id)
+    request_body = request.get_json()
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return make_response({"goal": goal.to_dict()}, 200)
+
