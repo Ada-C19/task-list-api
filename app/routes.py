@@ -134,7 +134,7 @@ def delete_task(task_id):
 def send_slack_notification(task_title, is_complete):
     url = "https://slack.com/api/chat.postMessage"
     headers = {
-        "Authorization": "Bearer " + SLACKBOT_TOKEN
+        "Authorization": f"Bearer {SLACKBOT_TOKEN}"
     }
 
     if is_complete:
@@ -179,8 +179,7 @@ def mark_task_complete(task_id):
         }
 
     return jsonify(response)
-
-
+#Test to commit
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
