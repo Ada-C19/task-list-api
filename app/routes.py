@@ -89,7 +89,7 @@ def update_task_completion(task_id):
     url = "https://slack.com/api/chat.postMessage"
     slack_token = os.environ.get("SLACK_API_TOKEN")
     data = {
-        "channel": "task-notifcations",
+        "channel": "task-notifications",
         "text": f"Someone just completed the task {task.title}",
         "token" : slack_token
     }
