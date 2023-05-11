@@ -34,3 +34,4 @@ def create_app(test_config=None):
     # Register Blueprints here
     app.register_blueprint(tasks_bp)
     return app
+
