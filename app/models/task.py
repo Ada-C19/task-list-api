@@ -24,7 +24,7 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, task_data):
-        title = task_data["title"],
+        title = task_data["title"]
         description = task_data["description"]
         if "completed_at" in task_data:
             completed_at = task_data["completed_at"]
