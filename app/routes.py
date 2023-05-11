@@ -3,6 +3,7 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import asc, desc
 from datetime import datetime
+import os, requests
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
@@ -73,7 +74,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
-    task = validate_model(Task, task_id)
+    task = validate_model(task_id)
 
     task.completed_at = datetime.utcnow()
     db.session.commit()
@@ -82,7 +83,8 @@ def mark_task_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
-    task = validate_model(Task, task_id)
+    task = validate_model(task_id)
+
     task.completed_at = None
     db.session.commit()
 
