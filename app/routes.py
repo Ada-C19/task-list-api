@@ -108,12 +108,14 @@ def mark_complete(task_id):
 
     SLACK_TOKEN = "xoxb-5256635652369-5250803635203-5JNwfXzwvXuJifEe1iBlNnOi"
 
-    query_params = {
+    request_body = {
         "token": SLACK_TOKEN,
         "channel": "task-notifications",
         "text": message }
 
-    requests.post(path, params=query_params)
+    requests.post(path, data=request_body)
+    
+
 
     return make_response(jsonify(response), 200)
 
