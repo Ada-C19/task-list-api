@@ -3,31 +3,35 @@ from app import db
 from app.models.task import Task
 import datetime
 import os
-import requests
 from slack_sdk import WebClient
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+
 
 def validate_item(model, item_id):
     try:
         item_id = int(item_id)
     except ValueError:
         return abort(make_response({"details": "Invalid data"}, 400))
-    
-    return model.query.get_or_404(item_id, description=f"No data with id {item_id} found.")
 
-# Task Routes
+    return model.query.get_or_404(
+        item_id, description=f"No data with id {item_id} found."
+    )
+
+
 @task_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
+
     if "title" not in request_body or "description" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
-    new_task = Task.from_dict(request_body)
 
+    new_task = Task.from_dict(request_body)
     db.session.add(new_task)
     db.session.commit()
 
     return {"task": new_task.to_dict()}, 201
+
 
 @task_bp.route("", methods=["GET"])
 def get_tasks():
@@ -41,16 +45,17 @@ def get_tasks():
     elif sort_query == "desc":
         all_tasks = Task.query.order_by(Task.title.desc()).all()
 
-    for task in all_tasks:
-        response.append(task.to_dict())
+    response = [task.to_dict() for task in all_tasks]
 
     return jsonify(response), 200
+
 
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_item(Task, task_id)
 
     return {"task": task.to_dict()}, 200
+
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -66,6 +71,7 @@ def update_task(task_id):
     db.session.commit()
 
     return {"task": task.to_dict()}, 200
+
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -86,9 +92,13 @@ def update_task_completed_at(task_id):
     db.session.commit()
 
     client = WebClient(token=os.environ.get("SLACK_TOKEN"))
-    client.chat_postMessage(channel="task-notifications", text=f"Someone just completed the task {task.title}")
+    client.chat_postMessage(
+        channel="task-notifications",
+        text=f"Someone just completed the task {task.title}",
+    )
 
     return {"task": task.to_dict()}, 200
+
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_task_incompleted_at(task_id):
