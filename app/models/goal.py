@@ -11,3 +11,8 @@ def to_dict(self):
         id=self.goal_id,
         title=self.title
     )
+
+@classmethod
+def from_dict(cls, goal_data):
+    new_goal = Goal(title=goal_data["title"])
+    return new_goal
