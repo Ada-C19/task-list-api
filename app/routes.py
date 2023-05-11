@@ -4,8 +4,12 @@ from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy.types import DateTime
 from sqlalchemy.sql.functions import now
-import requests
+import requests, logging
 import os
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+
 
 
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
@@ -102,12 +106,29 @@ def mark_task_complete(task_id):
         "task": task.task_to_dict()
     }
 
-    data_payload = {
-        "channel": "task_notifications",
-        "message": "Hi from my own API!"
-        }
-    r = requests.get("https://slack.com/api/chat.postMessage", auth=os.environ.get(
-            "SLACK_AUTH_TOKEN"), params=data_payload)
+    # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
+
+    client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+    logger = logging.getLogger(__name__)
+    channel_id = "task-notifications"
+
+    try:
+        # Call the chat.postMessage method using the WebClient
+        result = client.chat_postMessage(
+            channel=channel_id, 
+            text=f"Someone just completed the task {task.title}."
+        )
+        logger.info(result)
+
+    except SlackApiError as e:
+        logger.error(f"Error posting message: {e}")
+
+    # data_payload = {
+    #     "channel": "task_notifications",
+    #     "message": "Hi from my own API!"
+    #     }
+    # r = requests.get("https://slack.com/api/chat.postMessage", auth=os.environ.get(
+    #         "SLACK_AUTH_TOKEN"), params=data_payload)
 
     return jsonify(response_body)
 
@@ -127,26 +148,3 @@ def mark_task_incomplete(task_id):
     }
 
     return jsonify(response_body)
-
-import logging
-import os
-# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
-
-
-# WebClient instantiates a client that can call API methods
-# When using Bolt, you can use either `app.client` or the `client` passed to listeners.
-client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
-logger = logging.getLogger(__name__)
-# ID of the channel you want to send the message to
-channel_id = "C12345"
-
-try:
-    # Call the chat.postMessage method using the WebClient
-    result = client.chat_postMessage(
-        channel=channel_id, 
-        text="Hello world"
-    )
-    logger.info(result)
-
-except SlackApiError as e:
-    logger.error(f"Error posting message: {e}")
