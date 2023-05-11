@@ -27,14 +27,12 @@ def add_task():
 
 @task_bp.route("", methods=["GET"])
 def get_tasks():
-    response_list = []
     sort_query = request.args.get("sort", default=None)
     sort_by_query = request.args.get("sort_by", default="title")
 
     all_tasks = Task.query.all()
 
-    for task in all_tasks:
-        response_list.append(task.to_dict())
+    response_list = [task.to_dict() for task in all_tasks]
     if sort_by_query == "title":
         sort_key = get_title 
     elif sort_by_query == "id":

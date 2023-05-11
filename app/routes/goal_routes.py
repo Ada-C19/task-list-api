@@ -24,11 +24,9 @@ def add_goal():
 
 @goal_bp.route("", methods=["GET"])
 def get_goals():
-    response_list = []
     all_goals = Goal.query.all()
 
-    for goal in all_goals:
-        response_list.append(goal.to_dict())
+    response_list = [goal.to_dict() for goal in all_goals]
 
     return jsonify(response_list), 200
 
