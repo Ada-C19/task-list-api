@@ -8,7 +8,7 @@ from datetime import datetime
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-#ROUTE 1
+#ROUTE 1 POST
 @goals_bp.route("", methods=["POST"])
 def create_new_goal():
     request_body = request.get_json()
@@ -90,7 +90,7 @@ def add_task_to_goal(goal_id):
 
     for task_id in task_ids:
         task = validate_model(Task, task_id)
-        task.goal_id = goal_id
+        task.goal_id = goal.goal_id
         db.session.add(task)
 
     db.session.commit()

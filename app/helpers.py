@@ -3,7 +3,6 @@ from app.models.task import Task
 from app import db, token
 import requests
 
-
 def validate_model(cls, id):
     try:
         id = int(id)
@@ -12,8 +11,6 @@ def validate_model(cls, id):
         abort(make_response({"message": message}, 400))
 
     model = cls.query.get(id)
-
-    
 
     if not model:
         message = f"{cls.__name__} {id} not found"
@@ -32,7 +29,6 @@ def slack_post_message(task):
     headers = {
         'Authorization': f"Bearer {token}"
     }
-
     response = requests.post(api_url, headers=headers, data=payload)
 
     print(response.text)

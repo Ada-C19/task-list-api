@@ -4,13 +4,10 @@ from app.models.goal import Goal
 from app import db
 from app.helpers import validate_model, slack_post_message
 from datetime import datetime
-import requests
-
-
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-#ROUTE 1
+#ROUTE 1 POST
 @tasks_bp.route("", methods=["POST"])
 def create_new_task():
     request_body = request.get_json()
@@ -24,7 +21,7 @@ def create_new_task():
     except KeyError as e:
         abort(make_response({"details": f"missing {e}"}, 400))
 
-#ROUTE 2
+#ROUTE 2 GET
 @tasks_bp.route("", methods=["GET"])
 def get_saved_tasks():
     sort_order = request.args.get("sort")
@@ -53,7 +50,7 @@ def get_saved_tasks():
 
 
 
-#ROUTE 3
+#ROUTE 3 GET 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     try:
@@ -64,7 +61,7 @@ def get_one_task(task_id):
         abort(make_response({'details': f"Task {task_id} not found"}, 404))
 
 
-#ROUTE 4
+#ROUTE 4 PUT
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
     try:
@@ -80,7 +77,7 @@ def update_one_task(task_id):
     except KeyError:
         abort(make_response({'details': f"Task {task_id} not found"}, 404))
 
-#ROUTE 5
+#ROUTE 5 DELETE
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_one_task(task_id):
     try:
@@ -113,7 +110,6 @@ def task_mark_complete(task_id):
         return make_response({"task": task.to_dict()}, 200)
     except KeyError:
         abort(make_response({'details': f"Task {task_id} not found"}, 404))
-
 
 
 #WAVE 3 ROUTE 2
