@@ -104,7 +104,6 @@ def add_tasks_to_goal(id):
 @goal_bp.route("/<id>/tasks", methods=["GET"])
 def get_tasks_of_one_goal(id):
     goal = validate_goal(id)
-    # goal_data = request.get_json()
     tasks = goal.tasks
     
     task_list = []
@@ -113,30 +112,21 @@ def get_tasks_of_one_goal(id):
         task_dict = task.to_dict()
         task_list.append(task_dict)
         
-    return jsonify({"goal_id": goal.goal_id,"tasks": task_list }, 200)
+    return jsonify({"id": goal.goal_id,"tasks": task_list, "title": goal.title}), 200
 
 @goal_bp.route("/<id>/tasks", methods=["GET"])
 def get_goal_no_matching_tasks(id):
     goal = validate_goal(id)
     tasks = goal.tasks
+
     task_list = []
-    
     for task in tasks:
         task_dict = task.to_dict()
         task_list.append(task_dict)
-        
-    return jsonify(task_list)
-    
-    
-    # goal = validate_goal(id)
-    # tasks = goal.tasks
 
-    # task_list = []
-    # for task in tasks:
-    #     task_dict = task.to_dict()
-    #     task_list.append(task_dict)
+    response_data = {"goal_id": goal.goal_id, "tasks": task_list}
 
-    # return jsonify({"id": goal.goal_id, "title": goal.title, "tasks": task_list})
+    return jsonify(response_data), 200
 
 @goal_bp.route("/<id>/tasks", methods=["GET"])
 def get_no_matching_goal_tasks(id):
