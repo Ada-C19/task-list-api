@@ -45,7 +45,9 @@ def test_mark_complete_on_incomplete_task(client, one_task):
 pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_complete_task(client, completed_task):
     # Act
-    response = client.patch("/tasks/1/mark_incomplete")
+    with patch("requests.post") as mock_get:
+        mock_get.return_value.status_code = 200
+        response = client.patch("/tasks/1/mark_incomplete")
     response_body = response.get_json()
 
     # Assert
@@ -101,8 +103,10 @@ def test_mark_complete_on_completed_task(client, completed_task):
 
 pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_on_incomplete_task(client, one_task):
-    # Act
-    response = client.patch("/tasks/1/mark_incomplete")
+    #Act
+    with patch("requests.post") as mock_get:
+        mock_get.return_value.status_code = 200
+        response = client.patch("/tasks/1/mark_incomplete")
     response_body = response.get_json()
 
     # Assert
@@ -130,9 +134,6 @@ def test_mark_complete_missing_task(client):
     assert response_body == {"details": "Task not found"}
 
     # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
 
 
 pytest.mark.skip(reason="No way to test this feature yet")
