@@ -152,7 +152,7 @@ def delete_task(task_id):
 
 @tasks_bp.route('/ui/')
 def index():
-    incomplete = Task.query.filter_by(completed_at=False).all()
+    incomplete = Task.query.all()
     # complete = Task.query.filter_by(completed_at=True).all()
     return render_template('index.html', incomplete=incomplete)
                         # , complete=complete)
