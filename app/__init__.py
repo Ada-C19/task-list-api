@@ -17,7 +17,7 @@ def create_app(test_config=None):
     if test_config is None:
         # Set up configurations for production environment
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "SQLALCHEMY_DATABASE_URI")
+            "RENDER_DATABASE_URI")
         app.config["SLACK_API_TOKEN"] = os.environ.get("SLACK_API_TOKEN")
         app.config["SLACK_API_URL"] = os.environ.get("SLACK_API_URL")
         app.config["SLACK_CHANNEL"] = os.environ.get("SLACK_CHANNEL")
