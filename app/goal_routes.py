@@ -30,3 +30,18 @@ def create_goal():
             }
         }, 201
     )
+
+@goals_bp.route("", methods=["GET"])
+def read_goals():
+    goals = Goal.query.all()
+
+    goals_response = []
+    for goal in goals:
+        goals_response.append(
+            {
+                "id": goal.goal_id,
+                "title": goal.title,
+            }
+        ), 200
+
+    return jsonify(goals_response)
