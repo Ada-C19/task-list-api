@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
-import re
+from sqlalchemy import asc, desc
 from app import db
 from app.models.task import Task
 
@@ -26,18 +26,24 @@ def create_tasks():
 
 @tasks_bp.route("", methods = ["GET"])
 def read_all_tasks():
-    tasks_response = []
     query_params = request.args.to_dict()
+    tasks = filter_tasks_by_params(query_params)
+    tasks_response = [task.task_to_dict() for task in tasks]
+    return jsonify(tasks_response)
 
+def filter_tasks_by_params(query_params):
+    sort_by = query_params.get("sort")
+    
+    if sort_by:
+        return get_sorted_tasks(query_params)
+    
     if query_params:
         query_params = {k.lower(): v.title() for k, v in query_params.items()}
         tasks = Task.query.filter_by(**query_params).all()
     else:
         tasks = Task.query.all()
-
-    tasks_response = [task.task_to_dict() for task in tasks]
-
-    return jsonify(tasks_response)
+    
+    return tasks
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
@@ -81,4 +87,14 @@ def validate_model(cls, id):
     
     return obj
 
+def get_sorted_tasks(query_params):
+    sort_param = query_params.pop('sort', None)
 
+    if sort_param == 'title':
+        return Task.query.filter_by(**query_params).order_by(Task.title.asc()).all()
+    elif sort_param == 'description':
+        return Task.query.filter_by(**query_params).order_by(Task.description.asc()).all()
+    elif sort_param == 'completed_at':
+        return Task.query.filter_by(**query_params).order_by(Task.completed_at.asc()).all()
+    else:
+        return Task.query.filter_by(**query_params).all()
