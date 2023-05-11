@@ -45,3 +45,14 @@ def read_goals():
         ), 200
 
     return jsonify(goals_response)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def read_one_saved_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    return {
+        "goal": {
+            "id": goal.goal_id,
+            "title": goal.title,
+        }
+    }
