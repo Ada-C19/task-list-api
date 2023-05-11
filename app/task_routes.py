@@ -40,13 +40,13 @@ def read_all_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
-    task = validate_model(task_id)
+    task = validate_model(Task, task_id)
 
     return make_response({"task": task.to_dict()}, 200)
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_model(task_id)
+    task = validate_model(Task, task_id)
     request_body = request.get_json()
 
     task.title = request_body["title"]
@@ -58,7 +58,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
-    task = validate_model(task_id)
+    task = validate_model(Task, task_id)
 
     task.completed_at = datetime.utcnow()
     db.session.commit()
@@ -69,7 +69,7 @@ def mark_task_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
-    task = validate_model(task_id)
+    task = validate_model(Task, task_id)
 
     task.completed_at = None
     db.session.commit()
@@ -78,7 +78,7 @@ def mark_task_incomplete(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_model(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()

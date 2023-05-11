@@ -3,7 +3,7 @@ from flask import make_response, abort
 import os, requests
 
 
-def validate_model(model_id):
+def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
     except:
