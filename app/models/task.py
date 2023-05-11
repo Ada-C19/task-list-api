@@ -1,12 +1,14 @@
 from app import db
+import datetime 
+
 
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    completed_at = db.Column(db.DateTime, default = None)
-    # completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    # completed_at = db.Column(db.DateTime, default = None)
+    completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
         
     @classmethod
