@@ -14,7 +14,7 @@ def create_task():
     request_body = request.get_json()
     if "title" not in request_body or "description" not in request_body:
         return make_response(jsonify({"details": "Invalid data"}), 400)
-    
+
     new_task = Task(
         title=request_body["title"],
         description=request_body["description"],
@@ -81,7 +81,7 @@ def mark_complete(task_id):
     db.session.commit()
 
     URL = "https://slack.com/api/chat.postMessage"
-    query_param = {"channel": "api-test-channel", "text": f"Someone just completed the task {task.title}"}
+    query_param = {"channel": "task-notification", "text": f"Someone just completed the task {task.title}"}
     headers = {"Authorization": os.environ.get("SLACK_BOT_TOKEN")}
     response_bot = requests.post(URL,params=query_param, headers=headers)
 
