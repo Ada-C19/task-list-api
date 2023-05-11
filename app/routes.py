@@ -55,7 +55,6 @@ def get_all_tasks():
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     task = validate_item_by_id(Task, id)
-    print("IM PRINTING", task.to_dict()) # DELETE THIS LATER
     return {"task": task.to_dict()}, 200
 
 
