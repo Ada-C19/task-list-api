@@ -53,8 +53,7 @@ def test_update_goal_200(client, one_goal):
         "title": "Updated goal Title",
     })
     response_body = response.get_json()
-    print(f"{response = }")
-    print(f"{response_body = }")
+
     # Assert
     assert response.status_code == 200
     assert "goal" in response_body
@@ -72,8 +71,7 @@ def test_delete_goal_200(client, one_goal):
     # Act
     response = client.delete("/goals/1")
     response_body = response.get_json()
-    print(f"{response = }")
-    print(f"{response_body = }")
+
     # Assert
     assert response.status_code == 200
     assert "details" in response_body
@@ -121,7 +119,7 @@ def test_create_goal_missing_title_400(client):
     # Assert
     assert response.status_code == 400
     assert response_body == {
-        "details": "Invalid data"
+        'details': "KeyError invalid Goal data, missing key: 'title'"
     }
 
 

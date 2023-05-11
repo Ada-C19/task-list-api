@@ -32,7 +32,10 @@ def generate_error_message(cls, model_id):
 def create_instance(cls):
     instance_info = request.get_json()
 
-    instance = cls.from_json(instance_info)
+    try:
+        instance = cls.from_json(instance_info)
+    except KeyError as err:
+        abort(make_response({"details": f"KeyError invalid {cls.__name__} data, missing key: {err}"}, HTTPStatus.BAD_REQUEST))
 
     db.session.add(instance)
     db.session.commit()
