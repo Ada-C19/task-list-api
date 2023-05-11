@@ -3,6 +3,7 @@ from app.models.task import Task
 from app import db
 from datetime import datetime
 import requests, os
+from app.helper_functions import validate_model
 
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
 
@@ -100,20 +101,6 @@ def delete_task(task_id):
 
 
 # Helper Functions
-def validate_model(cls, model_id):
-    try:
-        model_id = int(model_id)
-    except:
-        abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
-
-    model = cls.query.get(model_id)
-
-    if not model:
-        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
-
-    return model
-
-
 def check_task_data(request):
     if "title" not in request or "description" not in request:
         return abort(make_response({"details": "Invalid data"}, 400))
