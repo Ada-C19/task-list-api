@@ -36,7 +36,7 @@ def read_all_goals():
 
     return jsonify(all_goals), 200
 
-@goals_bp.route("/<task_id>", methods=["GET"])
+@goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
