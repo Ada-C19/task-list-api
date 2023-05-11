@@ -34,7 +34,7 @@ def get_all_tasks():
         task_query = task_query.order_by(desc(Task.title))
 
     if title_query:
-        task_query = Task.query.filter_by(title=title_query)
+        task_query = task_query.filter(Task.title.ilike(f"%{title_query}%"))
     
     tasks_response = [task.to_dict() for task in task_query]
     return jsonify(tasks_response)
