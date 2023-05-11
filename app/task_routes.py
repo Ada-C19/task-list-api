@@ -162,3 +162,7 @@ def add():
     db.session.add(todo)
     db.session.commit()
     return redirect(url_for('index'))
+
+@tasks_bp.route('/test/')
+def test_page():
+        return '<h1>Testing the Flask Application Factory Pattern</h1>'
