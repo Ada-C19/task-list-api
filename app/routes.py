@@ -24,7 +24,12 @@ def validate_model(cls, model_id):
 def create_task():
     request_body = request.get_json()
 
-    new_task = Task.from_dict(request_body)
+    try:
+        new_task = Task.from_dict(request_body)
+
+    # if not (new_task.title and new_task.description):
+    except KeyError as err:
+        abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_task)
     db.session.commit()
@@ -75,3 +80,14 @@ def update_task(task_id):
 
 
 # DELETE TASK
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    task_message = {"details": f'Task {task.task_id} \"{task.title}\" successfully deleted'}
+
+    return jsonify(task_message)
+
