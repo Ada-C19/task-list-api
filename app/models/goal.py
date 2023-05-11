@@ -20,3 +20,6 @@ class Goal(db.Model):
         "id": self.goal_id,
         "title": self.title,
         "task": [task.to_dict() for task in self.tasks]}
+
+    
+    
