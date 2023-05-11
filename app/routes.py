@@ -3,6 +3,13 @@ from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
+from datetime import datetime
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+import os
+import requests
+
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -115,7 +122,55 @@ def delete_task(task_id):
 
     return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'})
 
-    # make_response({"message":f"task {task_id} not found"}, 404))
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    
+    task = validate_task(task_id)
+    
+    task.completed_at = datetime.utcnow()
+
+#use requests instead of WebClient and add bearer... add token to .env look up requests.post
+    client = WebClient(token=os.environ.get("slack_token"))
+    client.chat_postMessage(channel="C0570RZGHDL", text=f"Someone just completed the task {task.title}")
+   
+
+    
+    if task.completed_at:
+        task.is_complete = True
+        
+    
+    db.session.commit()
+
+    return {"task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
+            }
+        }
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    
+    task = validate_task(task_id)
+    
+    if task.completed_at:
+        task.completed_at = None
+        task.is_complete = False
+        
+    
+    db.session.commit()
+
+    return {"task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
+            }
+        }
+
+
+    
 
     
 

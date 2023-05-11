@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 
 
+
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
