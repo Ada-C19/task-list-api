@@ -138,3 +138,35 @@ def delete_goal(goal_id):
         return jsonify(details=f'Goal {goal_id} "{goal.title}" successfully deleted'), 200
     else:
         return jsonify(details="Goal not found"), 404
+
+@goals_bp.route("/<int:goal_id>/tasks", methods=["POST"])
+def post_task_ids_to_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        return jsonify(details="Goal not found"), 404
+
+    request_data = request.get_json()
+
+    if "task_ids" not in request_data:
+        return jsonify(details="Invalid data"), 400
+
+    for task_id in request_data["task_ids"]:
+        task = Task.query.get(task_id)
+        if task:
+            task.goal_id = goal_id
+            db.session.commit()
+        else:
+            return jsonify(details=f"Task {task_id} not found"), 404
+
+    return jsonify(id=goal_id, task_ids=request_data["task_ids"]), 200
+
+@goals_bp.route("/<int:goal_id>/tasks", methods=["GET"])
+def get_tasks_for_specific_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        return jsonify(details="Goal not found"), 404
+
+    tasks = Task.query.filter_by(goal_id=goal_id).all()
+    tasks_response = [task.to_dict() for task in tasks]
+    return jsonify(id=goal_id, title=goal.title, tasks=tasks_response), 200
+
