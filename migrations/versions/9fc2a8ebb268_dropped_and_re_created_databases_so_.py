@@ -1,8 +1,8 @@
-"""re-creating databases
+"""dropped and re-created databases so migration would successfully detect render database connection string
 
-Revision ID: 5606b2125706
+Revision ID: 9fc2a8ebb268
 Revises: 
-Create Date: 2023-05-10 12:29:23.421419
+Create Date: 2023-05-11 16:53:17.682667
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5606b2125706'
+revision = '9fc2a8ebb268'
 down_revision = None
 branch_labels = None
 depends_on = None
