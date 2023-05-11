@@ -115,6 +115,27 @@ def mark_task_complete(task_id):
         }, 200
     )
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    task = validate_task(task_id)
+
+    request_body = request.get_json()
+
+    task.completed_at = None
+
+    db.session.commit()
+                
+    return make_response(
+        {
+            "task": {
+                "id": task.task_id,
+                "title": task.title,
+                "description": task.description,
+                "is_complete": False
+            }
+        }, 200
+    )
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_task(task_id)
