@@ -38,11 +38,17 @@ def create_task():
 
 @task_list_bp.route("", methods=["GET"])
 def get_all_tasks():
+    sort_query = request.args.get("sort")
+    if sort_query=
     tasks = Task.query.all()
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.task_to_dict())
+    tasks_response = [task.task_to_dict() for task in tasks]
 
+    return jsonify(tasks_response)
+
+@task_list_bp.route("/sort=asc", methods=["GET"])
+def get_all_tasks_asc():
+    tasks = Task.query.order_by(Task.title)
+    tasks_response = [task.task_to_dict() for task in tasks]
     return jsonify(tasks_response)
 
 @task_list_bp.route("/<task_id>", methods=["GET"])
@@ -79,3 +85,4 @@ def delete_task(task_id):
     db.session.commit()
 
     return response_body
+
