@@ -68,19 +68,6 @@ def update_task(task_id):
 
     return make_response(message, 200)
     
-# validate helper function
-# def validate_task(task_id):
-#     try:
-#         task_id = int(task_id)
-#     except:
-#         abort(make_response({"message":f"task {task_id} invalid"}, 400))
-
-#     tasks = Task.query.all()
-#     for task in tasks:
-#         if task.task_id == task_id:
-#             return task
-    
-#     abort(make_response({"message":f"task {task_id} not found"}, 404))
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
