@@ -3,13 +3,13 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from datetime import datetime
-from dotenv import load_dotenv
 import requests
 import os
 
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
+
 
 @task_bp.route("", methods=["POST"])
 def add_task():
@@ -28,7 +28,7 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify(new_task.to_dict_task()), 201
+    return jsonify({"task":new_task.to_dict()}), 201
 
 
 def validate_task(task_id):
@@ -62,7 +62,7 @@ def get_tasks():
 def get_one_task(task_id):
     task = validate_task(task_id)
 
-    return task.to_dict_task(), 200
+    return jsonify({"task":task.to_dict()}), 200
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -74,8 +74,8 @@ def update_task(task_id):
     task.description = request_data["description"]
 
     db.session.commit()
-
-    return task.to_dict_task()
+    
+    return jsonify({"task":task.to_dict()})
 
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
@@ -102,10 +102,8 @@ def not_found(error):
 def complete_or_incomplete(task_id, action):
     task = validate_task(task_id)
     current_datetime = datetime.utcnow()
-    task_status = action
-    if task_status == "mark_complete":
+    if action == "mark_complete":
         task.completed_at = current_datetime
-        #send a message to the slack api here
         slack_bot_token = os.environ.get("SLACK_BOT_TOKEN")
         message = f"Someone just completed the task {task.title}"
         header = {
@@ -115,13 +113,14 @@ def complete_or_incomplete(task_id, action):
             "channel": "task-notifications",
             "text": message
         }
-        response = requests.post("https://slack.com/api/chat.postMessage", headers=header, json=data_to_send)   
+        requests.post("https://slack.com/api/chat.postMessage", headers=header, json=data_to_send)   
 
-    elif task_status == "mark_incomplete":
+    elif action == "mark_incomplete":
         task.completed_at = None
     db.session.commit()
 
-    return task.to_dict_task(), 200
+    return jsonify({"task":task.to_dict()}), 200
+
 
 # Goal routes --------------------------------
 
@@ -196,3 +195,39 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
+
+
+# one-to-many relationship -------------------
+
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def send_task_to_goal(goal_id):
+    request_data = request.get_json()
+    task_ids = request_data.get("task_ids", [])
+
+    for task_id in task_ids:
+        task = Task.query.get(task_id)
+        if task:
+            task.goal_id = goal_id
+
+            db.session.add(task)
+    db.session.commit()
+
+    return jsonify({"id": int(goal_id), "task_ids": task_ids}), 200
+
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_from_goal(goal_id):
+    goal = validate_goal(goal_id)
+    tasklist = []
+    goal = Goal.query.get(goal_id)
+    for task in goal.tasks:
+        task_dict = task.to_dict()
+        task_dict["goal_id"] = int(goal_id)
+        tasklist.append(task_dict)
+    return_data = {
+        "id": int(goal_id),
+        "title": goal.title,
+        "tasks": tasklist
+    }
+    return jsonify(return_data), 200
