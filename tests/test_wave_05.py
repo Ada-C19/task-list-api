@@ -46,7 +46,7 @@ def test_get_goal(client, one_goal):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
     response = client.get("/goals/1")
     response_body = response.get_json()
@@ -74,7 +74,7 @@ def test_create_goal(client):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
     response = client.put("/goals/1", json={"title": "Updated Goal Title"})
     response_body = response.get_json()
@@ -88,7 +88,7 @@ def test_update_goal(client, one_goal):
         }
     }
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
     response = client.put("/goals/1", json={"title": "Updated Goal Title"})
     response_body = response.get_json()
@@ -115,7 +115,7 @@ def test_delete_goal(client, one_goal):
 
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
     response = client.delete("/goals/1")
     response_body = response.get_json()
