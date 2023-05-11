@@ -43,14 +43,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return {
-        "task": {
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": True if new_task.completed_at else False
-        }
-    }, 201
+    return {"task": new_task.to_dict()}, 201
 
 # define a route for getting all tasks
 @task_bp.route("", methods=["GET"])
@@ -82,12 +75,7 @@ def read_all_tasks():
     tasks_response = []
 
     for task in tasks:
-        tasks_response.append({
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False
-        })
+        tasks_response.append(task.to_dict())
 
     return jsonify(tasks_response), 200
 
@@ -106,14 +94,7 @@ def read_one_task(task_id):
         }
     }, 200
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False
-        }
-    }, 200
+    return {"task": task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -126,14 +107,7 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False
-        }
-    }, 200
+    return {"task": task.to_dict()}, 200
 
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
@@ -155,14 +129,7 @@ def task_mark_complete(task_id):
 
     slack = requests.post(url_path, headers=header, json=body)
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False
-        }
-    }, 200
+    return {"task": task.to_dict()}, 200
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def task_mark_incomplete(task_id):
@@ -172,14 +139,7 @@ def task_mark_incomplete(task_id):
 
     db.session.commit()
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False
-        }
-    }, 200
+    return {"task": task.to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
