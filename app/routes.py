@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
 from app import db
 from app.models.task import Task
+from datetime import datetime
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -50,7 +51,6 @@ def read_one_task(task_id):
     task = validate_model(Task, task_id)
     task = Task.query.get(task_id)
     task = Task.generate_message(task)
-    # return jsonify(task.task_to_dict()), 200
     return jsonify(task), 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -90,11 +90,10 @@ def validate_model(cls, id):
 def get_sorted_tasks(query_params):
     sort_param = query_params.pop('sort', None)
 
-    if sort_param == 'title':
+    if sort_param == 'asc':
         return Task.query.filter_by(**query_params).order_by(Task.title.asc()).all()
-    elif sort_param == 'description':
-        return Task.query.filter_by(**query_params).order_by(Task.description.asc()).all()
-    elif sort_param == 'completed_at':
-        return Task.query.filter_by(**query_params).order_by(Task.completed_at.asc()).all()
+    elif sort_param == 'desc':
+        return Task.query.filter_by(**query_params).order_by(Task.title.desc()).all()
     else:
-        return Task.query.filter_by(**query_params).all()
+        return Task.query.filter_by(**query_params).order_by(Task.id.asc()).all()
+
