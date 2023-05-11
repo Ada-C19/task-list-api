@@ -89,12 +89,21 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
-    return { "task":{
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": bool(task.completed_at)}
-            }
+    if task.goal_id:
+        return { "task":{
+                    "id": task.task_id,
+                    "goal_id": task.goal_id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": bool(task.completed_at)}
+                }
+    else:
+        return { "task":{
+                    "id": task.task_id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": bool(task.completed_at)}
+                }
 
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -269,4 +278,25 @@ def assign_tasks_to_goal(goal_id):
     "id": goal.goal_id,
     "task_ids": task_list
     }
+
+
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    task_list = []
+    for task in goal.tasks:
+        task_list.append({
+    "id": task.task_id,
+    "goal_id": task.goal_id,
+    "title": task.title,
+    "description": task.description,
+    "is_complete": bool(task.completed_at)
+    })
+    return {
+    "id": goal.goal_id,
+    "title": goal.title,
+    "tasks": task_list
+    }
+
+
 
