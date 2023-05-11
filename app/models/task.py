@@ -13,33 +13,11 @@ class Task(db.Model):
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": self.completed_at is not None
+            "is_complete": False
         }
     
-
-    # def to_json(self):
-    #         return dict(
-    #             id=self.task_id,
-    #             title = self.title,
-    #             description = self.description,
-    #             is_complete=self.completed_at is not None
-    #         )
-    
-    # def __init__(self, title, description, completed_at=datetime.utcnow()):
-    #     self.title = title
-    #     self.description = description
-    #     self.completed_at = completed_at
-
-
-    
-
-
-
-
-
-
-
-    
-    
-    
-    
+    @classmethod
+    def from_dict(cls, request_body):
+        return cls(title=request_body.get("title"),
+                description=request_body.get("description"),
+                completed_at=request_body.get("completed_at"))

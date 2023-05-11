@@ -1,24 +1,3 @@
-# Wave 4: Using an External Web API
-
-## Goal
-
-When clients use the task list API, they can create, read, update, delete, and sort tasks. Clients can also mark them as complete or incomplete.
-
-When our users mark a task as complete, it's a big celebration! Our users want to be notified that a task was complete _with Slack messages_, using the Slack web API.
-
-Our goal is to integrate the Slack web API. When our API marks a task as "complete," it should also make a call to the Slack API. The Slack API will post a message to a workspace and channel of our choosing.
-
-## Requirements
-
-To complete this wave, follow these steps:
-
-1. Setup a Slack workspace
-1. Create a Slackbot with the right permissions, and get a Slackbot API key
-1. Verify that your Slackbot works using the Slack Tester
-1. Verify that your Slackbot works using Postman
-1. Modify the `/tasks/<task_id>/mark_complete` route to make a call to the Slack API
-1. Use Postman to verify your work
-
 ### Setup a Slack Workspace
 
 For this Task List API project, you will need an independent Slack workspace to use.

@@ -72,8 +72,7 @@ def test_update_goal_200(client, one_goal):
         "title": "Updated goal Title",
     })
     response_body = response.get_json()
-    print(f"{response = }")
-    print(f"{response_body = }")
+
     # Assert
     assert response.status_code == 200
     assert "goal" in response_body
