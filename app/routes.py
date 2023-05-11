@@ -8,7 +8,7 @@ from slack_sdk import WebClient
 
 #All routes defined with tasks_bp start with url_prefix (/tasks)
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 def get_valid_model_by_id(model, id):
     try:
@@ -123,8 +123,6 @@ def incomplete_task(task_id):
     return make_response(({"task":task_response}), 200)
 
 
-goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
-
 @goals_bp.route("", methods=['POST'])
 def create_goal():
     #Get the data from the request body
@@ -237,4 +235,4 @@ def handle_all_tasks_from_one_goal(goal_id):
         "id": goal.goal_id,
         "title": goal.title,
         "tasks": task_response
-        }), 200
+    }), 200

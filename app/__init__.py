@@ -4,13 +4,11 @@ from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
 
-
-def create_app(test_config=None):
+def create_app(test_config=None, foo=None):
     app = Flask(__name__)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
