@@ -70,7 +70,7 @@ def mark_complete(task_id, complete_status):
     task = validate_item(Task, task_id)
     if complete_status == "mark_complete":
         task.completed_at = datetime.now()
-        requests.post("https://slack.com/api/chat.postMessage", json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"token": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"})
+        requests.post("https://slack.com/api/chat.postMessage", json={"channel": "task-notifications", "text": f"Someone just completed the task {task.title}"}, headers={"Authorization": f"Bearer {os.environ.get('SLACK_BOT_TOKEN')}"})
     elif complete_status == "mark_incomplete":
         task.completed_at = None
     db.session.commit()
