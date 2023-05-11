@@ -76,7 +76,7 @@ def create_task_assigned_to_specific_goal(goal_id):
     db.session.commit()
     return {'details': f'New task "{new_task.title}" for goal "{goal.title}" created', 'task details': new_task.to_dict()}, 201
 
-@goals_bp.route('/<goal_id>/tasks', methods=['POST'])
+@goals_bp.route('/<goal_id>/few_tasks', methods=['POST'])
 def create_list_of_tasks_to_goal(goal_id):
     valid.validate_id(Goal, goal_id)
     request_body = request.get_json()
@@ -87,13 +87,14 @@ def create_list_of_tasks_to_goal(goal_id):
     db.session.commit()
     return {'id': goal_id, 'task_ids': [task.id for task in tasks_response]}, 201
 
-@goals_bp.route('/<goal_id>/tasks/<task_id>', methods=['PATCH'])
-def match_task_with_goal(goal_id, task_id):
-    goal = valid.validate_id(Goal, goal_id)
-    task = valid.validate_id(Task, task_id)
+@goals_bp.route('/<goal_id>/tasks', methods=['PATCH'])
+def match_tasks_with_goal(goal_id):
+    valid.validate_id(Goal, goal_id)
+    request_body = request.get_json()
     
-    task.goal_id = goal_id
+    for task_id in request_body['task_ids']:
+        task = valid.validate_id(Task, str(task_id))
+        task.goal_id = goal_id
 
     db.session.commit()
-    
-    return {'details': f'Task "{task.title}" assigned to goal {goal_id} "{goal.title}" successfully'}, 200
+    return {'id': goal_id, 'task_ids': request_body['task_ids']}, 200
