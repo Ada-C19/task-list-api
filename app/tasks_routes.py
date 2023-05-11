@@ -23,10 +23,10 @@ def send_slack_message_for_completed_task(task_title):
     slack_api_token = current_app.config["SLACK_API_TOKEN"]
     slack_api_url = current_app.config["SLACK_API_URL"]
     slack_channel = current_app.config["SLACK_CHANNEL"]
-    
+
     headers = {
-        'Authorization': f'Bearer {slack_api_token}',
-        'Content-type': 'application/json'
+        "Authorization": f"Bearer {slack_api_token}",
+        "Content-type": "application/json"
     }
 
     request_body = {
