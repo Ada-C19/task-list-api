@@ -6,12 +6,14 @@ class Goal(db.Model):
     title = db.Column(db.String)
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
+    # Return the goal in a dictionary form (without task list)
     def to_dict(self):
         return {
             "id": self.goal_id, 
             "title": self.title
         }
     
+    # Return the goal in dictionary form (with task list)
     def to_dict_with_tasks(self):
         task_list = []
         for task in self.tasks:
@@ -22,6 +24,7 @@ class Goal(db.Model):
             "tasks": task_list
         }
     
+    # Create an instance of a goal using a dictionary
     @classmethod
     def from_dict(cls, goal_data):
         return cls(
