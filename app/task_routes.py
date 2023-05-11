@@ -3,11 +3,9 @@ from app import db
 from app.models.task import Task
 from app.routes_helpers import validate_model
 from datetime import datetime
-from dotenv import load_dotenv
 import requests
 import os
 
-load_dotenv()
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
