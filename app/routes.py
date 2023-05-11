@@ -1,7 +1,10 @@
+#/task-list-api/app/routes.py
 from flask import Blueprint, request, jsonify
 from app.models.task import Task
 from app import db
 from datetime import datetime
+from slack import send_slack_notification
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -62,15 +65,19 @@ def delete_task(task_id):
         return jsonify(details=f'Task {task_id} "{task.title}" successfully deleted'), 200
     else:
         return jsonify(details="Task not found"), 404
+
+
 @tasks_bp.route("/<int:task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    task = Task.query.get(task_id)
+    task = Task.query.get(task_id)  # Find the task with the given task_id
     if task:
         task.completed_at = datetime.utcnow()
         db.session.commit()
+        send_slack_notification(task.title)  # Send Slack notification
         return jsonify(task=task.to_dict()), 200
     else:
         return jsonify(details="Task not found"), 404
+
 
 
 @tasks_bp.route("/<int:task_id>/mark_incomplete", methods=["PATCH"])
