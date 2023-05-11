@@ -19,7 +19,7 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    return make_response({"goal": new_goal.todict()}, 201)
+    return make_response({"goal": new_goal.to_dict()}, 201)
 
 @goals_bp.route("", methods=["GET"])
 def read_all_goals():
@@ -38,13 +38,13 @@ def read_all_goals():
 
 @goals_bp.route("/<task_id>", methods=["GET"])
 def read_one_goal(goal_id):
-    goal = validate_model(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     return make_response({"goal": goal.to_dict()}, 200)
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal = validate_model(goal_id)
+    goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
     goal.title = request_body["title"]
 
@@ -54,7 +54,7 @@ def update_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = validate_model(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
