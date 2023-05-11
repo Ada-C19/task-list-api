@@ -26,11 +26,9 @@ def create_goal():
 def add_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_ids = request.json.get("task_ids")
-    tasks = Task.query.filter(Task.id.in_(task_ids)).all()
 
-    for task in tasks:
-        goal.tasks.append(task)
-    
+    tasks = Task.query.filter(Task.id.in_(task_ids)).all()
+    goal.tasks = [task for task in tasks]
     db.session.commit()
 
     return make_response({
