@@ -18,11 +18,11 @@ class Goal(db.Model):
         task_list = []
         for task in self.tasks:
             task_list.append(task.to_dict_with_goal())
-        return {
-            "id": self.goal_id, 
-            "title": self.title,
-            "tasks": task_list
-        }
+
+        dictionary = self.to_dict()
+        dictionary["tasks"] = task_list
+        
+        return dictionary 
     
     # Create an instance of a goal using a dictionary
     @classmethod

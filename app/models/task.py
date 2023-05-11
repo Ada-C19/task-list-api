@@ -24,17 +24,11 @@ class Task(db.Model):
     
     # Return the Task in dictionary form (with goal id)
     def to_dict_with_goal(self):
-        if self.completed_at:
-            is_complete = True
-        else:
-            is_complete = False
-        return {
-            "id": self.task_id, 
-            "title": self.title,
-            "description": self.description,
-            "is_complete": is_complete,
-            "goal_id": self.goal_id
-        }
+        dictionary = self.to_dict()
+
+        dictionary["goal_id"] = self.goal_id
+        
+        return dictionary
     
     # Create an instance of a Task using a dictionary
     @classmethod
