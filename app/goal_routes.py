@@ -20,7 +20,7 @@ def create_goal():
         return abort(make_response({"details": "Invalid data"}, 400))
 
     return make_response({"goal": new_goal.to_dict()}, 201)
-    
+
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def add_tasks_to_goal(goal_id):
@@ -60,14 +60,12 @@ def list_specific_goal(goal_id):
 def list_tasks_for_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_list = [task.to_dict() for task in goal.tasks]
-    for task in task_list:
-        task["goal_id"] = goal.id
     return make_response({
                             "id": goal.id,
                             "title": goal.title,
                             "tasks": task_list
                         })
-            
+
 
 # Update
 @goals_bp.route("<goal_id>", methods=["PUT"])
