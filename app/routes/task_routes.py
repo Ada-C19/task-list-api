@@ -5,9 +5,7 @@ from datetime import datetime
 import requests
 import logging
 import os
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
-client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+slack_token = os.environ.get("SLACK_BOT_TOKEN")
 logger = logging.getLogger(__name__)
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
@@ -106,8 +104,10 @@ def mark_task_complete(task_id):
     channel_id = "task-notifications"
     response_text = f"Someone just completed the task {task.title}"
 
-    result = client.chat_postMessage(channel=channel_id, text=response_text)
+    slack_bot = {"channel": channel_id, "token": slack_token, "text": response_text}
 
+    requests.post(slack_path, data = slack_bot)
+    
     response_dict = message_for_only_one_task(task)
     return make_response(response_dict, 200)
 
