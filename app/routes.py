@@ -191,3 +191,25 @@ def delete_goal(goal_id):
         }
 
     return make_response(message, 200)
+
+# wave 6 nested routes
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_tasks_for_goal_assignment(goal_id):
+    request_body = request.get_json()
+    goal = validate_model(Goal, goal_id)
+    task_list = request_body.get("task_ids")
+
+    tasks = []
+    for task_id in task_list:
+        task = validate_model(Task, task_id)
+        task.goal = goal 
+        tasks.append(task_id)
+
+    db.session.commit()
+
+    message = {
+        "id": goal.goal_id,
+        "task_ids": tasks
+        }
+
+    return make_response(message, 200)
