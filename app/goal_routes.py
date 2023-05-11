@@ -89,11 +89,11 @@ def create_list_of_tasks_to_goal(goal_id):
     
     db.session.add_all(tasks_response)
     db.session.commit()
-    return {'id': goal_id, 'task_ids': [task.id for task in tasks_response]}, 201
+    return {'id': int(goal_id), 'task_ids': [task.id for task in tasks_response]}, 201
 
 
-@goals_bp.route('/<goal_id>/tasks', methods=['PATCH'])
-def match_tasks_with_goal(goal_id):
+@goals_bp.route('/<goal_id>/tasks', methods=['POST'])
+def post_task_ids_to_goal(goal_id):
     valid.validate_id(Goal, goal_id)
     request_body = request.get_json()
     
@@ -102,7 +102,7 @@ def match_tasks_with_goal(goal_id):
         task.goal_id = goal_id
 
     db.session.commit()
-    return {'id': goal_id, 'task_ids': request_body['task_ids']}, 200
+    return {'id': int(goal_id), 'task_ids': request_body['task_ids']}, 200
 
 
 @goals_bp.route('/<goal_id>/tasks', methods=['GET'])

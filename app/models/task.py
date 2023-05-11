@@ -54,4 +54,3 @@ class Task(db.Model):
                 completed_at=request_body.get('completed_at', None),
                 goal_id=parent_id)
         return task
-    
