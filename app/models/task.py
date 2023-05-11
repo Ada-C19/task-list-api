@@ -22,6 +22,11 @@ class Task(db.Model):
         return task_dict
 
 
+    def update_data(self, request_body):
+        self.title = request_body["title"]
+        self.description = request_body["description"]
+
+
     @classmethod
     def from_dict(cls, task_data): 
         new_task = Task(
