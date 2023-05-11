@@ -2,7 +2,6 @@ import os
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, request, make_response, abort
-import requests
 from datetime import datetime
 from slack_sdk import WebClient
 
@@ -19,11 +18,6 @@ def validate_task(cls,task_id):
         abort(make_response({"message":f"{cls.__name__} {task_id} not found"}, 404))
     return task
 
-# def get_valid_item_by_id(validate_task,task_id):
-#     try:
-#         task_id = int(id)
-#     except:
-#         abort(make_response({'msg': f"Invalid id '{id}"}, 400))
 
 # POST request to create new task
 @tasks_bp.route("", methods=['POST'])
@@ -61,15 +55,8 @@ def get_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_by_id(task_id):
     task = validate_task(Task, task_id)
+    return {"task": task.to_dict()}, 200
 
-    return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-  }
-    }, 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -116,7 +103,7 @@ def mark_as_complete(task_id):
     result = client.chat_postMessage(channel="task-notifications",
     text=f"Someone just completed the task {task.title}")
 
-    return make_response({"task": task.to_dict()}, 200)
+    return {"task": task.to_dict()}, 200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 
@@ -124,11 +111,11 @@ def mark_as_incomplete(task_id):
     task = validate_task(Task,task_id)
 
     if task.completed_at is None:
-        return make_response({"task": task.to_dict()}, 200)
+        return {"task": task.to_dict()}, 200
 
     else:
         task.completed_at = None
 
     db.session.commit()
 
-    return make_response({"task": task.to_dict()}, 200)
+    return {"task": task.to_dict()}, 200
