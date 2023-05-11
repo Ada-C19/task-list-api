@@ -1,5 +1,5 @@
 from flask import abort, make_response
-
+from app.models.task import Task 
 def validate_model(cls, id):
     try:
         id = int(id)
@@ -12,3 +12,9 @@ def validate_model(cls, id):
 
     return model
 
+def validate_data(cls, request_body):
+    
+    if "title" not in request_body or (cls == Task and "description" not in request_body):
+        abort(make_response({"details": "Invalid data"}, 400))
+
+    return request_body

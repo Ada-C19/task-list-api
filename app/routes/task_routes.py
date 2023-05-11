@@ -4,25 +4,26 @@ from app.models.task import Task
 import requests
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
-from .routes_helper import validate_model
+from .routes_helper import validate_model, validate_data
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
-    request_body = request.get_json()
+    #request_body = request.get_json()
+    request_body = validate_data(Task, request.get_json())
     response_body= {}
-    if "title" not in request_body or "description" not in request_body:
-       response_body = {"details": "Invalid data"}
-       return make_response(jsonify(response_body), 400)
-    else:
-        new_task = Task(title=request_body["title"],
+    # if "title" not in request_body or "description" not in request_body:
+    #    response_body = {"details": "Invalid data"}
+    #    return make_response(jsonify(response_body), 400)
+    # else:
+    new_task = Task(title=request_body["title"],
                     description=request_body["description"])
     
-        db.session.add(new_task)
-        db.session.commit()
+    db.session.add(new_task)
+    db.session.commit()
     
-        response_body["task"]= new_task.to_dict()
+    response_body["task"]= new_task.to_dict()
 
     return make_response(jsonify(response_body), 201)
 

@@ -3,25 +3,26 @@ import os
 from app.models.goal import Goal
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
-from .routes_helper import validate_model
+from .routes_helper import validate_model, validate_data
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
-    request_body = request.get_json()
+    #request_body = request.get_json()
+    request_body = validate_data(Goal, request.get_json())
     response_body= {}
 
-    if "title" not in request_body:
-       response_body = {"details": "Invalid data"}
-       return make_response(jsonify(response_body), 400)
-    else:
-        new_goal = Goal(title=request_body["title"])
+    # if "title" not in request_body:
+    #    response_body = {"details": "Invalid data"}
+    #    return make_response(jsonify(response_body), 400)
+    # else:
+    new_goal = Goal(title=request_body["title"])
         
-        db.session.add(new_goal)
-        db.session.commit()
+    db.session.add(new_goal)
+    db.session.commit()
 
-        response_body["goal"] = new_goal.to_dict()
+    response_body["goal"] = new_goal.to_dict()
 
     return make_response(jsonify(response_body), 201)
 
