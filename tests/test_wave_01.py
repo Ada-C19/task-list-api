@@ -72,26 +72,25 @@ def test_create_task(client):
     response = client.post("/tasks", json={
         "title": "A Brand New Task",
         "description": "Test Description",
-        "completed_at": None
     })
     response_body = response.get_json()
 
     # Assert
     assert response.status_code == 201
     assert "task" in response_body
-    new_task = Task.query.get(1)
-    assert new_task
-    assert new_task.title == "A Brand New Task"
-    assert new_task.description == "Test Description"
-    assert new_task.completed_at == None
     assert response_body == {
         "task": {
             "id": 1,
             "title": "A Brand New Task",
             "description": "Test Description",
-            "is_complete": True if new_task.completed_at else False
+            "is_complete": False
         }
     }
+    new_task = Task.query.get(1)
+    assert new_task
+    assert new_task.title == "A Brand New Task"
+    assert new_task.description == "Test Description"
+    assert new_task.completed_at == None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")

@@ -7,6 +7,7 @@ from app.models.task import Task
 # DEFINING THE TASK BLUEPRINT
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+# error handling
 def validate_model(task_id):
     try:
         task_id = int(task_id)
@@ -33,8 +34,8 @@ def create_task():
     #     return {"details": "Invalid data"}, 400
     
     new_task = Task(title=request_body["title"],
-                    description=request_body["description"], 
-                    completed_at=request_body["completed_at"])
+                    description=request_body["description"])
+                    # completed_at=request_body["completed_at"])
 
     db.session.add(new_task)
     db.session.commit()
@@ -51,7 +52,19 @@ def create_task():
 # READ ALL TASKS- GET request to /tasks
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
-    tasks = Task.query.all()
+    # tasks = Task.query.all()
+    # query param to sort tasks by title, ascending /tasks?sort=asc
+    # this code replaces the previous query all code
+    sorted_by_title = request.args.get("sort")
+    # print(request.args)
+    
+    if sorted_by_title== "asc":
+        tasks = Task.query.order_by(Task.title).all()
+    elif sorted_by_title == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    if not sorted_by_title:  
+        tasks= Task.query.all()
+    
     tasks_response = []
     for task in tasks:
         tasks_response.append({
@@ -77,6 +90,7 @@ def read_one_task(task_id):
         }
     }, 200
 
+
 # UPDATE TASK- PUT request to /tasks/<task_id>
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -97,7 +111,8 @@ def update_task(task_id):
         "is_complete": True if task.completed_at else False
         }
     }, 200
-    
+
+
 # DELETE TASK- DELETE request to /tasks/<task_id>
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_book(task_id):
