@@ -9,7 +9,6 @@ class Task(db.Model):
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable = True)
 
-
     def to_dict(self):
         return {"task": {
             "task_id": self.task_id,
@@ -41,4 +40,4 @@ class Task(db.Model):
             abort(make_response(jsonify({"message": f"{cls.__name__} {task_id} not found"}), 404))
 
         return task
-
+    

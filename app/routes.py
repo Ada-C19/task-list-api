@@ -2,6 +2,7 @@ from os import abort
 from app import db
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
+from datetime import datetime
 
 tasks_bp = Blueprint("task", __name__, url_prefix="/tasks")
 
@@ -11,15 +12,11 @@ def create_task():
     request_body = request.get_json()
     if "description" not in request_body:
         return make_response(jsonify({"details": "Invalid data"}), 400)
-    
     if "title" not in request_body:
         return make_response(jsonify({"details": "Invalid data"}), 400)
-    
     new_task = Task.from_dict(request_body)
-
     db.session.add(new_task)
     db.session.commit()
-
     return make_response(jsonify(new_task.to_dict()), 201)
 
 
@@ -28,12 +25,10 @@ def get_tasks():
     sort_order = request.args.get("sort", "asc")
     sort_key = lambda task: task.title
     tasks = Task.query.all()
-
     if len(tasks) > 1:
         tasks = sorted(tasks, key=sort_key)
         if sort_order == "desc":
             tasks = reversed(tasks)
-    
     task_list = [task.to_dict()["task"]for task in tasks]
     return make_response(jsonify(task_list), 200)
 
@@ -47,13 +42,11 @@ def read_one_task(task_id):
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = Task.validate_task(task_id)
-    
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
     task.completed_at = request_body.get("completed_at", None)
     db.session.commit()
-
     return make_response(jsonify(task.to_dict()), 200)
 
 
@@ -62,7 +55,27 @@ def delete_task(task_id):
     task = Task.validate_task(task_id)
     db.session.delete(task)
     db.session.commit()
+    return make_response(jsonify({"details": f'Task {task_id} "{task.title}" successfully deleted'}))
 
-    return make_response(jsonify({"details": 'Task 1 "Go on my daily walk 🏞" successfully deleted'}))
 
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = Task.validate_task(task_id)
+    if not task:
+        abort(make_response(jsonify({"message": f"Task {task_id} not found"}), 404))
+    if task.completed_at is None:
+        task.completed_at = datetime.now()
+        db.session.commit()
+    return make_response(jsonify(task.to_dict()), 200)
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = Task.validate_task(task_id)
+    if not task:
+        abort(make_response(jsonify({"message": f"Task {task_id} not found"}), 404))
+    if task.completed_at is not None:
+        task.completed_at = None
+        db.session.commit()
+    return make_response(jsonify(task.to_dict()), 200)
 
