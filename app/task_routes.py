@@ -77,6 +77,7 @@ def mark_complete(task_id):
     task = valid.validate_id(Task, task_id)
     
     task.completed_at, task.is_complete = func.now(), True
+    valid.slack_notification(task)
     
     db.session.commit()
     return {'task': task.to_dict()}, 200

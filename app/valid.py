@@ -1,4 +1,7 @@
 from flask import abort, make_response
+from dotenv import load_dotenv
+import requests
+import os
 
 
 def validate_id(model, id):
@@ -16,3 +19,10 @@ def validate_entry(model, request_body):
             abort(make_response({'details': 'Invalid data'}, 400))
             # abort(make_response({'Invalid Request': f'Missing {model.__name__} {atr}'}, 400))
     return request_body
+
+def slack_notification(entity):
+    slack_url = 'https://slack.com/api/chat.postMessage'
+    token = os.environ.get("SLACK_API_TOKEN")
+    notification = {'channel': 'task-notifications', 'text': f'Yeaaaay! Tha task {entity.title} is now completed! Congrats :-)'}
+    headers = {'Content-type': 'application/json', 'Authorization': f'Bearer {token}'}
+    requests.post(slack_url, json=notification, headers=headers)
