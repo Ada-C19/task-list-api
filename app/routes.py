@@ -3,6 +3,9 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app.models.goal import Goal
 from sqlalchemy import asc, desc
+import requests
+import json
+from app.helper_functions import slack_mark_complete
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -106,7 +109,11 @@ def update_complete_status(task_id):
     task_completed.mark_complete(request_body)
     
     db.session.commit()
+
+    slack_mark_complete(task_completed)
+
     return jsonify({"task":task_completed.to_json()}), 200 
+
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def update_incomplete_status(task_id):

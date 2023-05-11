@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+import requests
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
@@ -43,3 +44,17 @@ class Task(db.Model):
     def mark_incomplete(self, request_body):
         self.completed_at = None
     
+    def slack_mark_complete(self):
+        url = "https://slack.com/api/chat.postMessage"
+
+        data = {
+        "channel": "#task-list-api",
+        "text": f"Someone just completed the task {self.title}"
+        }
+        headers = {
+    'Authorization': 'Bearer xoxb-5245529664147-5239168009126-Tl7hTy4y6CCqqpi9jP6BJuVv'
+        }
+
+        response = requests.post(url, headers=headers, data=data)
+
+        print(response.text)
