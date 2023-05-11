@@ -169,11 +169,7 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    return {
-        "goal": {
-            "id": new_goal.goal_id,
-            "title": new_goal.title
-            }}, 201
+    return {"goal": new_goal.to_dict()}, 201
 
 @goal_bp.route("/<goal_id>/tasks", methods=['POST'])
 def assign_tasks_to_goal(goal_id):
@@ -209,12 +205,6 @@ def read_goal_tasks(goal_id):
             "description": task.description,
             "is_complete": True if task.completed_at else False
         })
-    
-    print({
-        "id": goal.goal_id,
-        "title": goal.title,
-        "tasks": tasklist
-        })
 
     return {
         "id": goal.goal_id,
@@ -243,10 +233,7 @@ def read_all_goals():
     goals_response = []
 
     for goal in goals:
-        goals_response.append({
-            "id": goal.goal_id,
-            "title": goal.title
-            })
+        goals_response.append(goal.to_dict())
 
     return jsonify(goals_response), 200
 
@@ -254,11 +241,7 @@ def read_all_goals():
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    return {
-        "goal": {
-            "id": goal.goal_id,
-            "title": goal.title
-            }}, 200
+    return {"goal": goal.to_dict()}, 200
 
 @goal_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
@@ -270,11 +253,7 @@ def update_goal(goal_id):
 
     db.session.commit()
 
-    return {
-        "goal": {
-            "id": goal.goal_id,
-            "title": goal.title
-            }}, 200
+    return {"goal": goal.to_dict()}, 200
 
 @goal_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
