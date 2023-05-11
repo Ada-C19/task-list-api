@@ -77,3 +77,41 @@ def delete_one_goal(goal_id):
     except KeyError:
         abort(make_response({'details': f"Goal {goal_id} not found"}, 404))
 
+#WAVE 6 ROUTE 1 ADD TASKS TO GOAL
+@goals_bp.route("<goal_id>/tasks", methods=["POST"])
+def add_task_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    task_ids = request_body.get("task_ids", [])
+
+    if not task_ids:
+        abort(make_response({"message": "Please provide task_ids in the request body."}, 400))
+
+    for task_id in task_ids:
+        task = validate_model(Task, task_id)
+        task.goal_id = goal_id
+        db.session.add(task)
+
+    db.session.commit()
+    goal_id = int(goal_id)
+    return make_response(jsonify({"id": goal_id, "task_ids": task_ids}), 200)
+
+
+#WAVE 6 ROUTE 2 GET GOAL'S TAKS
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def get_goals_tasks(goal_id):
+    goal = validate_model(Goal, goal_id)
+    try:
+        tasks_response = []
+        goal_id = int(goal_id)
+        for task in goal.tasks:
+            tasks_response.append(task.to_dict())
+
+        if len(tasks_response) == 0:
+            return (jsonify({"id": goal_id, "title": goal.title, "tasks": []}), 200)
+
+
+        return(jsonify({"id": goal_id, "title": goal.title, "tasks": tasks_response}), 200)
+    except KeyError:
+        abort(make_response({"message": f"Goal {goal_id} not found"}), 400)
