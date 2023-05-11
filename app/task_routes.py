@@ -4,7 +4,6 @@ from app.helper_functions import validate_model, slack_bot_message
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import asc, desc
 from datetime import datetime
-import os, requests
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
