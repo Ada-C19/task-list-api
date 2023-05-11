@@ -95,22 +95,29 @@ def delete_one_task(id):
     return make_response(jsonify({"details": f'Task {task.id} "{task.title}" successfully deleted'}), 200)
 
 
-@bp.route("/<id>/<mark>", methods=["PATCH"])
-def mark_one_task(id, mark):
+@bp.route("/<id>/mark_complete", methods=["PATCH"])
+def mark_complete_one_task(id):
     load_dotenv()
-    task = validate_model(Task, id)
-    if mark == "mark_complete":
-        task.completed_at = datetime.now()
-        path = "https://slack.com/api/chat.postMessage"
-        SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
-        headers = {"Authorization": f"Bearer {SLACK_TOKEN}"}
-        params = {"channel": "task-notifications",
-                        "text": f"Someone just completed the task {task.title}"
-        }
-        requests.post(path, params=params, headers=headers)    
-    elif mark == "mark_incomplete":
-        task.completed_at = None
+    task = validate_model(Task, id) 
+    task.completed_at = datetime.now()
+    
+    path = "https://slack.com/api/chat.postMessage"
+    SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
+    headers = {"Authorization": f"Bearer {SLACK_TOKEN}"}
+    params = {"channel": "task-notifications",
+            "text": f"Someone just completed the task {task.title}"
+            }
+    requests.post(path, params=params, headers=headers)    
 
+    db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
+
+
+@bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete_one_task(id):
+    task = validate_model(Task, id) 
+    task.completed_at = None
     db.session.commit()
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
