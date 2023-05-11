@@ -1,5 +1,4 @@
 from flask import abort, make_response
-from dotenv import load_dotenv
 import requests
 import os
 

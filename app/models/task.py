@@ -7,13 +7,16 @@ class Task(db.Model):
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
     is_complete = db.Column(db.Boolean, default=False)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goals.id'), nullable=True)
+    goal = db.relationship('Goal', back_populates='tasks')
 
     def to_dict(self):
         return {
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'is_complete': self.is_complete
+            'is_complete': self.is_complete,
+            'goal_id': self.goal_id
             }
     
     #returns all the attributes that must be passed in order to create a record. All not nullable instance variables accept id.'
@@ -37,5 +40,6 @@ class Task(db.Model):
                 title=request_body['title'],
                 description=request_body['description'],
                 is_complete=request_body.get('is_complete', False),
-                completed_at=request_body.get('completed_at', None))
+                completed_at=request_body.get('completed_at', None),
+                author_id=request_body.get('author_id', None)
         return task
