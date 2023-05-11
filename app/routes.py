@@ -89,17 +89,7 @@ def mark_incomplete(task_id):
 
 @goal_bp.route("", methods=["POST"])
 def create_goal():
-    request_body = request.get_json()
-
-    if "title" not in request_body:
-        abort(make_response({"details": "Invalid data"}, 400))
-
-    new_goal = Goal.from_dict(request_body)
-
-    db.session.add(new_goal)
-    db.session.commit()
-
-    return make_response({"goal": new_goal.to_dict()}, 201)
+    return create_new_model(Goal, request.get_json())
 
 
 @goal_bp.route("", methods=["GET"])
