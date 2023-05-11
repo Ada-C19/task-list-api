@@ -15,7 +15,7 @@ SLACK_API_KEY = os.getenv("SLACK_API_KEY")
 #CREATE BP/ENDPOINT
 tasks_bp = Blueprint("tasks",__name__, url_prefix="/tasks")
 
-#GET ALL tasks [GET]/tasks :(CREATE)
+# GET all Tasks - /tasks - (CREATE)
 @tasks_bp.route("",methods=["GET"])
 def get_all_tasks():
     if request.args.get("sort") == "asc":
@@ -32,7 +32,7 @@ def get_all_tasks():
     return jsonify(tasks_response),200
 
 
-#GET one task [GET]/tasks/<id> :(CREATE)
+# GET one Tasks - /tasks/<id> - (CREATE)
 @tasks_bp.route("/<id>",methods=["GET"])
 def get_one_task(id):
     task = validate_task(id)
@@ -44,18 +44,17 @@ def get_one_task(id):
 def create_tasks():
     request_body = request.get_json()
 
-    try:
-        if request_body["title"] or request_body["description"]:
-            new_task = Task.create_dict(request_body)
-    except KeyError:
+    if "title" not in request_body or "description" not in request_body:
         return make_response({"details": "Invalid data"}), 400
 
+    new_task = Task.create_dict(request_body)
+    
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify({"task":new_task.to_dict()}), 201
-
-#UPDATE one task/RETURN msg not found [PUT]/tasks/<id> :(UPDATE)
+    return make_response({"task":new_task.to_dict()}), 201
+  
+#UPDATE a task/ RETURN msg not found -PUT / tasks/<id> - (UPDATE)
 @tasks_bp.route("/<id>",methods=["PUT"])
 def update_task(id):
     task = Task.query.get(id)
@@ -69,7 +68,7 @@ def update_task(id):
     return jsonify({'task':task.to_dict()}),200
 
 
-#DELETE one task [DELETE]/tasks/<id> :(DELETE)
+#DELETE one task -DELETE /tasks/<id> - (DELETE)
 @tasks_bp.route("/<id>",methods=["DELETE"])
 def delete_task(id):
     task_to_delete = validate_task(id)
@@ -80,6 +79,7 @@ def delete_task(id):
     message = {'details': f'Task {id} "{task_to_delete.title}" successfully deleted'}
 
     return make_response(message,200)
+
 
 #PATCH mark as complete on incomplete [PATCH]/tasks/<id>/mark_complete :(UPDATE)
 @tasks_bp.route("/<id>/mark_complete",methods=["PATCH"])
@@ -103,6 +103,7 @@ def mark_completed(id):
     return jsonify({"task":task_to_complete.to_dict()}),200
 
 
+
 #PATCH mark as incomplete on in/complete [PATCH]/tasks/<id>/mark_incomplete :(UPDATE)
 @tasks_bp.route("/<id>/mark_incomplete",methods=["PATCH"])
 def mark_incomplete(id):
@@ -115,9 +116,3 @@ def mark_incomplete(id):
     db.session.commit()
 
     return jsonify({"task":task_incomplete.to_dict()}),200
-
-
-
-
-
-
