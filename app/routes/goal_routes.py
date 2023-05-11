@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, abort, make_response
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -20,12 +21,12 @@ def create_goal():
     if "title" not in request_body:
         abort(make_response({"details": "Invalid data"}, 400))
 
-    new_goal = Goal.from_goals_dict(request_body)
+    new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
     db.session.commit()
 
-    return {"goal": new_goal.to_goals_dict()}, 201
+    return {"goal": new_goal.to_dict()}, 201
 
 @goal_bp.route("", methods=["GET"])
 def get_goals():
@@ -34,7 +35,7 @@ def get_goals():
     all_goals = Goal.query.all()
 
     for goal in all_goals:
-        response.append(goal.to_goals_dict())
+        response.append(goal.to_dict())
 
     return jsonify(response), 200
 
@@ -42,7 +43,7 @@ def get_goals():
 def get_one_goal(goal_id):
     goal = validate_item(Goal, goal_id)
 
-    return {"goal": goal.to_goals_dict()}, 200
+    return {"goal": goal.to_dict()}, 200
 
 @goal_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
@@ -54,7 +55,7 @@ def update_goal(goal_id):
 
     db.session.commit()
 
-    return {"goal": goal.to_goals_dict()}, 200
+    return {"goal": goal.to_dict()}, 200
 
 @goal_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
@@ -64,3 +65,29 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_task_to_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    request_body = request.get_json()
+
+    task_ids = request_body["task_ids"]
+
+    for task_id in task_ids:
+        task = validate_item(Task, task_id)
+        goal.tasks.append(task)
+    
+    db.session.commit()
+
+    return {"id": int(goal_id), "task_ids": task_ids}, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_of_goal(goal_id):
+    goal = validate_item(Goal, goal_id)
+
+    goal_dict = goal.to_dict()
+    goal_dict["tasks"] = []
+    goal_dict["tasks"] = [task.to_dict() for task in goal.tasks]
+
+    return jsonify(goal_dict), 200
