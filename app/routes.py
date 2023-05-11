@@ -135,19 +135,24 @@ def post_to_slack(task_title):
     return response
 
 # goals routes - wave 5
-# goal_bp.route("", methods=["POST"])
-# def create_goal():
-#     request_body = request.get_json()
-#     try:
-#         new_task = Task(title = request_body["title"],
-#                         description = request_body["description"])
+@goal_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal(title=request_body["title"])
         
-#         db.session.add(new_task)
-#         db.session.commit()
+        db.session.add(new_goal)
+        db.session.commit()
 
-#         message  = {
-#             "task": new_task.to_dict()
-#         }
-#         return make_response(message, 201)
-#     except KeyError as e:
-#         abort(make_response({"details": "Invalid data"}, 400))
+        message  = {
+            "goal": new_goal.to_dict()
+        }
+        return make_response(message, 201)
+    except KeyError as e:
+        abort(make_response({"details": "Invalid data"}, 400))
+
+@goal_bp.route("", methods=["GET"])
+def get_goals():    
+    goals = Goal.query.all()
+    goals_response = [goal.to_dict() for goal in goals]
+    return jsonify(goals_response) 
