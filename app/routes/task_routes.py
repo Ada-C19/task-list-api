@@ -14,7 +14,7 @@ def validate_item(model, item_id):
     except ValueError:
         return abort(make_response({"details": "Invalid data"}, 400))
     
-    return model.query.get_or_404(item_id)
+    return model.query.get_or_404(item_id, description=f"No data with id {item_id} found.")
 
 # Task Routes
 @task_bp.route("", methods=["POST"])
