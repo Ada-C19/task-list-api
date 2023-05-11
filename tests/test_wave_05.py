@@ -57,7 +57,8 @@ def test_get_goal_not_found(client):
     # Assert
     # ---- Complete Test ----
     assert response.status_code == 404
-    assert response_body == {"message":"Goal 1 not found"}
+    assert response_body == {'message': "No Goal with id 1"}
+    
     # ---- Complete Test ----
 
 
@@ -122,7 +123,7 @@ def test_update_goal_not_found(client):
     # ---- Complete Assertions Here ----
     assert response.status_code == 404
     # assertion 2 goes here
-    assert response_body == {"message":f"Goal 1 not found"}
+    assert response_body == {'message': "No Goal with id 1"}
     # ---- Complete Assertions Here ----
 
 
