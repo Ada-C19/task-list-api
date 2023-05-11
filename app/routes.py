@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, make_response, request
+import os, requests
 from app import db
 from app.models.task import Task
 from app.helper import validate_id
@@ -59,6 +60,8 @@ def delete_task(id):
     db.session.commit()
     return jsonify({"details": f'Task {id} "{task.to_dict()["title"]}" successfully deleted'}), 200
 
+SLACK_API_URL = "https://slack.com/api/chat.postMessage"
+SLACKBOT_TOKEN = "xoxb-4680452269380-5269316188848-cgZRMqukeZCylI3G4FAOGG9p"
 
 #patch task-"tasks/1/mark_complete"-PATCH(update)
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
@@ -66,7 +69,21 @@ def mark_complete(id):
     task = validate_id(id)
     request_body = request.get_json()
     task.patch_complete()
-    db.session.commit()
+    db.session.commit()    
+    slackbot_token = os.environ.get('SLACKBOT_TOKEN')
+    if slackbot_token is None:
+        return jsonify({'error': 'Slackbot token not set'}), 500
+    message = f"Someone just completed the task {task.title}"
+    channel = request_body.get('channel', 'task-notification')
+    headers = {'Authorization': f'Bearer {slackbot_token}'}
+    payload = {
+    'channel': channel,
+    'text': message,
+    }
+    response = requests.post(SLACK_API_URL, headers=headers, json=payload)
+    if not response.ok:
+        return jsonify({'error': 'Failed to send Slack message'}), 500
+
     return jsonify({"task":task.to_dict()}), 200
 
 
