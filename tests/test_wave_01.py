@@ -67,7 +67,6 @@ def test_get_task_not_found(client):
     assert response_body == {"message":"Task 1 not found"}
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_create_task(client):
     # Act
     response = client.post("/tasks", json={
         "title": "A Brand New Task",
