@@ -39,6 +39,7 @@ def one_task(app):
         title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=None)
     db.session.add(new_task)
     db.session.commit()
+    
 
 
 # This fixture gets called in every test that
