@@ -21,3 +21,17 @@ def create_goal():
 
     return make_response({"goal": new_goal.todict()}, 201)
 
+@goals_bp.route("", methods=["GET"])
+def read_all_goals():
+    sort_query = request.args.get("sort")
+    if sort_query:
+        if sort_query == "asc":
+            goals = Goal.query.order_by(Goal.title.asc()).all()
+        elif sort_query == "desc":
+            goals = Goal.query.order_by(Goal.title.desc()).all()
+    else:
+        goals = Goal.query.all()
+    
+    all_goals = [goal.to_dict() for goal in goals]
+
+    return jsonify(all_goals), 200
