@@ -6,6 +6,7 @@ class Task(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
+    is_complete = db.Column(db.Boolean, nullable=True)
 
     def to_dict(self):
         return {
