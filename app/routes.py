@@ -204,6 +204,26 @@ def create_goal():
             "title": new_goal.title
             }}, 201
 
+@goal_bp.route("/<goal_id>/tasks", methods=['POST'])
+def assign_tasks_to_goal(goal_id):
+    request_body = request.get_json()
+    response_tasklist = request_body["task_ids"]
+    print(response_tasklist)
+
+    goal = validate_model(Goal, goal_id)
+
+    for task_id in response_tasklist:
+        single_task = validate_model(Task, task_id)
+        
+        if single_task:
+            goal.tasks.append(single_task)
+
+    db.session.commit()
+
+    return {
+        "id": goal.goal_id,
+        "task_ids": response_tasklist
+        }, 200
 
 @goal_bp.route("", methods=["GET"])
 def read_all_goals():
