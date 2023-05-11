@@ -11,15 +11,15 @@ class Task(db.Model):
     @classmethod
     def from_dict(cls, task_data):
         new_task = Task(
-            title = task_title["title"],
-            description = task_description["description"]
+            title = task_data["title"],
+            description = task_data["description"]
         )
 
         return new_task
 
     def to_dict(self):
         return {
-            "id": self.id,
+            "id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": bool(self.completed_at)
