@@ -63,7 +63,7 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return jsonify({"details":f"Task {task_id} \"{task.title}\" successfully deleted"})
+    return jsonify({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
     
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete_task(task_id):
