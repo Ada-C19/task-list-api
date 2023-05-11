@@ -25,18 +25,7 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
 
-    is_complete = True if new_task.completed_at else False
-
-    
-    return {
-        "task":
-            {
-            "id": new_task.id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": is_complete
-            }
-    }, 201
+    return jsonify(new_task.to_dict()), 201
 
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
@@ -189,6 +178,31 @@ def delete_goal(goal_id):
 
     return {"details": f'Goal {goal_id} "{goal.title}" successfully deleted'}, 200
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+    goal = Goal.query.get_or_404(int(goal_id))
 
+    for task_id in task_ids:
+        task = Task.query.get_or_404(task_id)
+        task.goal_id = goal_id
 
+    db.session.commit()
+    response = {
+        "id": int(goal_id),
+        "task_ids": task_ids
+        }
+    return jsonify(response), 200
 
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_from_goal(goal_id):
+    goal = Goal.query.get(int(goal_id))
+    if goal is None:
+        return jsonify(None), 404
+    tasks = [task.to_dict()["task"] for task in goal.tasks]
+    return jsonify({
+        "id": int(goal_id),
+        "title": goal.title,
+        "tasks": tasks
+    }), 200
