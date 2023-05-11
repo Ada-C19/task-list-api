@@ -1,7 +1,7 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.task import Task
-from .routes_helpers import validate_model, slack_call
+from .routes_helpers import validate_model, slack_call, query_sort
 from datetime import date
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -24,29 +24,12 @@ def create_tasks():
 def handle_task(task_id):
     task = validate_model(Task, task_id)
     response_body = dict(task=task.to_dict())
-    return make_response(jsonify(response_body), 200)
+    return jsonify(response_body), 200
 
 @tasks_bp.route("", methods=["GET"])
 def handle_tasks():
-    tasks = Task.query.all()
-    sort_by = request.args.get('sort')
-    title_param = request.args.get('title')
+    task_query = query_sort(Task)
     
-    if title_param: 
-        task_query = Task.query.filter(Task.title.ilike(f'%{title_param}%'))
-    else: 
-        task_query = Task.query
-        
-    if sort_by:
-        if 'asc' in sort_by:
-            if not 'id' in sort_by:
-                task_query = task_query.order_by(Task.title.asc())
-            else: task_query = task_query.order_by(Task.task_id.asc())
-        elif 'desc' in sort_by:
-            if not 'id' in sort_by:
-                task_query = task_query.order_by(Task.title.desc())
-            else: task_query = task_query.order_by(Task.task_id.desc())
-            
     response_body = [Task.to_dict(task) for task in task_query]
 
     return make_response(jsonify(response_body),200)
@@ -102,6 +85,6 @@ def delete_task(id):
     db.session.delete(task)
     db.session.commit()
 
-    response_body = dict(details=f'Task {task.task_id} "{task.title}" successfully deleted')
+    response_body = dict(details=f'Task {task.id} "{task.title}" successfully deleted')
 
     return make_response(jsonify(response_body), 200)

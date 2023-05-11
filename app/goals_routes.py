@@ -2,7 +2,7 @@ from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.goal import Goal
 from app.models.task import Task
-from .routes_helpers import validate_model
+from .routes_helpers import validate_model, query_sort
 
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -23,7 +23,7 @@ def create_goal():
 # READ
 @goals_bp.route("", methods=["GET"])
 def handle_goals():
-    goals = Goal.query.all()
+    goals = query_sort(Goal)
 
     response_body = [Goal.to_dict(goal) for goal in goals]
 
@@ -40,9 +40,9 @@ def handle_goal(goal_id):
 def handle_tasks_by_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    tasks_response = [Task.to_dict(task) for task in goal.tasks]
+    tasks_response = [task.to_dict() for task in goal.tasks]
 
-    response_body = dict(id=goal.goal_id, tasks=tasks_response, title=goal.title)
+    response_body = dict(id=goal.id, tasks=tasks_response, title=goal.title)
     
     return make_response(jsonify(response_body), 200)
 
@@ -65,14 +65,14 @@ def post_task_ids(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
 
-    tasks = Task.query.filter(Task.task_id.in_(request_body['task_ids'])).all()
+    tasks = Task.query.filter(Task.id.in_(request_body['task_ids'])).all()
     for task in tasks:
         goal.tasks.append(task)
     
     db.session.commit()
 
-    added_task_ids = [task.task_id for task in tasks]
-    response_body = dict(id=goal.goal_id, task_ids=added_task_ids)
+    added_task_ids = [task.id for task in tasks]
+    response_body = dict(id=goal.id , task_ids=added_task_ids)
 
     return make_response(jsonify(response_body), 200)
 
@@ -84,6 +84,6 @@ def delete_goal(id):
     db.session.delete(goal)
     db.session.commit()
 
-    response_body = dict(details=f'Goal {goal.goal_id} "{goal.title}" successfully deleted')
+    response_body = dict(details=f'Goal {goal.id} "{goal.title}" successfully deleted')
     return make_response(jsonify(response_body), 200)
 

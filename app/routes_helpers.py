@@ -1,4 +1,4 @@
-from flask import abort, make_response
+from flask import abort, make_response,request
 import requests
 from app import token
 
@@ -21,11 +21,33 @@ def slack_call(task):
     data = {
             "channel": "U04M9CL7W6Q",
             "text": f"Someone just completed the task {task['title']}"
-                    }
+            }
     headers = {
                 'Authorization': token,
                 }
 
-    response = requests.request("POST", path, headers=headers, data=data)
+    response = requests.post(path, data=data, headers=headers)
 
     return response.text
+
+def query_sort(cls):
+    sort_by = request.args.get('sort')
+    title_param = request.args.get('title')
+
+    if not title_param or not sort_by:
+        cls_query = cls.query
+
+    if title_param: 
+            cls_query = cls.query.filter(cls.title.ilike(f'%{title_param}%'))
+            
+    if sort_by:
+        if 'asc' in sort_by:
+            if not 'id' in sort_by:
+                cls_query = cls_query.order_by(cls.title.asc())
+            else: cls_query = cls_query.order_by(cls.id.asc())
+        elif 'desc' in sort_by:
+            if not 'id' in sort_by:
+                cls_query = cls_query.order_by(cls.title.desc())
+            else: cls_query = cls_query.order_by(cls.id.desc())
+
+    return cls_query
