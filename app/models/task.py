@@ -1,12 +1,16 @@
 from app import db
 from app.models.goal import Goal
 from datetime import datetime
+import requests
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, default=None, nullable = True)
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable = True)
+    goal = db.relationship("Goal", back_populates= "tasks")
+    
     
 
     def to_dict(self):

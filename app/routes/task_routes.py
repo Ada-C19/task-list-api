@@ -107,3 +107,4 @@ def update_incomplete_status(task_id):
 
     db.session.commit()
     return jsonify({"task":task_to_update.to_json()}), 200
+

@@ -1,6 +1,5 @@
 from app import db
-from flask import Blueprint, jsonify, abort, make_response, request
-from app.models.task import Task
+from flask import Blueprint, jsonify, make_response, request
 from app.models.goal import Goal
 from app.helper_functions import validate_model
 
@@ -69,3 +68,6 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"})
+
+# @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+# def 
