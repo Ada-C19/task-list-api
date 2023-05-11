@@ -3,8 +3,11 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import desc
 from datetime import datetime
+import os
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
 
 def validate_model(cls, model_id):
     try:
@@ -89,9 +92,15 @@ def complete_one_task(task_id):
     if not task.completed_at:
         task.completed_at = datetime.now()
 
-
-
     db.session.commit()
+
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {"Authorization": f"Bearer {SLACK_API_TOKEN}"}
+    message = f"Someone just completed the task {task.title}"
+    data = {"channel": "random", "text": message}
+
+    requests.post(url, headers=headers, data=data)
+
     response = {"task": task.to_dict()}
     return make_response(response, 200)
 
