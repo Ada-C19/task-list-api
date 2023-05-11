@@ -72,7 +72,7 @@ def update_task_not_complete(task_id):
     return {"task" : task.to_dict()}, 200
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def update_task__is_complete(task_id):
+def update_task_is_complete(task_id):
     task = validate_id(Task, task_id)
     # request_data = request.get_json()
 
