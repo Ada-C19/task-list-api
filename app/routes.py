@@ -61,7 +61,6 @@ def delete_task(id):
     return jsonify({"details": f'Task {id} "{task.to_dict()["title"]}" successfully deleted'}), 200
 
 SLACK_API_URL = "https://slack.com/api/chat.postMessage"
-SLACKBOT_TOKEN = "xoxb-4680452269380-5269316188848-cgZRMqukeZCylI3G4FAOGG9p"
 
 #patch task-"tasks/1/mark_complete"-PATCH(update)
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
