@@ -51,6 +51,8 @@ def get_tasks():
     if sort_query:
         if sort_query == "asc":
             tasks = Task.query.order_by(Task.title)
+        elif sort_query == "desc":
+            tasks = Task.query.order_by(Task.title.desc())
     else:
         tasks = Task.query.all()
     
