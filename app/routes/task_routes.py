@@ -83,7 +83,6 @@ def mark_task_as_complete(task_id):
     task = validate_item(Task, task_id)
 
     task.completed_at = datetime.datetime.now()
-    task.is_complete = True
 
     db.session.commit()
 
@@ -104,7 +103,6 @@ def mark_task_as_incomplete(task_id):
     task = validate_item(Task, task_id)
 
     task.completed_at = None
-    task.is_complete = False
 
     db.session.commit()
 
