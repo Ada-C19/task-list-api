@@ -91,6 +91,8 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.utcnow()
     db.session.commit()
 
+    slack_bot_message(f"Someone just completed the task {task.title}")
+
     return make_response({"task": task.to_dict()}, 200)
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
