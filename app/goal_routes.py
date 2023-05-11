@@ -11,12 +11,13 @@ goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
-    check_goal_data(request_body)
 
-    new_goal = Goal.from_dict(request_body)
-
-    db.session.add(new_goal)
-    db.session.commit()
+    try:
+        new_goal = Goal.from_dict(request_body)
+        db.session.add(new_goal)
+        db.session.commit()
+    except KeyError:
+        return abort(make_response({"details": "Invalid data"}, 400))
 
     return make_response({"goal": new_goal.to_dict()}, 201)
     
