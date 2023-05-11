@@ -13,10 +13,8 @@ def create_app(test_config=None, foo=None):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     if test_config is None:
-        if app.config["HEROKU_DEPLOY"] and bool(app.config["HEROKU_DEPLOY"]):
-            app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
-        else:
-            app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("RENDER_DATABASE_URI")
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+            "DATABASE_URL")
     else:
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get( 
