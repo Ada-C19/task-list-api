@@ -56,3 +56,15 @@ def read_one_saved_goal(goal_id):
             "title": goal.title,
         }
     }
+
+
+def validate_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response(
+            {
+                "details": "Goal ID not found"
+            }, 404
+        ))
+    return goal
