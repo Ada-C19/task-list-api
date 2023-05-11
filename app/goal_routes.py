@@ -1,6 +1,6 @@
 from app import db
 from app.models.goal import Goal
-from app.helper_functions import validate_model, slack_bot_message
+from app.helper_functions import validate_model
 from flask import Blueprint, jsonify, make_response, request
 from sqlalchemy import asc, desc
 
