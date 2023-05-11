@@ -3,7 +3,7 @@ from flask import make_response, abort, jsonify
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
-    task_title = db.Column(db.String)
+    title = db.Column(db.String)
     description=db.Column(db.String)
     completed_at=db.Column(db.DateTime, nullable=True)
     is_complete= db.Column(db.Boolean, default=False)
@@ -11,24 +11,24 @@ class Task(db.Model):
     def task_to_dict(self):
         return {
         "id": self.task_id,
-        "title": self.task_title,
+        "title": self.title,
         "description": self.description,
         "is_complete": False if self.completed_at is None else True
         if self.completed_at is not None else None
         }
     
-
     @classmethod
     def create_new_task(cls, request_data):
         if "title" not in request_data:
-            raise KeyError("title")
+            raise KeyError({"details": "Invalid data"})
         if "description" not in request_data:
             raise KeyError("description")
-        if "completed_at" not in request_data:
-            raise KeyError("completed_at")
+        
+        request_data["completed_at"] = None
         is_complete = False if request_data["completed_at"] is None else True
+        
         return cls(
-            task_title=request_data["title"].title(),
+            title=request_data["title"].title(),
             description=request_data["description"],
             completed_at=request_data.get("completed_at"),
             is_complete=is_complete
@@ -37,7 +37,7 @@ class Task(db.Model):
     def update(self, task):
         for key, value in task.items():
             if key == "title":
-                self.task_title = value
+                self.title = value
             if key == "description":
                 self.description = value
             if key == "completed_at":
@@ -50,9 +50,9 @@ class Task(db.Model):
     @classmethod
     def generate_message(cls, task):
         return {
-            f"{cls.__name__.lower()}": {
+            f"task": {
                 "id": task.task_id,
-                "title": task.task_title,
+                "title": task.title,
                 "description": task.description,
                 "is_complete": task.is_complete
             }

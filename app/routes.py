@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+import re
 from app import db
 from app.models.task import Task
 
@@ -17,7 +18,7 @@ def create_tasks():
 
         return make_response(jsonify(message), 201)
     except KeyError as e:
-        message = f"Invalid request. Missing required value: {e}"
+        message = "Invalid data"
         return make_response({"details": message}, 400)
 
     # except KeyError as e:
@@ -35,16 +36,19 @@ def read_all_tasks():
         tasks = Task.query.all()
 
     tasks_response = [task.task_to_dict() for task in tasks]
+
     return jsonify(tasks_response)
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
     task = Task.query.get(task_id)
-    return jsonify(task.task_to_dict()), 200
+    task = Task.generate_message(task)
+    # return jsonify(task.task_to_dict()), 200
+    return jsonify(task), 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
-def update_planet(task_id):
+def update_task(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
     task.update(request_body)
@@ -60,7 +64,7 @@ def delete_task(task_id):
     db.session.commit()
 
     message = {
-        "details": f"Task {task_id} \"{task.description}\" successfully deleted"
+        "details": f'Task {task_id} "{task.title}" successfully deleted'
         }
     return make_response(jsonify(message), 200)
 
@@ -76,3 +80,5 @@ def validate_model(cls, id):
         abort(make_response(jsonify(message=f"{cls.__name__} not found"), 404))
     
     return obj
+
+
