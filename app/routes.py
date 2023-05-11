@@ -3,6 +3,8 @@ from app.util import validate_object
 from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from datetime import datetime
+import os
+import requests
 
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -83,6 +85,15 @@ def update_task_completion(task_id):
     task = validate_object(Task,task_id)
     task.completed_at = datetime.now()
     db.session.commit()
+
+    url = "https://slack.com/app.client.chat_postMessage"
+    slack_token = os.environ.get("SLACK_API_TOKEN")
+    data = {
+        "channel": "task-notifcations",
+        "text": f"string taesk {task.title}",
+        "token" : slack_token
+    }
+    reponse = requests.post(url, data=data)
     
     return make_response(jsonify({"task":task.to_dict()}),200)
 
