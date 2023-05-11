@@ -3,6 +3,8 @@ import requests
 from app.models.task import Task
 from datetime import datetime
 from app import db
+import os
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -104,35 +106,76 @@ def delete_task(model_id):
 
 
 #---------------------------------------------
-
-@tasks_bp.route("<model_id>/mark_complete", methods=["PATCH"])
-def mark_task_complete(model_id):
-    try:
-        new_task = validate_model(Task, model_id)
-    except:
-        return jsonify({"Message": "Invalid id"}), 404
     
     # Send the message to Slack
-    message = f"Someone just completed the task {new_task.title} My Beautiful Task"
-    payload = {
-        "text": message,
-        "channel": "api-test-channel",
-        "token": "your_slack_token"  
-    }
-    response = requests.post("https://slack.com/api/chat.postMessage", data=payload)
+    # token = os.environ.get('SLACK_API_TOKEN')
+    # message = f"Someone just completed the task {new_task.title} My Beautiful Task"
+    # slack_message = {
+    #     "text": message,
+    #     "channel": "api-test-channel",
+    #     "token": token 
+    # }
+    # response = requests.post("https://slack.com/api/chat.postMessage", data=slack_message)
 
-    return jsonify({"task": new_task.to_dict()}), 200
-    
-    # if:
-    # https://slack.com/api/chat.postMessage
-    # return "Someone just completed the task {task.title} My Beautiful Task"
-
-
-    # new_task.completed_at = datetime.utcnow()
 
     # db.session.commit()
 
-    # return jsonify({"task": new_task.to_dict()}), 200
+    # return jsonify({"task": new_task.to_dict(), "slack_response": response.json()}), 200
+
+
+@tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    try:
+        new_task = validate_model(Task, task_id)
+    except:
+        return jsonify({"Message": "Invalid id"}), 404
+    
+    new_task.completed_at = datetime.utcnow()
+
+    send_slack_message(new_task)
+
+    db.session.commit()
+
+    return jsonify({"task": new_task.to_dict()}), 200
+
+
+@tasks_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+    try:
+        new_task = validate_model(Task, task_id)
+    except:
+        return jsonify({"Message": "Invalid id"}), 404
+
+    new_task.completed_at = None
+    
+    db.session.commit()
+
+    return jsonify({"task": new_task.to_dict()}), 200
+
+
+
+def send_slack_message(completed_task):
+    TOKEN = os.environ['SLACK_API_TOKEN']
+    AUTH_HEADERS = {
+        "Authorization": f"Bearer {TOKEN}"
+    }
+    CHANNEL_ID = "C0561UUDX4K"
+    SLACK_URL = "https://slack.com/api/chat.postMessage"
+    try:
+        message = f"Someone just completed the task {completed_task.title}"
+        payload = {
+            "channel": CHANNEL_ID,
+            "text": message
+            }
+    
+        requests.post(SLACK_URL, data = payload, headers = AUTH_HEADERS)
+        # r.json()
+        # return make_response(r.json(), 201)
+    
+    except:
+        print("There was an error making the call to Slack")
+
+
 
 # @tasks_bp.route("<model_id>/mark_complete", methods=["PATCH"])
 # def mark_task_complete(model_id):
@@ -146,18 +189,3 @@ def mark_task_complete(model_id):
 #     db.session.commit()
 
 #     return jsonify({"task": new_task.to_dict()}), 200
-
-
-@tasks_bp.route("<model_id>/mark_incomplete", methods=["PATCH"])
-def mark_task_incomplete(model_id):
-    try:
-        new_task = validate_model(Task, model_id)
-    except:
-        return jsonify({"Message": "Invalid id"}), 404
-
-    new_task.completed_at = None
-    
-    db.session.commit()
-
-    return jsonify({"task": new_task.to_dict()}), 200
-
