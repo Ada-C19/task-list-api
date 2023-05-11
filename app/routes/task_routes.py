@@ -24,8 +24,8 @@ def create_task():
         db.session.add(new_task)
         db.session.commit()
 
-        message = {"task": new_task.to_dict()}
-        return make_response(jsonify(message), 201)
+        result = {"task": new_task.to_dict()}
+        return jsonify(result), 201
 
     except KeyError:
         message = {"details": "Invalid data"}
@@ -45,7 +45,7 @@ def get_all_tasks():
         all_tasks = Task.query.all()
 
     tasks_response = [task.to_dict() for task in all_tasks]
-    return make_response(jsonify(tasks_response), 200)
+    return jsonify(tasks_response), 200
 
 
 # GET /tasks/<task_id>
@@ -53,8 +53,8 @@ def get_all_tasks():
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
 
-    response = {"task": task.to_dict()}
-    return (jsonify(response), 200)
+    result = {"task": task.to_dict()}
+    return jsonify(result), 200
 
 
 # PUT /tasks/<task_id>
@@ -67,8 +67,8 @@ def update_task(task_id):
         task_to_update.description = response["description"]
         db.session.commit()
 
-        message = {"task": task_to_update.to_dict()}
-        return make_response(jsonify(message), 200)
+        result = {"task": task_to_update.to_dict()}
+        return jsonify(result), 200
 
     except KeyError:
         message = {"details": "Invalid data"}
@@ -84,7 +84,7 @@ def delete_task(task_id):
 
     message = {
         "details": f'Task {task_to_delete.task_id} "{task_to_delete.title}" successfully deleted'}
-    return (jsonify(message), 200)
+    return make_response(jsonify(message), 200)
 
 
 # PATCH /tasks/<task_id>/mark_complete
@@ -108,8 +108,8 @@ def mark_complete(task_id):
     requests.post(
         url=SLACK_POST_ENDPOINT, headers=headers, data=slack_post_data)
 
-    message = {"task": task.to_dict()}
-    return make_response(jsonify(message), 200)
+    result = {"task": task.to_dict()}
+    return jsonify(result), 200
 
 
 # PATCH /tasks/<task_id>/mark_incomplete
@@ -120,5 +120,5 @@ def mark_incomplete(task_id):
     task.completed_at = None
     db.session.commit()
 
-    message = {"task": task.to_dict()}
-    return make_response(jsonify(message), 200)
+    result = {"task": task.to_dict()}
+    return jsonify(result), 200

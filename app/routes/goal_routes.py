@@ -17,8 +17,8 @@ def create_goal():
         db.session.add(new_goal)
         db.session.commit()
 
-        message = {"goal": new_goal.to_dict()}
-        return make_response(jsonify(message), 201)
+        result = {"goal": new_goal.to_dict()}
+        return jsonify(result), 201
 
     except KeyError:
         message = {"details": "Invalid data"}
@@ -35,11 +35,11 @@ def post_tasks_for_goal(goal_id):
         task.goal_id = goal.goal_id
         db.session.commit()
 
-    message = {
+    result = {
         "id": goal.goal_id,
         "task_ids": response["task_ids"]
     }
-    return make_response(jsonify(message), 200)
+    return jsonify(result), 200
 
 
 # GET /goals
@@ -48,7 +48,7 @@ def get_all_goals():
     all_goals = Goal.query.all()
     goals_reponse = [goal.to_dict() for goal in all_goals]
 
-    return make_response(jsonify(goals_reponse), 200)
+    return jsonify(goals_reponse), 200
 
 
 # GET /goals/<goal_id>
@@ -56,8 +56,8 @@ def get_all_goals():
 def get_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    message = {"goal": goal.to_dict()}
-    return make_response(jsonify(message), 200)
+    result = {"goal": goal.to_dict()}
+    return jsonify(result), 200
 
 
 # GET /goals/<goal_id>/tasks
@@ -67,13 +67,13 @@ def get_tasks_of_goal(goal_id):
     tasks = Task.query.filter_by(goal_id=goal.goal_id)
     tasks_response = [task.to_dict() for task in tasks]
 
-    message = {
+    result = {
         "id": goal.goal_id,
         "title": goal.title,
         "tasks": tasks_response
     }
 
-    return make_response(jsonify(message), 200)
+    return jsonify(result), 200
 
 
 # PUT /goals/<goal_id>
@@ -85,8 +85,8 @@ def update_goal(goal_id):
         goal_to_update.title = response["title"]
         db.session.commit()
 
-        message = {"goal": goal_to_update.to_dict()}
-        return make_response(jsonify(message), 200)
+        result = {"goal": goal_to_update.to_dict()}
+        return jsonify(result), 200
 
     except KeyError:
         message = {"details": "Invalid data"}
