@@ -186,10 +186,8 @@ def send_tasks_to_goal(goal_id):
 def get_tasks_of_one_goal(goal_id):
     goal = validate_item_by_id(Goal, goal_id)
     tasks = Task.query.all()
-    tasks_response = []
-    for task in tasks:
-        if task.goal_id == goal.goal_id:
-            tasks_response.append(task.to_dict())
+    
+    tasks_response = [task.to_dict() for task in tasks if task.goal_id == goal.goal_id]
     
     return {
         "id": goal.goal_id,
