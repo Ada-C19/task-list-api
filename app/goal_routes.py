@@ -52,6 +52,7 @@ def replace_goal(goal_id):
     db.session.commit()
     return {'goal': goal.to_dict()}, 200
 
+
 @goals_bp.route('/<goal_id>', methods=['DELETE'])
 def delete_goal(goal_id):
     goal = valid.validate_id(Goal, goal_id)
@@ -61,6 +62,8 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
     return {'details': f'Goal {goal_id} "{goal_title}" successfully deleted'}, 200
+
+
 
 # relantionship routes
 @goals_bp.route('/<goal_id>/create_task', methods=['POST'])
@@ -76,6 +79,7 @@ def create_task_assigned_to_specific_goal(goal_id):
     db.session.commit()
     return {'details': f'New task "{new_task.title}" for goal "{goal.title}" created', 'task details': new_task.to_dict()}, 201
 
+
 @goals_bp.route('/<goal_id>/few_tasks', methods=['POST'])
 def create_list_of_tasks_to_goal(goal_id):
     valid.validate_id(Goal, goal_id)
@@ -86,6 +90,7 @@ def create_list_of_tasks_to_goal(goal_id):
     db.session.add_all(tasks_response)
     db.session.commit()
     return {'id': goal_id, 'task_ids': [task.id for task in tasks_response]}, 201
+
 
 @goals_bp.route('/<goal_id>/tasks', methods=['PATCH'])
 def match_tasks_with_goal(goal_id):
@@ -98,3 +103,11 @@ def match_tasks_with_goal(goal_id):
 
     db.session.commit()
     return {'id': goal_id, 'task_ids': request_body['task_ids']}, 200
+
+
+@goals_bp.route('/<goal_id>/tasks', methods=['GET'])
+def get_one_goal_tasks(goal_id):
+    goal = valid.validate_id(Goal, goal_id)
+    tasks = Task.query.filter_by(goal_id=goal_id)
+    
+    return (goal.to_dict()) | ({'tasks': [task.to_dict() for task in tasks]}), 200
