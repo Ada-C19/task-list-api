@@ -10,16 +10,16 @@ class Task(db.Model):
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
     goal = db.relationship("Goal", back_populates="tasks")
 
-    def to_dict(task):
+    def to_dict(self):
         task_dict = dict(
-                id=task.id,
-                title=task.title,
-                description=task.description,
-                is_complete=task.completed_at != None,
+                id=self.id,
+                title=self.title,
+                description=self.description,
+                is_complete=self.completed_at != None,
                 )
         
-        if task.goal_id:
-            task_dict['goal_id'] = task.goal_id
+        if self.goal_id:
+            task_dict['goal_id'] = self.goal_id
             
         return task_dict
 
