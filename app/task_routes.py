@@ -91,7 +91,6 @@ def delete_one_task(id):
 def mark_task_complete(id):
     task = validate_task(id)
     
-    
     task.completed_at = datetime.date.today().isoformat()
     
     db.session.commit()

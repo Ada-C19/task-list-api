@@ -3,9 +3,6 @@ from app.models.goal import Goal
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.task_routes import validate_task
-# import datetime
-# import requests
-# from app import token 
 
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
@@ -105,7 +102,6 @@ def add_tasks_to_goal(id):
 def get_tasks_of_one_goal(id):
     goal = validate_goal(id)
     tasks = goal.tasks
-    
     task_list = []
     
     for task in tasks:
@@ -125,7 +121,6 @@ def get_goal_no_matching_tasks(id):
         task_list.append(task_dict)
 
     response_data = {"goal_id": goal.goal_id, "tasks": task_list}
-
     return jsonify(response_data), 200
 
 @goal_bp.route("/<id>/tasks", methods=["GET"])
