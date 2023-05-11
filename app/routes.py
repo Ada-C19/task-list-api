@@ -2,6 +2,15 @@ from flask import Blueprint,make_response,request,jsonify,abort
 from app import db
 from app.models.task import Task
 from app.helper import validate_task
+import requests
+import json
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+SLACK_API_KEY = os.getenv("SLACK_API_KEY")
 
 #CREATE BP/ENDPOINT
 tasks_bp = Blueprint("tasks",__name__, url_prefix="/tasks")
@@ -76,11 +85,23 @@ def delete_task(id):
 @tasks_bp.route("/<id>/mark_complete",methods=["PATCH"])
 def mark_completed(id):
     task_to_complete = validate_task(id)
-    request_body = request.get_json()
-    task_to_complete.patch_complete(request_body)
+    task_to_complete.patch_complete()
+    
     db.session.commit()
 
+    path = "https://slack.com/api/chat.postMessage"
+
+    params = {
+        "channel":"C056SMYR32B", 
+        "text": f"Task\"{task_to_complete.title}\" has been completed!"
+        }
+    
+    headers = {"Authorization": os.environ.get("SLACK_API_KEY")}
+    response = requests.post(path,params=params,headers=headers)
+    
+
     return jsonify({"task":task_to_complete.to_dict()}),200
+
 
 #PATCH mark as incomplete on in/complete [PATCH]/tasks/<id>/mark_incomplete :(UPDATE)
 @tasks_bp.route("/<id>/mark_incomplete",methods=["PATCH"])
@@ -90,7 +111,7 @@ def mark_incomplete(id):
         return jsonify({'error':'Task not found'}),404
     task_incomplete = validate_task(id)
     request_body = request.get_json()
-    task_incomplete.patch_incomplete(request_body)
+    task_incomplete.patch_incomplete()
     db.session.commit()
 
     return jsonify({"task":task_incomplete.to_dict()}),200

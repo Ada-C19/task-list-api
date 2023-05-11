@@ -29,8 +29,8 @@ class Task(db.Model):
             # completed_at = response_body.get("completed_at",None)
         )
     
-    def patch_complete(self,request_body):
+    def patch_complete(self):
         self.completed_at = datetime.utcnow()
     
-    def patch_incomplete(self,request_body):
+    def patch_incomplete(self):
         self.completed_at = None
