@@ -3,8 +3,7 @@ from datetime import datetime
 from app.models.task import Task
 from app.helper import validate_model, post_slack
 from flask import Blueprint, jsonify, abort, make_response, request
-import os
-import requests
+
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
