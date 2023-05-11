@@ -1,7 +1,8 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.task import Task
-import datetime 
+import datetime, requests, json, os
+
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -18,6 +19,18 @@ def validate_model(cls, model_id):
         abort(make_response({"message":f"task {model_id} not found"}, 404))
 
     return model
+
+def slack_api(task):
+
+    url = "https://slack.com/api/chat.postMessage"
+    token = os.environ.get("SLACKBOT_TOKEN_API")
+
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {"channel": "#api-test-channel", "text": f"Someone just completed the task {task.title}"}
+
+
+    response = requests.post(url, headers=headers, params=params)
+    return response.json
 
 # CREATES NEW TASKS
 @tasks_bp.route("", methods=["POST"])
@@ -85,9 +98,10 @@ def update_one_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_mark_complete(task_id):
     task = validate_model(Task, task_id)
+    slack_message = slack_api(task)
 
     task.completed_at = datetime.datetime.now()
-
+    
     db.session.commit()
 
     return make_response({"task": task.to_dict()}), 200
