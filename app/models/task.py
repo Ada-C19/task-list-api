@@ -22,6 +22,7 @@ class Task(db.Model):
             is_complete = True
         else:
             is_complete = False
+            
         if self.goal_id: 
             return {
                 "id": self.task_id,

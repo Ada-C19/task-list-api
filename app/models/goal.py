@@ -17,19 +17,3 @@ class Goal(db.Model):
         return cls(
             title = data_dict["title"]
         )
-
-
-
-    # def validate_complete(self):
-    #     if self.completed_at:
-    #         is_complete = True
-    #     else:
-    #         is_complete = False
-    
-    #     return {
-    #         "id": self.task_id,
-    #         "title": self.title,
-    #         "description": self.description,
-    #         "is_complete": is_complete
-    #         }
-    

@@ -46,7 +46,7 @@ def delete_goal(goal_id):
     db.session.commit()
     return make_response({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"}, 200)
 
-##### ONE_TO_MANY_ROUTES#####
+##### ONE_TO_MANY_ROUTES #####
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def post_tasks_to_goal(goal_id):
