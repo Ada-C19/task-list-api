@@ -53,11 +53,12 @@ def test_get_goal_not_found(client):
     response = client.get("/goals/1")
     response_body = response.get_json()
 
-    raise Exception("Complete test")
+
     # Assert
     # ---- Complete Test ----
-    # assertion 1 goes here
-    # assertion 2 goes here
+    assert response.status_code == 404
+    assert response_body == {'message': 'Goal not found'}
+
     # ---- Complete Test ----
 
 
@@ -82,28 +83,41 @@ def test_create_goal(client):
 
 #@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
-    raise Exception("Complete test")
+
     # Act
     # ---- Complete Act Here ----
-
+    response = client.put("/goals/1", json={
+        "title": "Updated Goal Title"
+    })
+    response_body = response.get_json()
     # Assert
     # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
-    # assertion 3 goes here
+    assert response.status_code == 200
+    assert "goal" in response_body
+    assert response_body == {
+        "goal": {
+            "id": 1,
+            "title": "Updated Goal Title"
+        }
+    }
+    goal = Goal.query.get(1)
+    assert goal.title == "Updated Goal Title"
+
     # ---- Complete Assertions Here ----
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
-    raise Exception("Complete test")
+    
     # Act
     # ---- Complete Act Here ----
+    response = client.put("/goals/1")
+    response_body = response.get_json()
 
     # Assert
     # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
+    assert response.status_code == 404
+    assert response_body == {"Message": "Goal not found."}
     # ---- Complete Assertions Here ----
 
 
@@ -116,31 +130,26 @@ def test_delete_goal(client, one_goal):
     # Assert
     assert response.status_code == 200
     assert "details" in response_body
-    assert response_body == {
-        "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
-    }
+    assert response_body == {"details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'}
 
     # Check that the goal was deleted
     response = client.get("/goals/1")
     assert response.status_code == 404
-
-    raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
-
+    assert Goal.query.get(1) == None
 
 #@pytest.mark.skip(reason="test to be completed by student")
 def test_delete_goal_not_found(client):
-    raise Exception("Complete test")
 
     # Act
     # ---- Complete Act Here ----
-
+    response = client.delete("/goals/1")
+    response_body = response.get_json()
     # Assert
     # ---- Complete Assertions Here ----
-    # assertion 1 goes here
-    # assertion 2 goes here
+    assert response.status_code == 404
+    assert response_body == {"message": "Goal not found."}
+    assert Goal.query.all() == []
+
     # ---- Complete Assertions Here ----
 
 
