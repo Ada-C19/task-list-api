@@ -5,6 +5,7 @@ from datetime import datetime
 import requests, os
 from app.helper_functions import validate_model
 
+
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
 
 # Create
@@ -89,7 +90,6 @@ def delete_task(task_id):
     db.session.commit()
 
     return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
-
 
 
 # Helper Functions
