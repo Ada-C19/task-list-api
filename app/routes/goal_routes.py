@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort, make_response
+from flask import Blueprint, request, jsonify
 from app.models.goal import Goal
 from app.models.task import Task
 from app import db
@@ -22,7 +22,7 @@ def create_goal():
 
     except KeyError:
         message = {"details": "Invalid data"}
-        abort(make_response(jsonify(message), 400))
+        return jsonify(message), 400
 
 
 # POST /goals/<goal_id>/tasks
@@ -90,7 +90,7 @@ def update_goal(goal_id):
 
     except KeyError:
         message = {"details": "Invalid data"}
-        abort(make_response(jsonify(message), 400))
+        return jsonify(message), 400
 
 
 # DELETE /goals/<goal_id>
@@ -102,4 +102,4 @@ def delete_goal(goal_id):
 
     message = {
         "details": f'Goal {goal_to_delete.goal_id} "{goal_to_delete.title}" successfully deleted'}
-    return make_response(jsonify(message), 200)
+    return jsonify(message), 200

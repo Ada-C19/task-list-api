@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, abort, make_response
+from flask import Blueprint, request, jsonify
 from app.models.task import Task
 from app import db
 from helper import validate_model
@@ -29,7 +29,7 @@ def create_task():
 
     except KeyError:
         message = {"details": "Invalid data"}
-        abort(make_response(jsonify(message), 400))
+        return jsonify(message), 400
 
 
 # GET /tasks
@@ -72,7 +72,7 @@ def update_task(task_id):
 
     except KeyError:
         message = {"details": "Invalid data"}
-        abort(make_response(jsonify(message), 400))
+        return jsonify(message), 400
 
 
 # DELETE /tasks/<task_id>
@@ -84,7 +84,7 @@ def delete_task(task_id):
 
     message = {
         "details": f'Task {task_to_delete.task_id} "{task_to_delete.title}" successfully deleted'}
-    return make_response(jsonify(message), 200)
+    return jsonify(message), 200
 
 
 # PATCH /tasks/<task_id>/mark_complete
