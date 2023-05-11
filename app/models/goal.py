@@ -22,3 +22,4 @@ class Goal(db.Model):
             )
         except KeyError as error:
             return f"Missing or invalid key {error}"
+

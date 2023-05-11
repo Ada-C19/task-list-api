@@ -1,4 +1,4 @@
-from flask import Blueprint, request, make_response, jsonify, abort 
+from flask import Blueprint, request, make_response, jsonify, abort
 from app import db
 from app.models.task import Task
 from app.routes_helpers import validate_model
@@ -38,36 +38,14 @@ def read_all_tasks():
    
     tasks_response = [task.to_dict()["task"] for task in tasks]
    
-    return make_response(jsonify(tasks_response), 200)
+    return jsonify(tasks_response), 200
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
 
-    if task.goal_id:
-        if not task.completed_at:
-            return make_response({
-                    "task": {
-                        "id": task.id,
-                        "goal_id": task.goal_id,
-                        "title": task.title,
-                        "description": task.description,
-                        "is_complete": False
-                    }
-            }, 200)
-        else:
-            return make_response({
-                "task": {
-                    "id": task.id,
-                    "goal_id": task.goal_id,
-                    "title": task.title,
-                    "description": task.description,
-                    "is_complete": True
-                }
-            }, 200)
-
-    return make_response(task.to_dict(), 200)
+    return task.to_dict(), 200
  
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -76,8 +54,8 @@ def update_one_task(task_id):
  
     request_body = request.get_json()
 
-    for attr, value in request_body.items():
-        setattr(task, attr, value)
+    for attr, val in request_body.items():
+        setattr(task, attr, val)
 
     db.session.add(task)
     db.session.commit()
@@ -92,7 +70,8 @@ def delete_one_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    return make_response(jsonify({"details": f"Task {task_id} \"{task.title}\" successfully deleted"}), 200)
+    return make_response({'details': f'Task {task_id} "{task.title}"'
+                         ' successfully deleted'}, 200)
 
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
@@ -113,7 +92,7 @@ def mark_complete(task_id):
     db.session.add(task)
     db.session.commit()
 
-    return make_response(jsonify(task.to_dict()), 200)
+    return make_response(task.to_dict(), 200)
 
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
@@ -126,8 +105,5 @@ def mark_incomplete(task_id):
     db.session.add(task)
     db.session.commit()
 
-    return make_response(jsonify(task.to_dict()), 200)
-
-
-
+    return make_response(task.to_dict(), 200)
 
