@@ -69,9 +69,13 @@ def delete_goal(goal_id):
 def create_task(goal_id):
     request_body = request.get_json()
     goal = validate_model(Goal, goal_id)
-    task_ids= request_body["task_ids"]
+    
+    if "task_ids" not in request_body:
+        abort(make_response(jsonify({"details": "Invalid data"}), 400))
+    
+    task_id= request_body["task_ids"]
 
-    new_task_ids = assign_tasks(goal, task_ids)
+    new_task_ids = assign_tasks(goal, task_id)
     
     return jsonify({"id": goal.goal_id, 
                     "task_ids": new_task_ids}), 200
