@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from app.models.task import Task
 from .routes_helpers import validate_model
 from app import db
-# from sqlalchemy import asc, desc
 from datetime import datetime
 import os
 import requests 
@@ -31,6 +30,7 @@ def get_all_tasks():
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
     output = {"task":task.to_dict()}
+
     return jsonify(output), 200
 
 @task_bp.route("", methods=["POST"])
@@ -46,6 +46,7 @@ def create_task():
         db.session.commit()
 
         output = {"task":new_task.to_dict()}
+
         return jsonify(output), 201
     
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -61,6 +62,7 @@ def update_task(task_id):
     db.session.commit()
 
     output = {"task":task.to_dict()}
+
     return jsonify(output), 200
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
@@ -82,6 +84,7 @@ def mark_complete(task_id):
     requests.post(path, data=ada_bot)
 
     output = {"task":task.to_dict()}
+
     return jsonify(output), 200
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
@@ -93,6 +96,7 @@ def mark_incomplete(task_id):
     db.session.commit()
 
     output = {"task":task.to_dict()}
+
     return jsonify(output), 200
 
 
@@ -104,4 +108,5 @@ def delete_task(task_id):
     db.session.commit()
 
     output = {"details": f'Task {task_id} \"{task.title}\" successfully deleted'}
+    
     return jsonify(output), 200

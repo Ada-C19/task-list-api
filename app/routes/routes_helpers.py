@@ -4,7 +4,7 @@ def validate_model(cls, id):
     try:
         id = int(id)
     except:
-        abort(make_response({"message": f"Task {id} is invalid."}, 400))
+        abort(make_response({"message": f"{cls.__name__} {id} is invalid."}, 400))
 
     model = cls.query.get(id)
 
