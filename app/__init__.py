@@ -21,7 +21,6 @@ def create_app(test_config=None):
             "SQLALCHEMY_TEST_DATABASE_URI")
         
 
-
     from app.models.task import Task
     from app.models.goal import Goal
 
