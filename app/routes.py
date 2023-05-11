@@ -106,8 +106,6 @@ def mark_task_complete(task_id):
         "task": task.task_to_dict()
     }
 
-    # Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
-
     client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
     logger = logging.getLogger(__name__)
     channel_id = "task-notifications"
@@ -122,13 +120,6 @@ def mark_task_complete(task_id):
 
     except SlackApiError as e:
         logger.error(f"Error posting message: {e}")
-
-    # data_payload = {
-    #     "channel": "task_notifications",
-    #     "message": "Hi from my own API!"
-    #     }
-    # r = requests.get("https://slack.com/api/chat.postMessage", auth=os.environ.get(
-    #         "SLACK_AUTH_TOKEN"), params=data_payload)
 
     return jsonify(response_body)
 
