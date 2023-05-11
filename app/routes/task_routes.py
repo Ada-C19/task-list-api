@@ -89,7 +89,7 @@ def create_task():
 
 
 
-def validate_task(id):
+def validate_goal(id):
     try:
         id = int(id)
     except:
@@ -106,13 +106,15 @@ def validate_task(id):
 
 @bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
-    task = validate_task(id)
+    task = validate_goal(id)
+    if task.goal_id:
+        return {"task": task.to_dict_with_goal()}, 200
     return {"task": task.to_dict()}, 200
 
 
 @bp.route("/<id>", methods=["PUT"])
 def update_task(id):
-    task = validate_task(id)
+    task = validate_goal(id)
     request_body = request.get_json()
     is_complete = request_body.get("is_complete", False)
 
@@ -131,7 +133,7 @@ def update_task(id):
 
 @bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
-    task = validate_task(id)
+    task = validate_goal(id)
 
     db.session.delete(task)
     db.session.commit()
@@ -141,7 +143,7 @@ def delete_task(id):
 
 @bp.route("/<id>/mark_complete", methods=["PATCH"])
 def complete_task(id):
-    task = validate_task(id)
+    task = validate_goal(id)
     # request_body = request.get_json()
 
     # if request_body is None:
@@ -158,6 +160,8 @@ def complete_task(id):
 
     Authorization = "Bearer xoxb-5242678399683-5266537240624-SzcfKHmF2xZaq407bmmGcsdL"
 
+    text = f"Someone just completed the task {task.title}"
+
     headers = {
         "Authorization": Authorization,
         "format": "json"
@@ -165,7 +169,7 @@ def complete_task(id):
 
     body = {
         "channel": "task-notifications",
-        "text": "Hello, World!",
+        "text": text,
     }
     requests.post(PATH, headers=headers, json=body)
     # response = requests.post(PATH, headers=headers, json=body)
@@ -194,7 +198,7 @@ def complete_task(id):
 
 @bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def incomplete_task(id):
-    task = validate_task(id)
+    task = validate_goal(id)
     # request_body = request.get_json()
 
     if task.completed_at:
