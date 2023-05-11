@@ -6,7 +6,7 @@ class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, nullable=True) # set default value to <null>
+    completed_at = db.Column(db.DateTime, nullable=True)
 
     @classmethod
     def task_from_dict(cls, task_data):

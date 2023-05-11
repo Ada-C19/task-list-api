@@ -63,7 +63,6 @@ def update_task(task_id):
     request_body = request.get_json()
     task.title = request_body["title"]
     task.description = request_body["description"]
-    # task.completed_at = request_body["completed_at"]
 
     db.session.commit()
 
@@ -83,4 +82,20 @@ def delete_task(task_id):
     db.session.commit()
 
     return response_body
+
+@task_list_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+    task = validate_model_task(Task, task_id)
+    
+    request_body = request.get_json()
+    # NoneType object not subscriptable
+    # can't access the index because it is None and technically doesn't exist
+    task.completed_at = request_body["completed_at"]
+
+    response_body = {
+        "task": task.task_to_dict()
+    }
+
+    return jsonify(response_body)
+
 
