@@ -7,12 +7,15 @@ class Task(db.Model):
     description = db.Column(db.String(200))
     completed_at = db.Column(db.DateTime, default=None)
 
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'), nullable=True)
+    goal = db.relationship("Goal", back_populates="tasks")
+    
     def to_dict(self):
-        return{
+        return {
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": bool(self.completed_at != None)
+            "is_complete": bool(self.completed_at),
         }
 
     @classmethod
