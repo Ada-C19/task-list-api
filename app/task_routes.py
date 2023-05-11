@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify, make_response, abort
+from flask import Blueprint, request, jsonify, make_response, abort 
 from app import db
 from app.models.task import Task
+from sqlalchemy.types import DateTime
+from sqlalchemy.sql.functions import now
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -40,16 +42,21 @@ def create_task():
     return jsonify(task_message), 201
 
 
-# GET SAVED TASKS
-# @tasks_bp.route("", methods=["GET"])
-# def get_saved_tasks():
-#     tasks = Task.query.all()
-#     tasks_list_response = []
-
-#     for task in tasks:
-#         tasks_list_response.append(task.to_dict())
-
-#     return jsonify(tasks_list_response)
+# GET ALL AND SORT TASKS BY TITLE 
+@tasks_bp.route("", methods=["GET"])
+def sort_by_title():
+    # task_query = Task.query
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        tasks = Task.query.order_by(Task.title)
+    elif sort_query == "desc":
+        tasks = Task.query.order_by(Task.title.desc())
+    else:
+        tasks = Task.query.all()
+    
+    task_response = [task.to_dict() for task in tasks]
+    
+    return jsonify(task_response)
 
 
 # GET ONE TASK
@@ -92,24 +99,39 @@ def delete_task(task_id):
     return jsonify(task_message)
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ WAVE 02 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MARK COMPLETE ON AN INCOMPLETED TASK
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = validate_model(Task, task_id)
+    request_body = request.get_json()
 
-# Can this just replace GET SAVED TASKS???
+    try:
+        task = Task.query.get(task_id)
+        task.completed_at = now()
+        
+        db.session.commit()
+        task_message = {"task": task.to_dict()}
+        return jsonify(task_message), 200
 
-# SORT TASKS BY TITLE  
-@tasks_bp.route("", methods=["GET"])
-def sort_by_title():
-    # task_query = Task.query
-    sort_query = request.args.get("sort")
-    if sort_query == "asc":
-        tasks = Task.query.order_by(Task.title)
-    elif sort_query == "desc":
-        tasks = Task.query.order_by(Task.title.desc())
-    else:
-        tasks = Task.query.all()
-    
-    task_response = [task.to_dict() for task in tasks]
-    
-    return jsonify(task_response)
+    except:
+        abort(make_response({"message": f"{task_id} not found"}, 404)) 
+
+
+# MARK INCOMPLETE ON A COMPLETED TASK
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = validate_model(Task, task_id)
+    request_body = request.get_json()
+
+    try:
+        task = Task.query.get(task_id)
+        task.completed_at = None
+        
+        db.session.commit()
+        task_message = {"task": task.to_dict()}
+        return jsonify(task_message), 200
+
+    except:
+        abort(make_response({"message": f"{task_id} not found"}, 404)) 
+
+
