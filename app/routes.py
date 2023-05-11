@@ -86,14 +86,14 @@ def update_task_completion(task_id):
     task.completed_at = datetime.now()
     db.session.commit()
 
-    url = "https://slack.com/app.client.chat_postMessage"
+    url = "https://slack.com/api/chat.postMessage"
     slack_token = os.environ.get("SLACK_API_TOKEN")
     data = {
         "channel": "task-notifcations",
         "text": f"Someone just completed the task {task.title}",
         "token" : slack_token
     }
-    reponse = requests.post(url, data=data)
+    response = requests.post(url, data=data)
     
     return make_response(jsonify({"task":task.to_dict()}),200)
 
