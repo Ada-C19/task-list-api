@@ -57,6 +57,17 @@ def three_tasks(app):
     ])
     db.session.commit()
 
+# Optional     
+@pytest.fixture
+def three_goals(app):
+    db.session.add_all([
+    Goal(
+        title="Manage time better"),
+    Goal(
+        title="Practice self-care on a daily basis"),
+    Goal(
+        title="Connect with family and friends")
+    ])
 
 # This fixture gets called in every test that
 # references "completed_task"
