@@ -10,21 +10,42 @@ class Task(db.Model):
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
 
     def to_dict(self):
-        if self.goal_id:
-            return {
-                "task": {
-                    "id": self.id,
-                    "goal_id": self.goal_id,
-                    "title": self.title,
-                    "description": self.description,
-                    "is_complete": False
-                }}
-    
-        elif self.goal_id == None:
-            return {"task": {
-                    "id": self.id,
-                    "title": self.title,
-                    "description": self.description,
-                    "is_complete": False
-                }}
+        
+        if not completed_at:
+            if self.goal_id >= 1:
+                return {
+                    "task": {
+                        "id": self.id,
+                        "goal_id": self.goal_id,
+                        "title": self.title,
+                        "description": self.description,
+                        "is_complete": False
+                    }}
+        
+            elif self.goal_id == None:
+                return {"task": {
+                        "id": self.id,
+                        "title": self.title,
+                        "description": self.description,
+                        "is_complete": False
+                    }}
+
+        elif completed_at:
+            if self.goal_id >= 1:
+                return {
+                    "task": {
+                        "id": self.id,
+                        "goal_id": self.goal_id,
+                        "title": self.title,
+                        "description": self.description,
+                        "is_complete": True
+                    }}
+        
+            elif self.goal_id == None:
+                return {"task": {
+                        "id": self.id,
+                        "title": self.title,
+                        "description": self.description,
+                        "is_complete": True
+                    }}
 
