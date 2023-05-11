@@ -2,9 +2,7 @@ from flask import Blueprint, request, make_response, jsonify, abort
 from ..models.task import Task
 from ..models.goal import Goal
 from app import db
-from datetime import datetime
-from flask import Flask 
-from app.routes.helper import send_requsest_to_slack, validate_model
+from app.routes.helper import validate_model
 
 goal_bp = Blueprint("goal_bp", __name__, url_prefix="/goals")
 
@@ -68,7 +66,6 @@ def post_task_belong_to_specific_goal(goal_id):
     for id in request_body_dict["task_ids"]:
         task = Task.query.get(id)
         task.goal_id = goal_id
-    
     db.session.add(goal_object)
     db.session.commit()
     response = {"id": goal_object.goal_id,

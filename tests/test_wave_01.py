@@ -59,10 +59,7 @@ def test_get_task_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"details" : "Task #1 not found"}
-    
     assert actual_task == None
-    response = client.get("/tasks/1")
-    assert response.status_code == 404
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")

@@ -1,11 +1,7 @@
 from flask import Blueprint, request, make_response, jsonify, abort
 from ..models.task import Task
-from ..models.goal import Goal
 from app import db
 from datetime import datetime
-# import os
-# from flask import Flask 
-# from routes.task_routes import validate_model
 from app.routes.helper import send_requsest_to_slack, validate_model
 
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")

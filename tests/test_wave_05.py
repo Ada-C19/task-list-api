@@ -56,8 +56,6 @@ def test_get_goal_not_found(client):
     assert response_body == {"details" : "Goal #1 not found"}
     actual_goal = Goal.query.get(1)
     assert actual_goal== None
-    response = client.get("/goals/1")
-    assert response.status_code == 404
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
