@@ -3,18 +3,18 @@ from flask import make_response, abort
 import os, requests
 
 
-def validate_model(task_id):
+def validate_model(model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message": f"Task {task_id} is invalid"}, 400))
+        abort(make_response({"message": f"{cls.__name__} {model_id} is invalid"}, 400))
 
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
 
-    if not task:
-        abort(make_response({"message": f"Task {task_id} not found"}, 404))
+    if not model:
+        abort(make_response({"message": f"{cls.__name__} {model_id} not found"}, 404))
     
-    return task
+    return model
 
 def slack_bot_message(message):
     slack_api_key = os.environ.get("SLACK_BOT_TOKEN")
