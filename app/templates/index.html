@@ -20,12 +20,12 @@
             <li style="font-size: 30pt" class='mark'>{{ todo.name }} <a href="{{ url_for('complete', id=todo.task_id) }}">Mark As Complete</a></li> 
             {% endfor %}     
         </ul> 
-        <h2>Completed Items</h2> 
+        <!-- <h2>Completed Items</h2> 
         <ul> 
             {% for todo in complete %} 
             <li style="font-size: 30pt">{{ todo.name }}</li> 
             {% endfor %} 
-        </ul> 
+        </ul>  -->
     </div> 
 </body> 
 </html> 

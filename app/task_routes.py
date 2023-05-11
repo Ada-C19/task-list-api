@@ -150,15 +150,16 @@ def delete_task(task_id):
 #     else:
 #         return render_template('update.html', task=task)
 
-@tasks_bp.route('/ui')
+@tasks_bp.route('/ui/')
 def index():
     incomplete = Task.query.filter_by(completed_at=False).all()
-    complete = Task.query.filter_by(completed_at=True).all()
-    return render_template('index.html', incomplete=incomplete, complete=complete)
+    # complete = Task.query.filter_by(completed_at=True).all()
+    return render_template('index.html', incomplete=incomplete)
+                        # , complete=complete)
 
 @tasks_bp.route('/ui/add', methods=['POST'])
 def add():
-    todo = Task(text=request.form['todoitem'], complete=False)
+    todo = Task(name=request.form['todoitem'], description="Test", completed_at=False)
     db.session.add(todo)
     db.session.commit()
     return redirect(url_for('index'))
