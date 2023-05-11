@@ -175,7 +175,6 @@ def create_goal():
 def assign_tasks_to_goal(goal_id):
     request_body = request.get_json()
     response_tasklist = request_body["task_ids"]
-    print(response_tasklist)
 
     goal = validate_model(Goal, goal_id)
 
