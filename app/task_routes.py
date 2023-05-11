@@ -3,7 +3,12 @@ from flask import Blueprint
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
+import logging
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 
+slack_client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+logger = logging.getLogger(__name__)
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -102,6 +107,14 @@ def mark_complete(task_id):
     task.is_complete = True
     
     db.session.commit()
+    
+    channel_id = "C057LC0GM09"
+    
+    slack_message = client.chat_postMessage(
+        channel=channel_id,
+        text="Hello world"
+    )
+    logger.info(slack_message)
     
     return make_response({
         "task": {
