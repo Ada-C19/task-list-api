@@ -11,10 +11,8 @@ import os
 # from slack_sdk.errors import SlackApiError
 
 
-
-
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
-goal_bp = Blueprint("goal_bp", __name__, )
+goal_bp = Blueprint("goal_bp", __name__, url_prefix="/goals")
 
 def validate_model_task(cls, model_id):
     try:
@@ -28,6 +26,19 @@ def validate_model_task(cls, model_id):
         abort(make_response({"message": f"{cls.__name__} {model_id} not found"}, 404))
 
     return task
+
+def validate_model_goal(cls, model_id):
+    try:
+        model_id = int(model_id)
+    except:
+        abort(make_response({"message": f"{cls.__name__} {model_id} invalid"}, 400))
+
+    goal = cls.query.get(model_id)
+
+    if not goal:
+        abort(make_response({"message": f"{cls.__name__} {model_id} not found"}, 404))
+    
+    return goal
 
 @task_list_bp.route("", methods=["POST"])
 def create_task():
@@ -157,3 +168,48 @@ def mark_task_incomplete(task_id):
     }
 
     return jsonify(response_body)
+
+
+############### Below = goal endpoints ###############
+
+
+@goal_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    is_valid_goal = "title" in request_body
+    if not is_valid_goal:
+        abort(make_response({"details": "Invalid data"}, 400))
+    
+    new_goal = Goal.goal_from_dict(request_body)
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    response_body = {
+        "goal": new_goal.goal_to_dict()
+    }
+
+    return make_response(jsonify(response_body), 201)
+
+@goal_bp.route("", methods=["GET"])
+def get_all_goals():
+    # goal = validate_model_goal()
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        goals = Goal.query.order_by(Goal.title)
+    elif sort_query == "desc":
+        goals = Goal.query.order_by(Goal.title.desc())
+    else:
+        goals = Goal.query.all()
+
+    goals_response = [goal.goal_to_dict() for goal in goals]
+    return jsonify(goals_response)
+
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_model_goal(Goal, goal_id)
+    response_body = {
+        "goal": goal.goal_to_dict()
+    }
+    return jsonify(response_body)
+
