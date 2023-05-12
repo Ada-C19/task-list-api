@@ -93,3 +93,51 @@ def test_update_task_with_invalid_date(client, one_task):
 
     task = Task.query.get(1)
     assert task.completed_at == None
+
+
+def test_get_goals_sorted_asc(client, three_goals):
+    # Act
+    response = client.get("/goals?sort=asc")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "id": 3,
+            "title": "Always Remember to cry, just a little 😭",
+        },
+        {
+            "id": 1,
+            "title": "Look for emojis that fit your personality 🌷",
+        },
+        {
+            "id": 2,
+            "title": "Read all 10000 unread emails 📧",
+        }
+    ]
+
+
+def test_get_goals_sorted_desc(client, three_goals):
+    # Act
+    response = client.get("/goals?sort=desc")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "id": 2,
+            "title": "Read all 10000 unread emails 📧"
+        },
+        {
+            "id": 1,
+            "title": "Look for emojis that fit your personality 🌷"
+        },
+        {
+            "id": 3,
+            "title": "Always Remember to cry, just a little 😭"
+        },
+    ]
