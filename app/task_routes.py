@@ -13,6 +13,7 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def get_all_tasks():
     tasks = Task.query.all()
     query_params = {
+        "id": request.args.get("id"),
         "title" : request.args.get("title"),
         "description" : request.args.get("description"),
         "completed_at" :request.args.get("completed_at"),

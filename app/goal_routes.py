@@ -2,14 +2,20 @@ from flask import Blueprint, jsonify, abort, request,make_response
 from app.models.goal import Goal
 from app.models.task import Task
 from app import db
-from app.helpers import validate_model
+from app.helpers import validate_model, query_filter
 
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @goals_bp.route("", methods=["GET"])
 def get_goals():
-    goals = Goal.query.all()
+    # goals = Goal.query.all()
+    query_params = {
+        "id": request.args.get("id"),
+        "title": request.args.get("title")
+    }
+    goals = query_filter(Goal, query_params).all()
+
     response_body = [goal.to_dict() for goal in goals]
 
     return make_response(jsonify(response_body), 200)
