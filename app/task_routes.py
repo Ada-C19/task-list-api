@@ -25,6 +25,7 @@ def get_all_tasks():
     title_query = request.args.get("title")
     tasks_query = Task.query
     if title_query:
+        # filter tasks by case-insensitive substring
         tasks_query = tasks_query.filter(Task.title.ilike(f'%{title_query}%'))
     tasks = sort_models(Task, tasks_query, sort_query)
     tasks_response = [task.to_dict() for task in tasks]
