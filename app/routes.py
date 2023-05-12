@@ -1,13 +1,15 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
 from app import db
-from app.say_bot import client
+import requests
+from app.say_bot import token
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 
 
-
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods = ["POST"])
 def create_tasks():
@@ -103,10 +105,7 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.now()
     db.session.commit()
 
-    client.chat_postMessage(
-        channel="#task-notifications", 
-        text=f"Someone just completed the task {task.title}"
-    )
+    slack_post_message(task)
     
     message = Task.generate_message(task)
     return make_response(jsonify(message), 200)
@@ -118,3 +117,41 @@ def mark_task_incomplete(task_id):
     db.session.commit()
     message = Task.generate_message(task)
     return make_response(jsonify(message), 200)
+
+def slack_post_message(task):
+    api_url = 'http://slack.com/api/chat.postMessage'
+
+    payload = {
+        "channel": "api-test-channel",
+        "text":f"Someone just completed the task {task.title}"
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    response = requests.post(api_url, headers=headers, data=payload)
+
+    print(response.text)
+
+@goals_bp.route("", methods = ["POST"])
+def create_goals():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal.create_new_goal(request_body)
+        db.session.add(new_goal)
+        db.session.commit()
+
+        # message = Goal.generate_message(new_goal)
+        message = new_goal.__str__()
+
+        return make_response(jsonify(message), 201)
+    except KeyError as e:
+        message = "Invalid data"
+        return make_response({"details": message}, 400)
+
+@goals_bp.route("", methods = ["GET"])
+def read_all_goals():
+    goals = Goal.query.all()
+    goal_response = [goal.goal_to_dict() for goal in goals]
+    return jsonify(goal_response)
+
+
