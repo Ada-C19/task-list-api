@@ -1,5 +1,5 @@
 from app import db
-from flask import make_response, abort, jsonify
+
 
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
@@ -7,6 +7,8 @@ class Task(db.Model):
     description=db.Column(db.String)
     completed_at=db.Column(db.DateTime, nullable=True)
     is_complete= db.Column(db.Boolean, default=False)
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'))
+    goal = db.relationship("Goal", back_populates="tasks")
 
     def task_to_dict(self):
         return {
@@ -56,14 +58,3 @@ class Task(db.Model):
                 "is_complete": self.is_complete
             }
         }
-
-    # @classmethod
-    # def generate_message(cls, task):
-    #     return {
-    #         f"goal": {
-    #             "id": task.task_id,
-    #             "title": task.title,
-    #             "description": task.description,
-    #             "is_complete": task.is_complete
-    #         }
-    #     }

@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
 
-
+token = os.environ.get('SLACK_TOKEN')
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -33,12 +33,11 @@ def create_app(test_config=None):
     from app.models.goal import Goal
 
     
-    from app.routes import tasks_bp
-    from app.routes import goals_bp
+    from app.routes.task_routes import tasks_bp
+    from app.routes.goal_routes import goals_bp
     # Register Blueprints here
     app.register_blueprint(tasks_bp)
     app.register_blueprint(goals_bp)
-    token = os.environ.get('SLACK_TOKEN')
 
     # client = slack.WebClient(token=os.environ['SLACK_TOKEN'])
     return app
