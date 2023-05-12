@@ -20,24 +20,12 @@ def create_task():
                 }, 400
             ))
 
-    task = Task(
-        title = request_body["title"],
-        description = request_body["description"],
-    )
+    task = Task.from_dict(request_body)
 
     db.session.add(task)
     db.session.commit()
 
-    return make_response(
-        {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False if not task.completed_at else True
-            }
-        }, 201
-    )
+    return jsonify({"task": task.to_dict()}), 201
 
 ###### Read Route ######
 
@@ -54,14 +42,7 @@ def read_tasks():
 
     tasks_response = []
     for task in tasks:
-        tasks_response.append(
-            {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": True if task.completed_at else False
-            }
-        ), 200
+        tasks_response.append(task.to_dict()), 200
 
     return jsonify(tasks_response)
 
@@ -69,26 +50,8 @@ def read_tasks():
 def read_one_saved_task(task_id):
     task = validate_model(Task, task_id)
 
-    if task.goal_id:
-        return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False,
-            "goal_id": task.goal_id
-        }
-    }
-    else:
-        return {
-        "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True if task.completed_at else False,
-        }
-    }
-
+    return {"task": task.to_dict()}
+    
 ###### Update Route ######
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -101,16 +64,7 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return make_response(
-        {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": True if task.completed_at else False
-            }
-        }, 200
-    )
+    return make_response({"task": task.to_dict()},200)
 
 ###### Patch Route ######
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
@@ -122,8 +76,6 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.datetime.now()
 
     db.session.commit()
-
-
 
     slack_channel_id = "C0581Q2TDGQ"
     slack_url = "https://slack.com/api/chat.postMessage"
@@ -139,16 +91,7 @@ def mark_task_complete(task_id):
     
     slack_request = requests.post(slack_url, headers=headers, json=slack_data)
     print(slack_request.text)
-    return make_response(
-        {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": True
-            }
-        }, 200
-    )
+    return make_response({"task": task.to_dict()}), 200
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
@@ -160,16 +103,7 @@ def mark_task_incomplete(task_id):
 
     db.session.commit()
                 
-    return make_response(
-        {
-            "task": {
-                "id": task.task_id,
-                "title": task.title,
-                "description": task.description,
-                "is_complete": False
-            }
-        }, 200
-    )
+    return make_response({"task": task.to_dict()}, 200)
 
 ###### Delete Route ######
 
