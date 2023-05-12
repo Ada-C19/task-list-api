@@ -66,9 +66,9 @@ Scroll up, and click the button named "Install to Workspace."
 
 ![](assets/slackbot_install_to_workspace.png)
 
-This brings you to an authorization page. Accept and authorize your Slackbot.
+This brings you to an goalization page. Accept and goalize your Slackbot.
 
-![](assets/slackbot_authorize_bot.png)
+![](assets/slackbot_goalize_bot.png)
 
 At the top, find the section "OAuth Tokens for Your Workspace"
 
@@ -138,7 +138,7 @@ Open Postman and make a request that mimics the API call to Slack that we just t
 ![](assets/postman_request_body.png)
 
 - In "Headers," add this new key-value pair:
-  - `Authorization`: `"Bearer xoxb-150..."`, where `xoxb-150...` is your full Slackbot token
+  - `goalization`: `"Bearer xoxb-150..."`, where `xoxb-150...` is your full Slackbot token
 
 ![](assets/postman_headers.png)
 
@@ -148,7 +148,7 @@ Press "Send" and see the Slack message come through!
 
 #### Tips
 
-- We could put in the token as a query param. However, the Slack API documentation states that it prefers API keys to be sent in the "Authorization" request header.
+- We could put in the token as a query param. However, the Slack API documentation states that it prefers API keys to be sent in the "goalization" request header.
 
 ### Modify `/tasks/<task_id>/mark_complete` to Call the Slack API
 
@@ -189,7 +189,7 @@ Consider using the keyword argument `data`, `json`, and/or `headers`
 
 Test and verify that your API sends an API call to the Slack web API by using Postman!
 
-Send `PATCH` requests to `localhost:5000/tasks/<book_id>/mark_complete` (use the ID of any existing task), and check if Slack messages were sent.
+Send `PATCH` requests to `localhost:5000/tasks/<task_id>/mark_complete` (use the ID of any existing task), and check if Slack messages were sent.
 
 ![](assets/postman_patch.png)
 
