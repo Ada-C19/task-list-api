@@ -14,12 +14,9 @@ class Task(db.Model):
         dict["id"] = self.task_id
         dict["title"] = self.title
         dict["description"] = self.description
+        dict["is_complete"] = bool(self.completed_at)
         if self.goal_id:
             dict["goal_id"] = self.goal_id
-        if self.completed_at:
-            dict["is_complete"] = True
-        else:
-            dict["is_complete"] = False
 
         return dict
 

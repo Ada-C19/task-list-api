@@ -35,9 +35,11 @@ def post_tasks_for_goal(goal_id):
         task.goal_id = goal.goal_id
         db.session.commit()
 
+    task_ids_list = [task.task_id for task in goal.tasks]
+
     result = {
         "id": goal.goal_id,
-        "task_ids": response["task_ids"]
+        "task_ids": task_ids_list
     }
     return jsonify(result), 200
 

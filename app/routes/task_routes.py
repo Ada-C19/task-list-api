@@ -1,17 +1,12 @@
 from flask import Blueprint, request, jsonify
 from app.models.task import Task
 from app import db
-from helper import validate_model
+from helper import validate_model, send_slack_massage
 from sqlalchemy import asc, desc
 from datetime import datetime
-import requests
-import json
-import os
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-SLACK_POST_ENDPOINT = "https://slack.com/api/chat.postMessage"
-SLACK_API = os.environ.get("SLACK_API")
 
 
 # POST /tasks
@@ -99,18 +94,7 @@ def mark_complete(task_id):
     task.completed_at = datetime.now()
     db.session.commit()
 
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {SLACK_API}"
-    }
-
-    slack_post_data = json.dumps({
-        "text": f"Someone just completed the task {task.title}",
-        "channel": "C05769EL4RF",
-    })
-
-    requests.post(
-        url=SLACK_POST_ENDPOINT, headers=headers, data=slack_post_data)
+    send_slack_massage(task)
 
     result = {"task": task.to_dict()}
     return jsonify(result), 200
