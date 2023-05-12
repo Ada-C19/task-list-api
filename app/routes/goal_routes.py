@@ -70,7 +70,7 @@ def create_tasks_for_one_goal(goal_id):
     db.session.commit()
 
     task_id_list = [task.task_id for task in goal.tasks]
-
+    
     response_body = {
         "id":goal.goal_id,
         "task_ids": task_id_list
