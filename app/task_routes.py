@@ -3,12 +3,13 @@ from flask import Blueprint
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
-import requests
+# import requests
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
+from app.slack_api import notify_slack
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-# load_dotenv()
+# token = os.environ.get("SLACK_BOT_USER_OAUTH_TOKEN")
 
 def validate_task(task_id):
     try:
@@ -22,6 +23,19 @@ def validate_task(task_id):
         abort(make_response({"details": f"Task {task_id} not found"}, 404))
     
     return task
+
+# def notify_slack():
+#     load_dotenv()
+
+#     token = os.environ.get("SLACK_BOT_USER_OAUTH_TOKEN")
+#     text = "This is a message from task_routes.py with a hardcoded API token"
+#     # auth_header = {"Authorization": f"Bearer {token}"}
+
+#     slack_response = requests.post('https://slack.com/api/chat.postMessage', data={"token": "xoxb-5242826251733-5256056876612-LiqN7w7C01EF1KGA1QMlrlO0", "channel": "task-notifications", "text": text})
+#     # print(response.status_code)
+#     # print(response.json())
+    
+#     return slack_response
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -106,13 +120,9 @@ def mark_complete(task_id):
     
     db.session.commit()
 
-    load_dotenv()
-    slack_token = os.environ.get("SLACK_BOT_USER_OAUTH_TOKEN")
-    text = "omg???"
-
-    response = requests.post('https://slack.com/api/chat.postMessage', data={"token": slack_token, "channel": "task-notifications", "text": text})
-    # print(response.status_code)
-    print(response.json())
+    slack_token = os.environ.get("SLACK_TOKEN")
+    task_name = task.title
+    slack_response = notify_slack(slack_token, task_name)
     
     return make_response({
         "task": {
@@ -122,9 +132,10 @@ def mark_complete(task_id):
             "is_complete": task.is_complete, 
         },
         "slack_response": {
-            "status_code": response.status_code,
-            "json": response.json()
-        }
+            "status_code": slack_response.status_code,
+            "json": slack_response.json()
+        },
+        "token": {"slack token": slack_token}
     })
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
