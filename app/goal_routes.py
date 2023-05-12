@@ -33,6 +33,7 @@ def get_one_goal(id):
 
     return jsonify({"goal":goal.to_dict()}),200
 
+
 #GET all goals [GET]/goals  :(CREATE)
 @goals_bp.route("",methods=["GET"])
 def get_all_goals():
@@ -57,6 +58,7 @@ def update_goal(id):
     db.session.commit()
 
     return jsonify({"goal":goal.to_dict()}),200
+
 
 #DELETE one goal [DELETE]/goals/<id> :(DELETE)
 @goals_bp.route("/<id>",methods=["DELETE"])
