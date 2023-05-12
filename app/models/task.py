@@ -10,6 +10,12 @@ class Task(db.Model):
     goal_id_parent = db.Column(db.Integer,db.ForeignKey("goal.goal_id"))
     
     @classmethod
+    def from_dict(cls,response_body):
+        return cls(
+            title=response_body["title"],
+            description=response_body["description"]
+        )
+
     def update_dict(self,request_body):
         self.title = request_body["title"]
         self.description = request_body["description"]
@@ -19,16 +25,11 @@ class Task(db.Model):
         return cls(
             title=response_body.get("title"),
             description=response_body.get("description"),
-            # goal=goal,
             completed_at = response_body.get("completed_at",None)
         )
     
-    def update_dict(self,request_body):
-        self.title = request_body["title"]
-        self.description = request_body["description"]
     
     def to_dict(self):
-        # is_complete= True if self.completed_at else False;
         dictionary = {}
         if self.goal:
             dictionary = {
