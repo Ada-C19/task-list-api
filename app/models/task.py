@@ -24,3 +24,12 @@ class Task(db.Model):
             "description": self.description,
             "is_complete": bool(self.completed_at)
         }
+    
+    def goal_to_dict(self):
+        return{
+            "id" : self.task_id,
+            "goal_id" : self.goal_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": bool(self.completed_at)
+        }

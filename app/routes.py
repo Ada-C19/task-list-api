@@ -59,7 +59,10 @@ def validate_model(model_class, model_id):
 @task_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task,task_id)
-    return {"task" :task.to_dict()}, 200
+    if not task.goal:
+        return {"task" :task.to_dict()}, 200
+    else:
+        return {"task" :task.goal_to_dict()}, 200
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -170,7 +173,7 @@ def update_goal(goal_id):
 
     db.session.commit()
     return  {
-        "goal": goapp/models/task.pyal.to_dict()}, 200
+        "goal": goal.to_dict()}, 200
 
 @goal_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
@@ -181,3 +184,30 @@ def delete_goal(goal_id):
     return  {
         "details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"
     }, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods = ["POST"])
+def add_list_of_tasks(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    task_list = request_body.get("task_ids")
+    for task_id in task_list:
+        new_task = validate_model(Task, task_id)
+        new_task.goal_id = goal.goal_id
+        new_task.goal = goal
+    db.session.commit()
+    return {"id": goal.goal_id, "task_ids": task_list}, 200
+
+@goal_bp.route("/<goal_id>/tasks", methods = ["GET"])
+def get_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    task_list = []
+    for task in goal.tasks:
+        task_list.append(task.goal_to_dict())
+    
+    return {
+        "id" : goal.goal_id,
+        "title": goal.title, 
+        "tasks": task_list
+    }
