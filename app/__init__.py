@@ -16,11 +16,11 @@ def create_app(test_config=None):
 
     if test_config is None:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "RENDER_DATABASE_URI")
+            "SQLALCHEMY_DATABASE_URI")
     else:
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "RENDER_DATABASE_URI")
+            "SQLALCHEMY_DATABASE_URI")
 
     # Import models here for Alembic setup
     from app.models.task import Task
