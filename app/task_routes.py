@@ -3,7 +3,7 @@ from app.models.task import Task
 from app import db
 from datetime import datetime
 import requests, os
-from app.helper_functions import validate_model
+from app.helper_functions import validate_model, create_model
 
 
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
@@ -12,14 +12,9 @@ tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-    
-    try:
-        new_task = Task.from_dict(request_body)
-        db.session.add(new_task)
-        db.session.commit()
-    except KeyError:
-        return abort(make_response({"details": "Invalid data"}, 400))
-
+    new_task = create_model(Task, request_body)
+    db.session.add(new_task)
+    db.session.commit()
     return make_response({"task": new_task.to_dict()}, 201)
 
 

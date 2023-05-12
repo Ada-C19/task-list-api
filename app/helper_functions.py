@@ -10,3 +10,11 @@ def validate_model(cls, model_id):
     if not model:
         abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
     return model
+
+
+def create_model(cls, request_body):
+    try:
+        model = cls.from_dict(request_body)
+    except KeyError:
+        return abort(make_response({"details": "Invalid data"}, 400))
+    return model
