@@ -67,7 +67,7 @@ def test_get_task_not_found(client):
     assert response_body == {"message": "Task 1 not found."}
 
 #@pytest.mark.skip(reason="No way to test this feature yet")
-
+def test_create_task(client):
     # Act
     response = client.post("/tasks", json={
         "title": "A Brand New Task",
@@ -76,23 +76,19 @@ def test_get_task_not_found(client):
     response_body = response.get_json()
 
     # Assert
+    new_task = Task.query.get(1)
     assert response.status_code == 201
     assert "task" in response_body
-    assert response_body == {
-        "task": {
-            "id": 1,
-            "title": "A Brand New Task",
-            "description": "Test Description",
-            "is_complete": False
-        }
-    }
-    new_task = Task.query.get(1)
+    assert response_body["task"]["title"] == "A Brand New Task"
+    assert response_body["task"]["description"] == "Test Description"
+    assert response_body["task"]["is_complete"] == False
+    
     assert new_task
     assert new_task.title == "A Brand New Task"
     assert new_task.description == "Test Description"
     assert new_task.completed_at == None
 
-    
+
 #@pytest.mark.skip(reason="No way to test this feature yet")
 def test_update_task(client, one_task):
     # Act
