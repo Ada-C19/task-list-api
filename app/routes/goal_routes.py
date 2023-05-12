@@ -1,4 +1,4 @@
-from .helper_functions import create_instance, get_all_instances, get_one_instance, get_one_instance, delete_instance, update_instance,  add_tasks_to_class
+from .helper_functions import create_instance, get_all_instances, get_one_instance, get_one_instance, delete_instance, update_instance,  add_tasks_to_model
 from app.models.goal import Goal
 from flask import Blueprint
 
@@ -35,7 +35,8 @@ def delete_goal(goal_id):
 def get_tasks_for_goal(goal_id):
     return get_all_instances(Goal, goal_id)
 
+
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def add_tasks_to_goal(goal_id):
-    return add_tasks_to_class(Goal, goal_id)
+    return add_tasks_to_model(Goal, goal_id)
 

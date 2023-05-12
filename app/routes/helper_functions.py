@@ -153,19 +153,20 @@ def make_instance_incomplete(cls, id):
     return create_response(cls, instance)
 
 
-def add_tasks_to_class(cls, id):
-    goal = get_model_by_id(cls, id)
+# Working on making this agnostic to being added to goals so that tasks can be added to project, lists, etc
+def add_tasks_to_model(cls, id):
+    model = get_model_by_id(cls, id)
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
 
-    for task in goal.tasks:
+    for task in model.tasks:
         task.goal_id = None
 
     for task_id in task_ids:
         task = get_model_by_id(Task, task_id)
-        task.goal_id = goal.goal_id
+        task.goal_id = model.goal_id
     
-    goal_id = goal.goal_id
+    goal_id = model.goal_id
 
     db.session.commit()
 
