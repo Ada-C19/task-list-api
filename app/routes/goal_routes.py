@@ -10,9 +10,7 @@ bp = Blueprint("goals", __name__, url_prefix="/goals")
 @bp.route("", methods=["GET"])
 def get_all_goals():
     goals = Goal.query.all()
-    goals_list = []
-    for goal in goals:
-        goals_list.append(goal.to_dict())
+    goals_list = [goal.to_dict() for goal in goals]
 
     return jsonify(goals_list), 200
 
@@ -42,7 +40,6 @@ def get_one_goal(id):
 def update_a_goal(id):
     goal = validate_model(Goal, id)
     request_body = request.get_json()
-
     goal.title = request_body["title"]
 
     db.session.commit()
@@ -55,26 +52,15 @@ def delete_a_goal(id):
     goal = validate_model(Goal, id)
     db.session.delete(goal)
     db.session.commit()
+
     return make_response({'details': f'Goal {goal.id} "{goal.title}" successfully deleted'}), 200
 
 
 @bp.route("/<id>/tasks", methods=["GET"])
 def get_all_tasks_for_one_goal(id):
     goal = validate_model(Goal, id)
-
-    tasks_list = []
-    for task in goal.tasks:
-        if not task.completed_at:
-            task.is_complete = False
-        task = (dict(
-            id=task.id,
-            title=task.title,
-            description=task.description,
-            is_complete=task.is_complete,
-            goal_id=goal.id
-        ))
-
-        tasks_list.append(task)
+    tasks_list = [(dict(id=task.id, title=task.title, description=task.description,
+                        is_complete=False if task.completed_at is None else True, goal_id=goal.id)) for task in goal.tasks]
 
     return {"id": goal.id, "title": goal.title, "tasks": tasks_list}, 200
 
@@ -87,12 +73,9 @@ def post_task_ids_to_goal(id):
         abort(make_response({"details": "Invalid data"}, 400))
 
     task_ids = request_body["task_ids"]
-    tasks_list = []
-    for task_id in task_ids:
-        tasks_list.append(Task.query.get(task_id))
+    tasks_list = [Task.query.get(task_id) for task_id in task_ids]
     goal.tasks = tasks_list
 
-    # db.session.add(new_task)
     db.session.commit()
 
     return {"id": goal.id, "task_ids": task_ids}, 200

@@ -18,9 +18,7 @@ def get_all_tasks():
     else:
         tasks = Task.query.all()
 
-    tasks_list = []
-    for task in tasks:
-        tasks_list.append(task.to_dict())
+    tasks_list = [task.to_dict() for task in tasks]
 
     return jsonify(tasks_list), 200
 
@@ -28,7 +26,6 @@ def get_all_tasks():
 @bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
-
     if "title" not in request_body or not request_body["title"] or "description" not in request_body or not request_body["description"]:
         abort(make_response({"details": "Invalid data"}, 400))
 
@@ -54,7 +51,6 @@ def get_one_task(id):
 @bp.route("/<id>", methods=["PUT"])
 def update_task(id):
     task = validate_model(Task, id)
-
     request_body = request.get_json()
     is_complete = request_body.get("is_complete", False)
 
@@ -100,6 +96,7 @@ def complete_task(id):
     requests.post(PATH, headers=headers, json=body)
 
     db.session.commit()
+
     return {"task": task.to_dict()}, 200
 
 
@@ -112,4 +109,5 @@ def incomplete_task(id):
     task.is_complete = False
 
     db.session.commit()
+
     return {"task": task.to_dict()}, 200
