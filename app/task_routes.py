@@ -121,7 +121,7 @@ def mark_complete(task_id):
             "id": task.task_id,
             "title": task.title,
             "description": task.description,
-            "is_complete": task.is_complete 
+            "is_complete": task.is_completem 
         }
     })
 
