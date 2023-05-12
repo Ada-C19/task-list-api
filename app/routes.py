@@ -145,6 +145,7 @@ def send_slack_message(completed_task):
     }
     CHANNEL_ID = "C0561UUDX4K"
     SLACK_URL = "https://slack.com/api/chat.postMessage"
+
     try:
         message = f"Someone just completed the task {completed_task.title}"
         payload = {
@@ -225,3 +226,6 @@ def delete_goal(goal_id):
     
     except:
         return {'details': 'Invalid data'}, 404
+
+#----------------------------------------------------------
+
