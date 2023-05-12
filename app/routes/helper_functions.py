@@ -61,13 +61,15 @@ def get_all_instances(cls):
     elif sort_order == "desc":
         instances = instances.order_by(desc(cls.title))
 
+    if hasattr(cls, 'description'):
+        if sort_order == "description_asc":
+            instances = instances.order_by(asc(cls.description))
+        elif sort_order == "description_desc":
+            instances = instances.order_by(desc(cls.description))
+
     instance_list = [instance.to_json() for instance in instances]
 
     return make_response(jsonify(instance_list), HTTPStatus.OK)
-
-
-
-	
 
 
 def get_one_instance(cls, model_id):

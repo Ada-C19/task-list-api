@@ -5,7 +5,7 @@ from app.models.goal import Goal
 from app import db
 from datetime import datetime
 from flask.signals import request_finished
-
+from datetime import datetime, timezone
 
 @pytest.fixture
 def app():
@@ -56,6 +56,21 @@ def three_tasks(app):
             title="Pay my outstanding tickets 😭", description="", completed_at=None)
     ])
     db.session.commit()
+
+from datetime import datetime, timezone
+
+@pytest.fixture
+def three_tasks_with_description(app):
+    db.session.add_all([
+        Task(
+            title="Water the garden 🌷", description="2", completed_at=None),
+        Task(
+            title="Answer forgotten email 📧", description="3", completed_at=None),
+        Task(
+            title="Pay my outstanding tickets 😭", description="1", completed_at=None)
+    ])
+    db.session.commit()
+
 
 
 # This fixture gets called in every test that
