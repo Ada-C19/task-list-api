@@ -9,6 +9,7 @@ from app.models.task import Task
 
 # DEFINING THE TASK BLUEPRINT
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 # error handling
 def validate_model(task_id):
