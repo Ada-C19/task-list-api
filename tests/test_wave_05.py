@@ -115,14 +115,14 @@ def test_update_goal_not_found(client):
     # raise Exception("Complete test")
     # Act
     # ---- Complete Act Here ----
-    respone = client.put("/goals/1")
-    respone_body = respone.get_json()
+    response = client.put("/goals/1")
+    response_body = response.get_json()
     # Assert
     # ---- Complete Assertions Here ----
     # assertion 1 goes here
-    assert respone.status_code == 404
+    assert response.status_code == 404
     # assertion 2 goes here
-    assert respone_body == {
+    assert response_body == {
         "details" : "Goal number 1 was not found"
     }
     # ---- Complete Assertions Here ----
@@ -145,11 +145,9 @@ def test_delete_goal(client, one_goal):
     response = client.get("/goals/1")
     assert response.status_code == 404
     response_body = response.get_json()
-    # assert response.get_data(as_text=True) == 'Goal number 1 was not found'
     assert response_body == {
         "details" : "Goal number 1 was not found"
     }
-    # assert response_body == "Goal number 1 was not found" #with jsonify
     
 
     # raise Exception("Complete test with assertion about response body")
