@@ -2,7 +2,7 @@ from flask import Blueprint, request, abort, make_response, jsonify
 from app.models.goal import Goal
 from app.models.task import Task
 from app import db
-from app.helper_functions import validate_model, create_model, sort_items, update_model
+from app.helper_functions import validate_model, create_model, sort_models, update_model
 
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -36,7 +36,8 @@ def post_tasks_to_goal(goal_id):
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
     sort_query = request.args.get("sort")
-    goals = sort_items(Goal, sort_query)
+    goal_query = Goal.query
+    goals = sort_models(Goal, goal_query, sort_query)
     goals_response = [goal.to_dict() for goal in goals]
     return jsonify(goals_response)
 
