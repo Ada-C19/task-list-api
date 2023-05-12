@@ -1,4 +1,5 @@
 from flask import abort, make_response
+import requests
 
 def validate_model(cls, model_id):
     try:
@@ -23,3 +24,17 @@ def sort_title_asc(response_body):
 def sort_title_desc(response_body):
     response_body = sorted(response_body, reverse=True, key=lambda task:task["title"])
     return response_body
+
+
+def query_filter(model_class, query_params):
+    query = model_class.query
+
+    for key, value in query_params.items():
+        if value:
+            query = query.filter_by(**{key:value})
+
+    return query
+
+
+
+

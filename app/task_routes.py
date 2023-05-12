@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, abort, request,make_response
 from app.models.task import Task
 from app import db
-from app.helpers import validate_model, sort_title_asc, sort_title_desc
+from app.helpers import validate_model, sort_title_asc, sort_title_desc, query_filter
 from datetime import datetime
 import os
 import requests
@@ -11,12 +11,16 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-
     tasks = Task.query.all()
-    response_body = []
-    for task in tasks:
-        response_body.append(task.to_dict())
+    query_params = {
+        "title" : request.args.get("title"),
+        "description" : request.args.get("description"),
+        "completed_at" :request.args.get("completed_at"),
+        "goal_id" : request.args.get("goal_id")
+    }
 
+    tasks = query_filter(Task, query_params).all()
+    response_body = [task.to_dict() for task in tasks]
     sort_query = request.args.get("sort")
     
     if sort_query and sort_query == "asc":
@@ -77,13 +81,9 @@ def delete_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_complete(task_id):
-
-
-
     task_to_update = validate_model(Task, task_id)
 
     current_time = datetime.utcnow()
-    
     task_to_update.completed_at = current_time
 
     db.session.commit()
@@ -93,7 +93,6 @@ def update_task_complete(task_id):
     headers = {"Authorization": f"Bearer {Api_key}"}
     data = {"channel": "task-notifications", "text":message}
     requests.post("https://slack.com/api/chat.postMessage", headers=headers, json=data )
-    
 
     message = task_to_update.to_dict()
     return make_response({"task":message}, 200)
