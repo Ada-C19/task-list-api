@@ -48,7 +48,14 @@ class Task(db.Model):
         return self.task_to_dict()
     
     def __str__(self):
-        return f"{self.__class__.__name__}"
+        return {
+            self.__class__.__name__.lower(): {
+                "id": self.task_id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": self.is_complete
+            }
+        }
 
     # @classmethod
     # def generate_message(cls, task):
@@ -60,10 +67,3 @@ class Task(db.Model):
     #             "is_complete": task.is_complete
     #         }
     #     }
-    def __str__(self):
-        return {
-            self.__class__.__name__: {
-                "id": self.id,
-                "title": self.title
-            }
-        }

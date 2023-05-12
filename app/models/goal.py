@@ -26,4 +26,11 @@ class Goal(db.Model):
                 "title": self.title
             }
         }
+    
+    def update(self, goal):
+        for key, value in goal.items():
+            if key == "title":
+                self.title = value
+        
+        return self.goal_to_dict()
 

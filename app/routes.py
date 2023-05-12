@@ -19,7 +19,7 @@ def create_tasks():
         db.session.add(new_task)
         db.session.commit()
 
-        message = Task.generate_message(new_task)
+        message = new_task.__str__()
 
         return make_response(jsonify(message), 201)
     except KeyError as e:
@@ -51,7 +51,7 @@ def filter_tasks_by_params(query_params):
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
     task = Task.query.get(task_id)
-    task = Task.generate_message(task)
+    task = task.__str__()
     return jsonify(task), 200
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
@@ -61,9 +61,9 @@ def update_task(task_id):
     task.update(request_body)
 
     db.session.commit()
-    message = Task.generate_message(task)
+    message = task.__str__()
     return make_response(jsonify(message))
-          
+
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
@@ -106,8 +106,7 @@ def mark_task_complete(task_id):
     db.session.commit()
 
     slack_post_message(task)
-    
-    message = Task.generate_message(task)
+    message = task.__str__()
     return make_response(jsonify(message), 200)
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
@@ -115,7 +114,7 @@ def mark_task_incomplete(task_id):
     task.is_complete = False
     task.completed_at = None
     db.session.commit()
-    message = Task.generate_message(task)
+    message = task.__str__()
     return make_response(jsonify(message), 200)
 
 def slack_post_message(task):
@@ -140,7 +139,6 @@ def create_goals():
         db.session.add(new_goal)
         db.session.commit()
 
-        # message = Goal.generate_message(new_goal)
         message = new_goal.__str__()
 
         return make_response(jsonify(message), 201)
@@ -160,5 +158,26 @@ def read_one_goal(goal_id):
     message = goal.__str__()
 
     return make_response(jsonify(message), 201)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    goal.update(request_body)
+
+    db.session.commit()
+    message = goal.__str__()
+    return make_response(jsonify(message))
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    db.session.delete(goal)
+    db.session.commit()
+
+    message = {
+        "details": f'Goal {goal_id} "{goal.title}" successfully deleted'
+        }
+    return make_response(jsonify(message), 200)
 
 
