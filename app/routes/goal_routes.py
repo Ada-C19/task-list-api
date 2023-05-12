@@ -60,3 +60,13 @@ def update_one_goal(goal_id):
     response = {"goal": goal.to_dict()}
 
     return make_response(response, 200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_of_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    # tasks_response = [task.to_dict() for task in goal.tasks]
+
+    goal = goal.to_dict()
+
+    return jsonify(goal)
