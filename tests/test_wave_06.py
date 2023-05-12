@@ -113,5 +113,28 @@ def test_get_tasks_for_specific_goal_no_goal_404(client):
 
 
 
+def test_post_task_ids_to_goal_invalid_goal_id_404(client):
+    # Act
+    response = client.post("/goals/100/tasks", json={
+        "task_ids": [1, 2, 3]
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Goal 100 was not found."}
+
+
+def test_post_task_ids_to_goal_invalid_task_ids_404(client, one_goal):
+    # Act
+    response = client.post("/goals/1/tasks", json={
+        "task_ids": [1, 2, 100]
+    })
+    response_body = response.get_json()
+    print(response_body)
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {'message': 'Task 1 was not found.'}
+
 
 

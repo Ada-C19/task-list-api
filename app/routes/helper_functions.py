@@ -1,6 +1,5 @@
-from flask import make_response, request, jsonify, abort
+from flask import make_response, request, abort
 from app.models.task import Task
-from app.models.goal import Goal
 from sqlalchemy import asc, desc
 from dotenv import load_dotenv
 from datetime import datetime
@@ -14,7 +13,7 @@ load_dotenv()
 
 NOWTIME = datetime.utcnow()
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
-CHANNEL = "C0561UUDX4K"
+CHANNEL = os.environ.get("CHANNEL")
 
 
 def create_response(cls, instance, status_code=HTTPStatus.OK):
@@ -135,10 +134,10 @@ def make_instance_complete(cls, id):
 
     slack_request_body = {
         "channel": CHANNEL,
-        "text": f"Someone just completed the task {cls.title}"
+        "text": f"Someone just completed the task {instance.title}"
     }
     slack_request_headers = {
-        "Authorization": f"Bearer" + SLACK_TOKEN
+        "Authorization": f"Bearer " + SLACK_TOKEN
     }
 
     slack_response = requests.post(slack_api_url, json=slack_request_body, headers=slack_request_headers)
@@ -155,22 +154,34 @@ def make_instance_incomplete(cls, id):
 
 
 def add_tasks_to_class(cls, id):
-    model = get_model_by_id(cls, id)
+    goal = get_model_by_id(cls, id)
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
 
-    for instance in model.tasks:
-        instance.goal_id = None
+    for task in goal.tasks:
+        task.goal_id = None
 
     for task_id in task_ids:
-        instance = get_model_by_id(Task, task_id)
-        instance.goal_id = model.goal_id
+        task = get_model_by_id(Task, task_id)
+        task.goal_id = goal.goal_id
     
-    goal_id = model.goal_id
+    goal_id = goal.goal_id
 
     db.session.commit()
 
     return make_response({"id": goal_id, "task_ids": task_ids}, HTTPStatus.OK)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

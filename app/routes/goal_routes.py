@@ -1,10 +1,10 @@
 from .helper_functions import create_instance, get_all_instances, get_one_instance, get_one_instance, delete_instance, update_instance,  add_tasks_to_class
 from app.models.goal import Goal
-from app.models.task import Task
-from flask import Blueprint, make_response, request
-from app import db
+from flask import Blueprint
+
 
 goals_bp = Blueprint('goals', __name__, url_prefix='/goals')
+
 
 @goals_bp.route("", methods=['POST'])
 def create_goal():

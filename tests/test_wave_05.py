@@ -90,6 +90,8 @@ def test_delete_goal_200(client, one_goal):
 
 
 
+
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal_201(client):
     # Act
@@ -161,6 +163,47 @@ def test_update_goal_not_found_404(client):
 
 
 
+
+
+
+def test_create_goal_missing_title_400(client):
+    # Act
+    response = client.post("/goals", json={})
+    response_body = response.get_json()
+    print(response_body)
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {'details': "KeyError invalid Goal data, missing key: 'title'"}
+
+
+def test_get_goal_not_found_404(client):
+    # Act
+    response = client.get("/goals/1")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {'message': 'Goal 1 was not found.'}
+
+
+def test_update_goal_not_found_404(client):
+    # Act
+    response = client.put("/goals/1", json={"title": "Updated Goal Title"})
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {'message': 'Goal 1 was not found.'}
+
+
+def test_delete_goal_not_found_404(client):
+    # Act
+    response = client.delete("/goals/1")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {'message': 'Goal 1 was not found.'}
 
 
 
