@@ -1,6 +1,6 @@
 from app import db
 from app.models.goal import Goal
-from flask import Blueprint, abort, make_response, request
+from flask import Blueprint, abort, make_response, request, jsonify
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -35,3 +35,13 @@ def create_goal():
             "title": new_goal.title
         }
     }, 201
+
+@goals_bp.route("", methods=["GET"])
+def get_goals():
+    goals = Goal.query.all()
+    
+    goals_response = []
+    for goal in goals:
+        goals_response.append(goal.to_dict())
+    
+    return jsonify(goals_response)
