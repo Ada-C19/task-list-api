@@ -71,7 +71,7 @@ def post_task_ids(goal_id):
     
     db.session.commit()
 
-    added_task_ids = [task.id for task in tasks]
+    added_task_ids = [task.id for task in goal.tasks]
     response_body = dict(id=goal.id , task_ids=added_task_ids)
 
     return make_response(jsonify(response_body), 200)
