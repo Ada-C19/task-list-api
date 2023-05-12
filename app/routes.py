@@ -37,7 +37,7 @@ def get_all_tasks():
 @tasks_bp.route("/<id>",methods=["GET"])
 def get_one_task(id):
     task = validate_task(id)
-
+    ex = task.to_dict()
     return jsonify({'task':task.to_dict()}),200
 
 #CREATE one task/must contain title+description [POST]/tasks/<id> :(CREATE)
