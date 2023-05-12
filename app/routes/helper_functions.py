@@ -1,16 +1,19 @@
 from flask import make_response, request, jsonify, abort
-from app import db
-from http import HTTPStatus
+from app.models.task import Task
 from sqlalchemy import asc, desc
-from datetime import timezone, datetime
 from dotenv import load_dotenv
-import os
+from datetime import datetime
+from http import HTTPStatus
+from app import db
 import requests
+import os
+
 
 load_dotenv()
 
 NOWTIME = datetime.utcnow()
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
+CHANNEL = "C0561UUDX4K"
 
 
 def create_response(cls, instance, status_code=HTTPStatus.OK):
@@ -120,16 +123,16 @@ def delete_instance(cls, id):
 def make_instance_complete(cls, id):
     instance = get_model_by_id(cls, id)
 
-    instance.completed_at = NOWTIME
+    setattr(instance, "completed_at", NOWTIME)
 
     slack_api_url = "https://slack.com/api/chat.postMessage"
 
     slack_request_body = {
-        "channel": "C0561UUDX4K",
+        "channel": CHANNEL,
         "text": f"Someone just completed the task {cls.title}"
     }
     slack_request_headers = {
-        "Authorization": f"Bearer " + SLACK_TOKEN
+        "Authorization": f"Bearer" + SLACK_TOKEN
     }
 
     slack_response = requests.post(slack_api_url, json=slack_request_body, headers=slack_request_headers)
@@ -140,35 +143,34 @@ def make_instance_complete(cls, id):
 def make_instance_incomplete(cls, id):
     instance = get_model_by_id(cls, id)
 
-    instance.completed_at = None
+    setattr(instance, "completed_at", None)
 
     return create_response(cls, instance)
 
 
-# def get_instances_for_instance(cls, id):
-#     goal = get_model_by_id(cls, id)
-#     return make_response(cls.to_dict(tasks=True), HTTPStatus.OK)
+def get_instances_for_instance(cls, id):
+    model = get_model_by_id(cls, id)
+    
+    json_data = model.to_json(tasks=True)
+    
+    return make_response(json_data, HTTPStatus.OK)
 
 
-# def add_instances_to_instance(cls, id):
-#     goal = get_model_by_id(cls, id)
-#     request_body = request.get_json()
-#     task_ids = request_body["task_ids"]
+def add_instances_to_instance(cls, id):
+    model = get_model_by_id(cls, id)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
 
-#     for task in goal.tasks:
-#         task.goal_id = None
+    for instance in model.tasks:
+        instance.goal_id = None
 
-#     for task_id in task_ids:
-#         task = get_model_by_id(cls, task_id)
-#         task.goal_id = goal.id
+    for task_id in task_ids:
+        instance = get_model_by_id(Task, task_id)
+        instance.goal_id = model.goal_id
+    
+    model.title = request.args.get("title", model.title)
 
-#     goal.title = request.args.get("title", goal.title)
+    db.session.commit()
 
-#     db.session.commit()
-
-#     return make_response({"id": goal.id, "task_ids": task_ids}, HTTPStatus.OK)
-
-
-
-
+    return make_response({"id": model.goal_id, "task_ids": task_ids}, HTTPStatus.OK)
 
