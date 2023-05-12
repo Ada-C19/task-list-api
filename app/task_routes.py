@@ -31,7 +31,6 @@ def get_tasks():
     # Sort by ascending or descending
     if sort_param == "asc":
         tasks_query = tasks_query.order_by(column.asc())
-        print(tasks_query)
     elif sort_param == "desc":
         tasks_query = tasks_query.order_by(column.desc())
 
