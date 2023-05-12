@@ -3,13 +3,13 @@ from flask import Blueprint
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
-import requests
+# import requests
 import os
 from dotenv import load_dotenv
-from app.slack_api import 
+from app.slack_api import notify_slack
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-# load_dotenv()
+load_dotenv()
 
 def validate_task(task_id):
     try:
@@ -107,13 +107,16 @@ def mark_complete(task_id):
     
     db.session.commit()
 
-    load_dotenv()
-    slack_token = os.environ.get("SLACK_BOT_USER_OAUTH_TOKEN")
-    text = "omg???"
+    # load_dotenv()
+    slack_token = os.environ.get("THE_SLACK_TOKEN")
+    # text = "omg???"
+    task_name = task.title
 
-    response = requests.post('https://slack.com/api/chat.postMessage', data={"token": slack_token, "channel": "task-notifications", "text": text})
-    # print(response.status_code)
-    print(response.json())
+    # response = requests.post('https://slack.com/api/chat.postMessage', data={"token": slack_token, "channel": "task-notifications", "text": text})
+    # # print(response.status_code)
+    # print(response.json())
+    
+    slack_response = notify_slack(slack_token, task_name)
     
     return make_response({
         "task": {
@@ -123,9 +126,10 @@ def mark_complete(task_id):
             "is_complete": task.is_complete, 
         },
         "slack_response": {
-            "status_code": response.status_code,
-            "json": response.json()
-        }
+            "status_code": slack_response.status_code,
+            "json": slack_response.json()
+        },
+        "token": {"slack token": slack_token}
     })
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
