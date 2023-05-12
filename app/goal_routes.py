@@ -18,21 +18,14 @@ def create_goal():
                 }, 400
             ))
 
-    goal = Goal(
+    new_goal = Goal(
         title = request_body["title"],
     )
 
-    db.session.add(goal)
+    db.session.add(new_goal)
     db.session.commit()
 
-    return make_response(
-        {
-            "goal": {
-                "id": goal.goal_id,
-                "title": goal.title,
-            }
-        }, 201
-    )
+    return make_response({"goal": new_goal.to_dict()}, 201)
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def add_task_to_goal(goal_id):
@@ -60,24 +53,16 @@ def read_goals():
 
     goals_response = []
     for goal in goals:
-        goals_response.append(
-            {
-                "id": goal.goal_id,
-                "title": goal.title,
-            }
-        ), 200
+        goals_response.append(goal.to_dict())
 
-    return jsonify(goals_response)
+    return jsonify(goals_response), 200
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_saved_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     return {
-        "goal": {
-            "id": goal.goal_id,
-            "title": goal.title,
-        }
+        "goal": goal.to_dict()
     }
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
@@ -86,15 +71,8 @@ def get_tasks_of_one_goal(goal_id):
 
     tasks_response = []
     for task in goal.tasks:
-        tasks_response.append({
-            "id": task.task_id,
-            "goal_id": goal.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": bool(task.completed_at)
-        })
-
-     
+        tasks_response.append(task.to_dict())
+    
     return jsonify({
             "id": goal.goal_id,
             "title": goal.title,
@@ -111,14 +89,8 @@ def update_goal(goal_id):
 
     db.session.commit()
 
-    return make_response(
-        {
-            "goal": {
-                "id": goal.goal_id,
-                "title": goal.title,
-            }
-        }, 200
-    )
+    return make_response({"goal": goal.to_dict()}), 200
+
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
