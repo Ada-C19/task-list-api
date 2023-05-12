@@ -138,9 +138,10 @@ def test_delete_goal(client, one_goal):
 
     # Check that the goal was deleted
     response = client.get("/goals/1")
+    response_body = response.get_json()
     assert response.status_code == 404
     assert response_body == {
-        "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
+        "message": "Goal 1 not found"
     }
 
     # raise Exception("Complete test with assertion about response body")
