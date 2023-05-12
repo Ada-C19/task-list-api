@@ -22,9 +22,11 @@ def create_task():
 @tasks_bp.route("", methods=["GET"])
 def list_all_tasks():
     sort_query = request.args.get("sort")
-    tasks = sort_by_title(Task, sort_query)
-    
-
+    title_query = request.args.get("title")
+    tasks = Task
+    if title_query:
+        tasks = Task.query.filter(Task.title.ilike(f'%{title_query}%'))
+    tasks = sort_by_title(tasks, sort_query)
     tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response)
 
