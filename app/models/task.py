@@ -10,10 +10,15 @@ class Task(db.Model):
 
     @classmethod
     def from_dict(cls, dict_data):
-        return cls(title = dict_data["title"],
-                description = dict_data["description"],
-                completed_at = True if dict_data.get("completed_at") else None)  
-    
+        request_task = cls(title = dict_data["title"],
+                    description = dict_data["description"],
+                    completed_at = True if dict_data.get("completed_at") else None) 
+        if dict_data.get("goal_id"):
+            request_task.goal_id =  dict_data.get("goal_id")
+        return request_task
+
+             
+        
     def to_dict(self):
         task_dict = {}
         task_dict = dict(id=self.task_id,
