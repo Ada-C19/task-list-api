@@ -11,10 +11,7 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 def create_goal():
     request_body = request.get_json()
 
-    try:
-        new_goal = Goal.from_dict(request_body)
-    except KeyError:
-        abort(make_response({"details": "Invalid data"}, 400))
+    new_goal = Goal.from_dict(request_body)
 
     db.session.add(new_goal)
     db.session.commit()
@@ -62,13 +59,14 @@ def update_goal(id):
 
     return jsonify({"goal": goal.to_dict()}), 200
 
-# assign tasks to goal
+# assign tasks to goal endpoint
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def assign_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     
     request_body = request.get_json()
 
+    # validate each task id prior to adding to goal.tasks
     for task_id in request_body["task_ids"]:
         task = validate_model(Task, task_id)
         goal.tasks.append(task)
@@ -77,7 +75,7 @@ def assign_tasks_to_goal(goal_id):
 
     return jsonify({"id": goal.id, "task_ids": [task.id for task in goal.tasks]})
 
-# get all tasks from a goal
+# get all tasks from a goal endpoint
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_all_tasks_from_goal(goal_id):
     goal = validate_model(Goal, goal_id)

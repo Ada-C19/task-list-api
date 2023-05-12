@@ -12,10 +12,15 @@ class Task(db.Model):
 
     @classmethod
     def from_dict(cls, data_dict):
-        return cls(
-            title=data_dict["title"],
-            description=data_dict["description"]
-        )
+        try:
+            new_instance = cls(
+                title=data_dict["title"],
+                description=data_dict["description"]
+            )
+        except KeyError:
+            abort(make_response({"details": "Invalid data"}, 400))
+        
+        return new_instance
 
     def to_dict(self):
         task_dict = dict(

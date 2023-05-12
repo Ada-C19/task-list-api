@@ -1,4 +1,5 @@
 from app import db
+from flask import make_response, abort
 
 
 class Goal(db.Model):
@@ -8,7 +9,12 @@ class Goal(db.Model):
 
     @classmethod
     def from_dict(cls, data_dict):
-        return cls(title=data_dict["title"])
+        try:
+            new_instance = cls(title=data_dict["title"])
+        except KeyError:
+            abort(make_response({"details": "Invalid data"}, 400))
+
+        return new_instance
     
     def to_dict(self):
         goal_dict = dict(

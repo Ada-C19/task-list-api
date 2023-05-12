@@ -26,6 +26,7 @@ def get_all_tasks():
 
     return jsonify(task_list), 200
 
+# get one task endpoint
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     task = validate_model(Task, id)
@@ -34,20 +35,19 @@ def get_one_task(id):
 
     return jsonify({"task": response_body}), 200
 
+# create task endpoint
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
     
-    try:
-        new_task = Task.from_dict(request_body)
-    except KeyError:
-        abort(make_response({"details": "Invalid data"}, 400))
+    new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit()
 
     return jsonify({f"task": new_task.to_dict()}), 201
 
+# update task endpoint
 @tasks_bp.route("/<id>", methods=["PUT"])
 def update_task(id):
     task = validate_model(Task, id)
@@ -61,6 +61,7 @@ def update_task(id):
 
     return jsonify({"task": task.to_dict()}), 200
 
+# delete task endpoint
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task = validate_model(Task, id)
@@ -70,6 +71,7 @@ def delete_task(id):
 
     return jsonify({"details": f'Task {task.id} "{task.title}" successfully deleted'}), 200
 
+# mark a task complete endpoint
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def complete_task(id):
     task = validate_model(Task, id)
@@ -82,6 +84,7 @@ def complete_task(id):
 
     return jsonify({"task": task.to_dict()}), 200
 
+# mark a task incomplete endpoint
 @tasks_bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def incomplete_task(id):
     task = validate_model(Task, id)
@@ -92,6 +95,7 @@ def incomplete_task(id):
 
     return jsonify({"task": task.to_dict()}), 200
 
+# helper function to post completion message to slack
 def post_message_to_slack(task):
     url = "https://slack.com/api/chat.postMessage"
     message = f"Someone just completed the task {task.title}"
