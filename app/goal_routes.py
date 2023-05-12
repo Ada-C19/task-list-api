@@ -20,7 +20,7 @@ def post_goal():
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def post_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-    task_ids = request.json.get("task_ids")
+    task_ids = request.get_json().get("task_ids")
 
     tasks = Task.query.filter(Task.id.in_(task_ids)).all()
     goal.tasks = [task for task in tasks]
