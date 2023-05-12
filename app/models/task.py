@@ -15,11 +15,11 @@ class Task(db.Model):
         self.description = request_body["description"]
         
         
-    def create_dict(cls,response_body,goal=None):
+    def create_dict(cls,response_body):#removed =NONE
         return cls(
             title=response_body.get("title"),
             description=response_body.get("description"),
-            goal=goal,
+            # goal=goal,
             completed_at = response_body.get("completed_at",None)
         )
     

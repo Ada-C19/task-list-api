@@ -1,7 +1,8 @@
 from flask import Blueprint,make_response,request,jsonify,abort
 from app import db
 from app.models.goal import Goal
-from app.helper import validate_goal
+from app.models.task import Task
+from app.helper import validate_goal,validate_task
 
 
 #CREATE BP/ENDPOINT
@@ -68,3 +69,38 @@ def delete_goal(id):
     message = {'details': f'Goal {id} "{goal_to_delete.title}" successfully deleted'}
 
     return make_response(message,200)
+
+#-----------------------------------------------
+#CREATE task by goal  [POST]/<goal_id_parent>/tasks - :(CREATE)
+@goals_bp.route("/<goal_id_parent>/tasks",methods=["POST"])
+def create_task(goal_id_parent):
+    goal = validate_goal(goal_id_parent)
+    request_body = request.get_json()
+
+    tasks_list_dict = request_body
+    for task_id in tasks_list_dict["task_ids"]:
+        task = validate_task(task_id)
+        task.goal = goal
+    
+    db.session.commit()
+    result=dict(id=goal.goal_id,
+                task_ids=tasks_list_dict["task_ids"])
+    
+    return make_response(jsonify(result),200)
+
+
+#GET all tasks by goal [GET]/<goal_id_parent>/tasks - :(READ)
+@goals_bp.route("/<goal_id_parent>/tasks",methods=["GET"])
+def handle_tasks_from_goal(goal_id_parent):
+    goal = validate_goal(goal_id_parent)
+    tasks = goal.tasks
+    tasks_lists = [validate_task(task.task_id).to_dict() for task in tasks]
+
+    for task_dict in tasks_lists:
+        task_dict["goal_id"]=int(goal_id_parent)
+    
+    result = dict(id=goal.goal_id,
+                  title=goal.title,
+                  tasks=tasks_lists)
+    
+    return make_response(jsonify(result),200)
