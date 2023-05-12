@@ -86,13 +86,8 @@ def get_tasks_with_goal(goal_id):
     for tasks in goal.tasks:
         task_response.append(tasks.to_dict())
 
-        if task_response:
-            for task in task_response:
-                task["goal_id"] = goal.goal_id
-
 
     return make_response(jsonify({
     "id": goal.goal_id, 
     "title": goal.title,
     "tasks": task_response }), 200)
-
