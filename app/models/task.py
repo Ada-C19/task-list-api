@@ -9,7 +9,7 @@ class Task(db.Model):
     description = db.Column(db.String, nullable=False)
     # completed_at = db.Column(db.DateTime, default = None)
     completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
-    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
 
         
     @classmethod

@@ -6,9 +6,10 @@ from datetime import datetime
 from app import db
 import os
 
-
-tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+
+
 
 #POST /tasks
 @tasks_bp.route("", methods=["POST"])
@@ -229,3 +230,60 @@ def delete_goal(goal_id):
 
 #----------------------------------------------------------
 
+@goals_bp.route("/<goal_id>/tasks", methods=['POST'])
+def create_goal_with_tasks(goal_id):
+
+    goal = Goal.query.get(goal_id)
+
+    if goal is None:
+        return jsonify({"error": "Goal not found"}), 404
+    
+    task_ids = request.json.get("task_ids", [])
+
+    for task_id in task_ids:
+        task = Task.query.get(task_id)
+        if task:
+            goal.tasks.append(task)
+
+    db.session.commit()
+
+    response_body = {"id": goal.goal_id, "task_ids": task_ids}
+    return jsonify(response_body)
+
+    # task_ids = request.json['task_ids']
+    # goal = Goal()
+
+    # for task_id in task_ids:
+    #     task = Task.query.get(task_id)
+    #     if task:
+    #         goal.task_ids.append(task)
+
+    # db.session.add(goal)
+    # db.session.commit()
+
+    # response_body = {'id': goal.model_id, 'task_ids': task_ids}
+    # return jsonify(response_body)
+        
+@goals_bp.route("/<goal_id>/tasks", methods=['GET'])
+def get_all_tasks_one_goal(goal_id):
+    
+    goal_id = request.args.get("id")
+    #validate?
+    tasks = Task.query.filter_by(goal_id=goal_id)
+
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append({
+            "id": task.task_id,
+            "goal_id": goal_id,
+            "title": goal_id.title,
+            "description": task.title,
+            "is_complete": task.completed_at
+        })
+
+    return {
+        "id": goal_id,
+        # "title": goal.title,
+        "tasks": [tasks_response]
+        }
+    
