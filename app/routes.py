@@ -154,4 +154,11 @@ def read_all_goals():
     goal_response = [goal.goal_to_dict() for goal in goals]
     return jsonify(goal_response)
 
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def read_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    message = goal.__str__()
+
+    return make_response(jsonify(message), 201)
+
 
