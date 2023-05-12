@@ -213,3 +213,28 @@ def get_one_goal(goal_id):
     }
     return jsonify(response_body)
 
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model_goal(Goal, goal_id)
+    request_body = request.get_json()
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    response_body = {
+        "goal": goal.goal_to_dict()
+    }
+    return response_body
+
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model_goal(Goal, goal_id)
+    response_body = {
+        "details": f'Goal {goal.goal_id} \"{goal.title}\" successfully deleted'
+    }
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return response_body
+
