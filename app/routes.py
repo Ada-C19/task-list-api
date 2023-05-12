@@ -64,7 +64,6 @@ def delete_task(id):
     return jsonify({"details": f'Task {id} "{task.to_dict()["title"]}" successfully deleted'}), 200
 
 
-
 #patch task-"tasks/1/mark_complete"-PATCH(update)
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_complete(id):
@@ -100,7 +99,19 @@ def mark_incomplete(id):
 
 
 
-#==========================WAVE5==========================
+
+
+
+
+
+
+
+
+
+
+
+#==========================WAVE 5 GOALS BELOW==========================
+
 
 
 
@@ -108,11 +119,6 @@ def mark_incomplete(id):
 #get all goals-"/tasks"-GET(read)
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
-    # if request.args.get("sort") == "asc":
-    #     goals = Goal.query.order_by(Goal.title.asc())
-    # elif request.args.get("sort") == "desc":
-    #     goals = Goal.query.order_by(Goal.title.desc())
-    # else:
     goals = Goal.query.all()
     goals_response = []
     for goal in goals:
@@ -167,19 +173,6 @@ def mark_complete(id):
     request_body = request.get_json()
     goal.patch_complete()
     db.session.commit()    
-
-    # SLACK_API_URL = "https://slack.com/api/chat.postMessage"
-    # if "SLACKBOT_TOKEN" is None:
-    #     return jsonify({'error': 'Slackbot token not set'}), 500
-    # headers = {"Authorization": os.environ.get("SLACKBOT_TOKEN")}
-    # params = {
-    # 'channel': 'task-notification',
-    # 'text': f"Someone just completed the task {task.title}",
-    # }
-    # response = requests.post(SLACK_API_URL, headers=headers, json=params)
-    # if not response.ok:
-    #     return jsonify({'error': 'Failed to send Slack message'}), 500
-
     return jsonify({"goal":goal.to_dict()}), 200
 
 
@@ -191,3 +184,51 @@ def mark_incomplete(id):
     goal.patch_incomplete()
     db.session.commit()
     return jsonify({"goal":goal.to_dict()}), 200
+
+
+
+
+
+
+
+
+
+
+
+
+
+# #=================wave6==================
+
+#add tasks to goal-"/goal_id/tasks"-POST(create)
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = validate_id(task_id)
+        goal.tasks.append(task)
+
+    db.session.commit()
+    
+    task_ids = [task.task_id for task in goal.tasks]
+
+    response_body = {
+        "id": goal.goal_id,
+        "task_ids": task_ids
+    }
+    return jsonify(response_body), 200
+
+#get tasks from goal-"/goal_id/tasks"-GET(read)
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_from_goal_id(goal_id):
+    goal = validate_goal(goal_id)
+    task_list= [task.to_dict() for task in goal.tasks]
+
+    response_body = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": task_list
+    }
+
+    return jsonify(response_body), 200
