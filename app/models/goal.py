@@ -10,9 +10,9 @@ class Goal(db.Model):
         return {
                 "goal": {
                     "id": self.id,
-                    "title": self.title,
+                    "title": self.title
                 }
-            }
+        }
 
     @classmethod
     def from_dict(cls, goal_dict):
