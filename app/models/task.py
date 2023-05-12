@@ -25,7 +25,7 @@ class Task(db.Model):
     
     @classmethod
     def from_dict(cls, data):
-        return Task(
+        return cls(
             title = data["title"],
             description = data["description"],
             completed_at = data.get("is_complete", None),
