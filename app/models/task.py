@@ -6,6 +6,9 @@ class Task(db.Model):
     title = db.Column(db.Text)
     description = db.Column(db.Text)
     completed_at = db.Column(db.DateTime, default=None) 
+    goal = db.relationship("Goal", back_populates="tasks")
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
+
     
     @classmethod 
     def from_dict(cls, data_dict):
@@ -14,15 +17,17 @@ class Task(db.Model):
                 completed_at = None)
 
     def to_dict(self):
-        return dict(
+        dct = dict(
             id = self.task_id,
             title = self.title,
             description = self.description,
-            is_complete = bool(self.completed_at)
-        )
+            is_complete = bool(self.completed_at)) 
+        if self.goal_id:
+            dct["goal_id"] = self.goal_id
+        return dct
 
-    
-    
+
+
     
 
 

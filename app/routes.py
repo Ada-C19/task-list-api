@@ -171,7 +171,7 @@ def update_task(goal_id):
     request_body=request.get_json()
 
     if request_body.get("title") is None:
-        return make_response(f"Some additional information needed to update goal{goal.goal_id}{goal.title}",400)
+        return make_response(f"Some additional information needed to update goal{goal.id}{goal.title}",400)
 
     goal.title=request_body["title"]
 
@@ -188,9 +188,55 @@ def delete_goal(goal_id):
 
     db.session.delete(goal)
     db.session.commit()
-    response = {"details": (f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted")}
+    response = {"details": (f"Goal {goal.id} \"{goal.title}\" successfully deleted")}
 
     return make_response(jsonify(response), 200)
+
+
+
+
+
+"""NESTED ROUTES"""
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task_id(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    
+    if request_body.get("task_ids") is None:
+        return make_response ({"details": "Invalid data"}, 400)
+    
+    
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        task.goal_id = goal_id 
+        
+    
+    db.session.commit()
+    
+    
+    
+    response = {"id": goal.id, "task_ids": request_body["task_ids"]}
+
+
+
+    return make_response(jsonify(response), 200)
+
+
+
+
+
+
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_task_from_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    response = {"id":goal.id, "title": goal.title, "tasks":[task.to_dict() for task in goal.tasks]}
+
+    return jsonify(response), 200
 
 
 
