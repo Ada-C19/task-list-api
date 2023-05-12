@@ -19,6 +19,8 @@ class Task(db.Model):
         task_as_dict["title"] = self.title
         task_as_dict["description"] = self.description
         task_as_dict["completed_at"] = self.completed_at
+        if self.goal_id:
+            task_as_dict["goal_id"] =self.goal_id
 
         return task_as_dict
     
@@ -28,12 +30,23 @@ class Task(db.Model):
         else:
             is_complete = False
 
-        return{
+        if self.goal_id:
+            return{
             "id": self.task_id,
             "title": self.title,
             "description": self.description,
-            "is_complete": is_complete
+            "is_complete": is_complete,
+            "goal_id": self.goal_id
         }
+        else:
+
+            return{
+                "id": self.task_id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": is_complete
+        }
+    
 
     @classmethod
     def from_dict(cls, task_data):

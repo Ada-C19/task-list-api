@@ -14,17 +14,20 @@ class Goal(db.Model):
         return goal_as_dict
     
     def to_json(self):
+        json_tasks = []
+        
+        for task in self.tasks:
+            json_tasks.append(task.to_json())
 
         return{
             "id": self.goal_id,
             "title": self.title,
+            "tasks": json_tasks
         }
 
     @classmethod
     def from_dict(cls, goal_data):
-        new_goal = Goal(title=goal_data["title"]
-                        
-                        )
+        new_goal = Goal(title=goal_data["title"])
         return new_goal
     
     # def mark_complete(self, request_body):
