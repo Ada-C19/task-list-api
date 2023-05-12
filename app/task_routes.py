@@ -97,17 +97,20 @@ def update_one_task(task_id):
         }}),200)
 
 def send_slack_message(task_title):
-    slack_token = os.environ.get(SLACK_API_KEY)
-
-    client = WebClient(token=slack_token)
     
-    try:
-        response = client.chat_postMessage(
-            channel="C057TBBCLQH",
-            text=f"Someone just completed the task {task_title}"
-        )
-    except SlackApiError as e:
-        assert e.response["error"]
+    path = 'https://slack.com/api/chat.postMessage'
+
+    slack_key = os.environ.get("SLACK_API_KEY")
+
+    params = {
+        "channel":"general",
+        "text":f"Someone just completed the task {task_title}"
+    }
+    headers = {
+        "Authorization":slack_key
+    }
+
+    requests.get(path, headers=headers, params=params)
 
 @tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
