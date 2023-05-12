@@ -1,3 +1,5 @@
+import os
+import requests
 from flask import Blueprint, jsonify, make_response, request
 from app import db
 from app.models.task import Task
@@ -57,14 +59,14 @@ def delete_task(id):
     return make_response(message, 200)
 
 # PATCH tasks/<id>/mark_complete (UPDATE)
-@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
-def mark_completed(id):
-    task_to_complete = validate_task(id)
-    request_body = request.get_json()
-    task_to_complete.patch_complete(request_body)
-    db.session.commit()
+# @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+# def mark_completed(id):
+#     task_to_complete = validate_task(id)
+#     request_body = request.get_json()
+#     task_to_complete.patch_complete(request_body)
+#     db.session.commit()
 
-    return jsonify({"task":task_to_complete.to_json()}), 200
+#     return jsonify({"task":task_to_complete.to_json()}), 200
 
 #PATCH /tasks/1/mark_incomplete" (UPDATE)
 @tasks_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
@@ -78,3 +80,24 @@ def mark_incompleted(id):
 
 
 
+# PATCH tasks/<id>/mark_complete (UPDATE)
+@tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
+def mark_completed(id):
+    task_to_complete = validate_task(id)
+    request_body = request.get_json()
+    task_to_complete.patch_complete(request_body)
+
+    db.session.commit()
+
+    PATH = "https://slack.com/api/chat.postMessage"
+
+    query_params = {
+        "channel": "api-test-channel",
+        "text": f'Task {task_to_complete.title} has been completed!'
+    }
+
+    headers = {"Authorization": os.environ.get("SLACK_API_KEY")}
+    
+    requests.post(PATH, params=query_params, headers=headers)
+
+    return jsonify({"task":task_to_complete.to_json()}), 200

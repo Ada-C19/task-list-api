@@ -1,5 +1,5 @@
 from app import db
-from flask import abort,  make_response, jsonify
+from flask import abort, make_response, jsonify
 from datetime import datetime
 
 class Task(db.Model):
