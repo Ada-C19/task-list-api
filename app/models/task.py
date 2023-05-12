@@ -18,8 +18,8 @@ class Task(db.Model):
             "is_complete": bool(self.completed_at)
             }
         
-        # if self.goal_id:
-        #     task_as_dict["goal_id"] = self.goal_id
+        if self.goal_id:
+            task_as_dict["goal_id"] = self.goal_id
 
         return task_as_dict
     @classmethod
