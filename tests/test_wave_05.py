@@ -88,12 +88,11 @@ def test_create_goal(client):
 def test_update_goal(client, one_goal):
     #raise Exception("Complete test")
     # Act
+    # ---- Complete Act Here ----
     response = client.put("/goals/1", json={
         "title": "Updated Goal Title"
     })
     response_body = response.get_json()
-    # ---- Complete Act Here ----
-
     # Assert
     # ---- Complete Assertions Here ----
     # assertion 1 goes here
