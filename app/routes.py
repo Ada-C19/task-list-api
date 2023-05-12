@@ -6,6 +6,7 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
+from app.models.goal import Goal
 
 
 load_dotenv()
@@ -115,9 +116,3 @@ def mark_incomplete(id):
     db.session.commit()
 
     return jsonify({"task":task_incomplete.to_dict()}),200
-
-
-
-
-
-

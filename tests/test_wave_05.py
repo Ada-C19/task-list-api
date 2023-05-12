@@ -26,11 +26,10 @@ def test_get_goals_one_saved_goal(client, one_goal):
             "id": 1,
             "title": "Build a habit of going outside daily"
         }
-    ]
+    ]#@pytest.mark.skip(reason="No way to test this feature yet")
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_goal(client, one_goal):
+def test_get_goal(client, one_goal):    
     # Act
     response = client.get("/goals/1")
     response_body = response.get_json()
@@ -61,7 +60,7 @@ def test_get_goal_not_found(client):
     # ---- Complete Test ----
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal(client):
     # Act
     response = client.post("/goals", json={
@@ -144,7 +143,7 @@ def test_delete_goal_not_found(client):
     # ---- Complete Assertions Here ----
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal_missing_title(client):
     # Act
     response = client.post("/goals", json={})
