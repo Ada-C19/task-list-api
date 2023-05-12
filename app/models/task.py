@@ -6,7 +6,7 @@ class Task(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
-    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
     goal = db.relationship("Goal", back_populates="tasks")
 
     def to_dict(self):
@@ -20,7 +20,7 @@ class Task(db.Model):
         
         # if self.goal_id:
         #     task_as_dict["goal_id"] = self.goal_id
-        
+
         return task_as_dict
     @classmethod
     def from_dict(cls, task_data):
