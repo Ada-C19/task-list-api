@@ -68,7 +68,12 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return jsonify(new_task.to_dict()), 201
+    return {"task": {
+        "id": new_task.id,
+        "title": new_task.title,
+        "description": new_task.description,
+        "is_complete": False
+        }}, 201
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -80,7 +85,12 @@ def update_task(task_id):
     
     db.session.commit()
 
-    return jsonify(task.to_dict()), 200
+    return {"task": {
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "is_complete": False
+        }}, 200
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -101,7 +111,12 @@ def mark_incomplete(task_id):
 
     db.session.commit()
 
-    return task.to_dict(), 200
+    return {"task": {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
+        }}, 200
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
