@@ -84,3 +84,62 @@ def remove_one_goal(goal_id):
     return make_response({
         "details": f'{Goal.__name__} {goal_id} "{goal.title}" successfully deleted'
     }), 200
+
+# nested routes
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    
+    request_body = request.get_json()
+
+    tasks_list = []
+
+    for task in request_body["task_ids"]:
+        task = validate_model(Task, task)
+        tasks_list.append(task)
+        task.goal_id = goal.goal_id
+    
+    goal.tasks = tasks_list
+
+    db.session.commit()
+
+    return make_response(jsonify({
+        "id" : goal.goal_id,
+        "task_ids" : request_body["task_ids"],
+        }),200)
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+    
+    tasks_list = []
+
+    for task in goal.tasks:
+        tasks_list.append({
+            "id" : task.task_id,
+            "goal_id" : task.goal_id,
+            "title" : task.title,
+            "description" : task.description,
+            "is_complete" : False
+        })
+
+    return {
+        "id": goal.goal_id,
+        "title" : goal.title,
+        "tasks" : tasks_list
+    }, 200
+
+# @goals_bp.route("/<goal_id>/tasks/<task_id>", methods=["GET"])
+# def get_one_task_for_goal(goal_id,task_id):
+#     goal = validate_model(Goal, goal_id)
+#     task = validate_model(Task, task_id)
+#     return {
+#         "task": {
+#             "id": task.task_id,
+#             "goal_id": task.goal_id,
+#             "title": task.title,
+#             "description": task.description,
+#             "is_complete": False
+#         }
+#     }
