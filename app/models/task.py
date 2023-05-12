@@ -1,5 +1,5 @@
 from app import db
-
+from flask import abort, make_response
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,13 +17,24 @@ class Task(db.Model):
             "is_complete": True
         }
         
-        if self.goal_id == None:
-            if self.completed_at == None:
-                task["is_complete"] = False
+        if not self.goal_id and not self.completed_at:
+            task["is_complete"] = False
         
         elif self.goal_id:
             task["goal_id"] = self.goal_id
             if self.completed_at == None:
                 task["is_complete"] = False
 
+        return task
+
+    @classmethod
+    def from_json(cls, response_data):
+        try:
+            task = cls(
+                title = response_data["title"],
+                description = response_data["description"]
+                )
+        except KeyError:
+            abort(make_response({"details": "Invalid data"}, 400))
+        
         return task

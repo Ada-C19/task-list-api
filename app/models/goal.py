@@ -1,4 +1,5 @@
 from app import db
+from flask import abort, make_response
 
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -10,5 +11,16 @@ class Goal(db.Model):
             "id": self.id,
             "title": self.title
             }
+        
+        return goal
+
+    @classmethod
+    def from_json(cls, response_data):
+        try:
+            goal = cls(
+                title = response_data["title"]
+                )
+        except KeyError:
+            abort(make_response({"details": "Invalid data"}, 400))
         
         return goal
