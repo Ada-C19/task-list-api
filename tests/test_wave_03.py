@@ -31,7 +31,7 @@ def test_mark_complete_on_incomplete_task(client, one_task):
     # Assert
     assert response.status_code == 200
     assert "task" in response_body
-    assert response_body["task"]["is_complete"] == True
+    assert response_body["task"]["is_complete"] is True
     assert response_body == {
         "task": {
             "id": 1,
@@ -51,7 +51,7 @@ def test_mark_incomplete_on_complete_task(client, completed_task):
 
     # Assert
     assert response.status_code == 200
-    assert response_body["task"]["is_complete"] == False
+    assert response_body["task"]["is_complete"] is False
     assert response_body == {
         "task": {
             "id": 1,
@@ -60,7 +60,7 @@ def test_mark_incomplete_on_complete_task(client, completed_task):
             "is_complete": False
         }
     }
-    assert Task.query.get(1).completed_at == None
+    assert Task.query.get(1).completed_at is None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -88,7 +88,7 @@ def test_mark_complete_on_completed_task(client, completed_task):
     # Assert
     assert response.status_code == 200
     assert "task" in response_body
-    assert response_body["task"]["is_complete"] == True
+    assert response_body["task"]["is_complete"] is True
     assert response_body == {
         "task": {
             "id": 1,
@@ -108,7 +108,7 @@ def test_mark_incomplete_on_incomplete_task(client, one_task):
 
     # Assert
     assert response.status_code == 200
-    assert response_body["task"]["is_complete"] == False
+    assert response_body["task"]["is_complete"] is False
     assert response_body == {
         "task": {
             "id": 1,
@@ -117,7 +117,7 @@ def test_mark_incomplete_on_incomplete_task(client, one_task):
             "is_complete": False
         }
     }
-    assert Task.query.get(1).completed_at == None
+    assert Task.query.get(1).completed_at is None
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -136,6 +136,16 @@ def test_mark_complete_missing_task(client):
     # *****************************************************************
 
 
+def test_mark_complete_invalid_task(client):
+    # Act
+    response = client.patch("/tasks/hello/mark_complete")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Task hello invalid"}
+
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_mark_incomplete_missing_task(client):
     # Act
@@ -150,3 +160,13 @@ def test_mark_incomplete_missing_task(client):
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
+
+
+def test_mark_incomplete_invalid_task(client):
+    # Act
+    response = client.patch("/tasks/hello/mark_incomplete")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Task hello invalid"}

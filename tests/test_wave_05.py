@@ -60,6 +60,14 @@ def test_get_goal_not_found(client):
     # ---- Complete Test ----
 
 
+def test_goal_invalid_id(client):
+    response = client.get("/goals/hello")
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert response_body == {"message": "Goal hello invalid"}   
+
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal(client):
     # Act
@@ -143,7 +151,6 @@ def test_delete_goal_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Goal 100 not found"}
-
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
