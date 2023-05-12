@@ -148,3 +148,23 @@ def test_mark_incomplete_missing_task(client):
     # **Complete test with assertion about response body***************
     # *****************************************************************
     assert response_body == {"message": "Task 1 not found"}
+
+#@pytest.mark.skip(reason="I created this test myself")
+def test_mark_incomplete_on_complete_task_str_datetime(client, completed_task_str_date):
+    # Act
+    response = client.patch("/tasks/1/mark_incomplete")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert response_body["task"]["is_complete"] == False
+    assert response_body == {
+        "task": {
+            "id": 1,
+            "title": "Prepare dinner",
+            "description": "Try a new recipe",
+            "is_complete": False
+        }
+    }
+    assert Task.query.get(1).completed_at == None
+

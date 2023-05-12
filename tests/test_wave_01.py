@@ -1,6 +1,6 @@
 from app.models.task import Task
 import pytest
-
+from datetime import datetime
 
 #@pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_no_saved_tasks(client):
@@ -200,3 +200,54 @@ def test_create_task_must_contain_description(client):
         "details": "Invalid data"
     }
     assert Task.query.all() == []
+
+#@pytest.mark.skip(reason="I'm creating this test myself")
+def test_update_task_invalid(client):
+    # Act
+    response = client.put("/tasks/1y", json={
+        "title": "Updated Task Title",
+        "description": "Updated Test Description",
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Task 1y invalid"}
+
+#@pytest.mark.skip(reason="I created this test case myself")
+def test_create_task_valid_datetime(client):
+    # Act
+    response = client.post("/tasks", json={
+        "title": "Practice Python for 1 hour daily", "description": "Learn new data types", "completed_at": "2023-05-04T11::12::40.356237"
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 201
+    assert "task" in response_body
+    assert response_body["task"] == {
+        "id" : 1,
+        "title": "Practice Python for 1 hour daily", 
+        "description": "Learn new data types", 
+        "is_complete": True
+    }
+    new_task = Task.query.get(1)
+    assert new_task
+    assert new_task.title == "Practice Python for 1 hour daily"
+    assert new_task.description == "Learn new data types"
+    assert new_task.completed_at == datetime(2023, 5, 4, 11, 12, 40, 356237)
+
+#@pytest.mark.skip(reason="I created this test case myself")
+def test_create_task_invalid_datetime(client):
+    # Act
+    response = client.post("/tasks", json={
+        "title": "Practice Python for 1 hour daily", "description": "Learn new data types", "completed_at": "May 4th"
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert "message" in response_body
+    assert response_body == {
+        "message": "May 4th is not a valid date time"
+    }

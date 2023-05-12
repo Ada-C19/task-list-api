@@ -91,3 +91,12 @@ def one_task_belongs_to_one_goal(app, one_goal, one_task):
     goal = Goal.query.first()
     goal.tasks.append(task)
     db.session.commit()
+
+#New fixture to check that the datetime is the right format
+@pytest.fixture
+def completed_task_str_date(app):
+    new_task = Task(
+        title="Prepare dinner", description="Try a new recipe", completed_at="2023-05-11 15:53:07.310166")
+    db.session.add(new_task)
+    db.session.commit()
+
