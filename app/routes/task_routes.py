@@ -7,12 +7,11 @@ import os
 from dotenv import load_dotenv
 import requests
 
-from .helper_functions import create_instance, get_all_instances, get_one_instance, update_instance, delete_instance
+from .helper_functions import create_instance, get_all_instances, get_one_instance, update_instance, delete_instance, make_instance_complete, make_instance_incomplete
 
 load_dotenv()
 
-NOWTIME = datetime.now(timezone.utc)
-SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
+
 
 tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
@@ -41,27 +40,15 @@ def delete_task(task_id):
     return delete_instance(Task, task_id)
 
 
+@tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
+def mark_task_completed(task_id):
+    return make_instance_complete(Task, task_id)
 
 
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
+def mark_task_incomplete(task_id):
+    return make_instance_incomplete(Task, task_id)
 
-
-
-# @tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
-# def mark_task_completed(task_id):
-#     return
-
-# @tasks_bp.route("/<task_id>/mark_complete", methods=['PATCH'])
-# def mark_task_completed(task_id):
-#     task = get_task_by_id(task_id)
-
-#     task.completed_at = NOWTIME
-
-#     db.session.commit()
-
-#     task = task.to_json()
-#     task["is_complete"] = True
-
-#     return make_response(jsonify(task=task)), 200
 
 
 
@@ -94,15 +81,4 @@ def delete_task(task_id):
 
 
 
-# @tasks_bp.route("/<task_id>/mark_incomplete", methods=['PATCH'])
-# def mark_task_incomplete(task_id):
-#     task = get_task_by_id(task_id)
 
-#     task.completed_at = None
-
-#     db.session.commit()
-
-#     task = task.to_json()
-#     task["is_complete"] = False
-
-#     return make_response(jsonify(task=task)), 200
