@@ -47,6 +47,11 @@ def get_goals():
     return jsonify(goals_response)
 
 # Get one saved goal
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+    
+    return {"goal": goal.to_dict()}
 
 # Update goal
 
