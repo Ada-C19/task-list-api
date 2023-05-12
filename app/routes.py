@@ -6,6 +6,7 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
+from app.models.goal import Goal
 
 
 load_dotenv()
