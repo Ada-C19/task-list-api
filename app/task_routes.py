@@ -1,5 +1,6 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, abort, request
 import datetime
 import requests
@@ -7,6 +8,7 @@ import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix = "/tasks")
 
+###### Create Route ######
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -37,6 +39,8 @@ def create_task():
         }, 201
     )
 
+###### Read Route ######
+
 @tasks_bp.route("", methods=["GET"])
 def read_tasks():
     
@@ -65,15 +69,27 @@ def read_tasks():
 def read_one_saved_task(task_id):
     task = validate_task(task_id)
 
-    return {
+    if task.goal_id:
+        return {
         "task": {
             "id": task.task_id,
             "title": task.title,
             "description": task.description,
-            "is_complete": True if task.completed_at else False
+            "is_complete": True if task.completed_at else False,
+            "goal_id": task.goal_id
+        }
+    }
+    else:
+        return {
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True if task.completed_at else False,
         }
     }
 
+###### Update Route ######
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_task(task_id)
@@ -96,6 +112,7 @@ def update_task(task_id):
         }, 200
     )
 
+###### Patch Route ######
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
     task = validate_task(task_id)
@@ -153,6 +170,8 @@ def mark_task_incomplete(task_id):
             }
         }, 200
     )
+
+###### Delete Route ######
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
