@@ -24,14 +24,14 @@ def read_all_goals():
         
     goals_response = []
     for goal in goals:
-        goals_response.append(goal.to_json())
+        goals_response.append(goal.to_dict())
     return jsonify(goals_response), 200
 
 #GET route to read one task
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def read_one_task(goal_id):
     goal = validate_model(Goal,goal_id)
-    return jsonify({"goal": goal.to_json()}), 200
+    return jsonify({"goal": goal.to_dict()}), 200
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -45,7 +45,7 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    return make_response({"goal":new_goal.to_json()}), 201
+    return make_response({"goal":new_goal.to_dict()}), 201
 
 #UPDATE route to edit a goal
 @goals_bp.route("/<goal_id>", methods=["PUT"])
@@ -58,7 +58,7 @@ def update_goal(goal_id):
 
     db.session.commit()
 
-    return make_response({"goal": goal.to_json()}), 200
+    return make_response({"goal": goal.to_dict()}), 200
 
 #DELETE existing goal
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
@@ -93,4 +93,4 @@ def read_goal_tasks(goal_id):
 
     goal = validate_model(Goal, goal_id)
 
-    return jsonify(goal.to_json()), 200
+    return make_response(goal.to_json()), 200

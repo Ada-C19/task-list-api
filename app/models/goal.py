@@ -7,13 +7,19 @@ class Goal(db.Model):
     
 
     def to_dict(self):
-        goal_as_dict = {}
-        goal_as_dict["goal_id"] = self.goal_id
-        goal_as_dict["title"] = self.title
+    
+        goal_as_dict = {
+            "id": self.goal_id,
+            "title": self.title,
+        }
+        if self.tasks:
+            goal_as_dict["task_ids"] = [task.to_dict() for task in self.tasks]
 
         return goal_as_dict
-    
+
+
     def to_json(self):
+        
         json_tasks = []
         
         for task in self.tasks:
@@ -22,7 +28,9 @@ class Goal(db.Model):
         return{
             "id": self.goal_id,
             "title": self.title,
-        }
+            "tasks": json_tasks
+            }
+
 
     @classmethod
     def from_dict(cls, goal_data):

@@ -49,6 +49,14 @@ class Task(db.Model):
                 "description": self.description,
                 "is_complete": is_complete
         }
+
+    # def to_json_tasks(self):
+
+
+    #     return{
+    #         "id": self.goal_id,
+    #         "title": self.title
+    #         }
     
 
     @classmethod
