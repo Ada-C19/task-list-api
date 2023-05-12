@@ -28,7 +28,6 @@ def create_task():
 
     try:
         new_task = Task.from_dict(request_body)
-
     except KeyError as err:
         abort(make_response({"details": "Invalid data"}, 400))
 
@@ -44,7 +43,6 @@ def create_task():
 # GET ALL AND SORT TASKS BY TITLE 
 @tasks_bp.route("", methods=["GET"])
 def sort_by_title():
-    # task_query = Task.query
     sort_query = request.args.get("sort")
     if sort_query == "asc":
         tasks = Task.query.order_by(Task.title)
