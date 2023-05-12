@@ -53,7 +53,6 @@ def test_get_tasks_for_specific_goal_no_goal(client):
     # **Complete test with assertion about response body***************
     # *****************************************************************
 
-
 def test_get_tasks_for_specific_goal_no_tasks(client, one_goal):
     # Act
     response = client.get("/goals/1/tasks")

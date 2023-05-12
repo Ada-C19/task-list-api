@@ -70,3 +70,24 @@ def get_all_tasks_of_one_goal(goal_id):
     goal = goal.to_dict()
 
     return jsonify(goal)
+
+# def to_json(self, tasks=False):
+#         goal_dict = {
+#             "id": self.goal_id,
+#             "title": self.title,
+#         }
+#         if tasks:
+#             goal_dict["tasks"] = [task.to_json() for task in self.tasks]
+#         return goal_dict
+
+#     def to_json(self):
+#         task_dict = {
+#             "id": self.task_id,
+#             "title": self.title,
+#             "description": self.description,
+#             "is_complete": self.completed_at is not None
+#         }
+#         if self.goal_id:
+#             task_dict["goal_id"] = self.goal_id
+
+#         return task_dict
