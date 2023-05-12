@@ -53,7 +53,6 @@ def test_get_task(client, one_task):
         }
     }
 
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task_not_found(client):
     # Act

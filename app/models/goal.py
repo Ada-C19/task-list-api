@@ -12,5 +12,5 @@ class Goal(db.Model):
     
     def to_dict(self):
         return dict(
-            id = self.id,
+            id = self.goal_id,
             title = self.title)
