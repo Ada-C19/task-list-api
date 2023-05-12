@@ -54,6 +54,20 @@ def get_one_goal(goal_id):
     return {"goal": goal.to_dict()}
 
 # Update goal
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_goal(goal_id)
+    
+    request_body = request.get_json()
+    
+    if "title" not in request_body:
+        abort(make_response({"details": f"Missing title"}, 400))
+    
+    goal.title = request_body["title"]
+    
+    db.session.commit()
+    
+    return {"title": goal.title}
 
 # Delete goal
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
