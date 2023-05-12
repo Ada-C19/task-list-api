@@ -1,6 +1,8 @@
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, abort, request
+import requests
 from app.task_routes import validate_task
 
 goals_bp = Blueprint("goals'", __name__, url_prefix = "/goals")
@@ -37,9 +39,8 @@ def add_task_to_goal(goal_id):
     goal = validate_goal(goal_id)
 
     request_body = request.get_json()
-    task_ids = request_body.get("task_ids")
 
-    for task_id in task_ids:
+    for task_id in request_body["task_ids"]:
         task = validate_task(task_id)
         task.goal_id = goal.goal_id
     
@@ -48,7 +49,7 @@ def add_task_to_goal(goal_id):
     return make_response(
         {
             "id": goal.goal_id,
-            "task_ids": task_ids
+            "task_ids": request_body["task_ids"]
         }
     ), 200
         
@@ -78,6 +79,27 @@ def read_one_saved_goal(goal_id):
             "title": goal.title,
         }
     }
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    tasks_response = []
+    for task in goal.tasks:
+        tasks_response.append({
+            "id": task.task_id,
+            "goal_id": goal.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": bool(task.completed_at)
+        })
+
+     
+    return jsonify({
+            "id": goal.goal_id,
+            "title": goal.title,
+            "tasks": tasks_response
+        }), 200
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
