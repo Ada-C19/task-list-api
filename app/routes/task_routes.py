@@ -3,6 +3,7 @@ from app import db
 from app.models.task import Task
 from sqlalchemy.types import DateTime
 from sqlalchemy.sql.functions import now
+import requests, os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -20,7 +21,6 @@ def validate_model(cls, model_id):
 
     return model
 
-
 # CREATE TASK
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -29,7 +29,6 @@ def create_task():
     try:
         new_task = Task.from_dict(request_body)
 
-    # if not (new_task.title and new_task.description):
     except KeyError as err:
         abort(make_response({"details": "Invalid data"}, 400))
 
@@ -99,7 +98,7 @@ def delete_task(task_id):
     return jsonify(task_message)
 
 
-# MARK COMPLETE ON AN INCOMPLETED TASK
+# MARK COMPLETE TASK
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
@@ -110,6 +109,9 @@ def mark_complete(task_id):
         task.completed_at = now()
         
         db.session.commit()
+
+        post_to_slack(task)
+
         task_message = {"task": task.to_dict()}
         return jsonify(task_message), 200
 
@@ -117,11 +119,10 @@ def mark_complete(task_id):
         abort(make_response({"message": f"{task_id} not found"}, 404)) 
 
 
-# MARK INCOMPLETE ON A COMPLETED TASK
+# MARK INCOMPLETE TASK
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)
-    request_body = request.get_json()
 
     try:
         task = Task.query.get(task_id)
@@ -135,3 +136,17 @@ def mark_incomplete(task_id):
         abort(make_response({"message": f"{task_id} not found"}, 404)) 
 
 
+def post_to_slack(task):
+    slack_url = "https://slack.com/api/chat.postMessage"
+    API_KEY = os.environ["API_KEY"]
+    headers = {
+        "Authorization": f"Bearer {API_KEY}"
+    }
+
+    data = {
+        "channel": "api-test-channel",
+        "text": f"Someone just completed the task {task.title}"
+    }
+
+    response = requests.post(slack_url, headers=headers, data=data)
+    return response
