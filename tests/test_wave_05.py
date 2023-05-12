@@ -4,7 +4,7 @@ from app import db
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_goals_no_saved_goals_200(client):
+def test_get_goals_no_saved_goals(client):
     # Act
     response = client.get("/goals")
     response_body = response.get_json()
@@ -15,7 +15,7 @@ def test_get_goals_no_saved_goals_200(client):
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_goals_one_saved_goal_200(client, one_goal):
+def test_get_goals_one_saved_goal(client, one_goal):
     # Act
     response = client.get("/goals")
     response_body = response.get_json()
@@ -30,8 +30,9 @@ def test_get_goals_one_saved_goal_200(client, one_goal):
         }
     ]
 
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_goal_200(client, one_goal):
+def test_get_goal(client, one_goal):
     # Act
     response = client.get("/goals/1")
     response_body = response.get_json()
@@ -46,8 +47,40 @@ def test_get_goal_200(client, one_goal):
         }
     }
 
+
 # @pytest.mark.skip(reason="test to be completed by student")
-def test_update_goal_200(client, one_goal):
+def test_get_goal_not_found(client):
+    pass
+    # Act
+    response = client.get("/goals/1")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body["message"] == 'Goal 1 was not found.'
+
+
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_create_goal(client):
+    # Act
+    response = client.post("/goals", json={
+        "title": "My New Goal"
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 201
+    assert "goal" in response_body
+    assert response_body == {
+        "goal": {
+            "id": 1,
+            "title": "My New Goal"
+        }
+    }
+
+
+# @pytest.mark.skip(reason="test to be completed by student")
+def test_update_goal(client, one_goal):
     # Act
     response = client.put("/goals/1", json={
         "title": "Updated goal Title",
@@ -66,8 +99,20 @@ def test_update_goal_200(client, one_goal):
     goal = db.session.get(Goal, 1)
     assert goal.title == 'Updated goal Title'
 
+
+# @pytest.mark.skip(reason="test to be completed by student")
+def test_update_goal_not_found(client):
+    # Act
+    response = client.put("/goals/1", json={"title": "Updated Goal Title"})
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {'message': 'Goal 1 was not found.'}
+
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_delete_goal_200(client, one_goal):
+def test_delete_goal(client, one_goal):
     # Act
     response = client.delete("/goals/1")
     response_body = response.get_json()
@@ -85,61 +130,8 @@ def test_delete_goal_200(client, one_goal):
     assert db.session.get(Goal, 1) is None
 
 
-
-
-
-
-
-
-
-# @pytest.mark.skip(reason="No way to test this feature yet")
-def test_create_goal_201(client):
-    # Act
-    response = client.post("/goals", json={
-        "title": "My New Goal"
-    })
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 201
-    assert "goal" in response_body
-    assert response_body == {
-        "goal": {
-            "id": 1,
-            "title": "My New Goal"
-        }
-    }
-
-
-
-# @pytest.mark.skip(reason="No way to test this feature yet")
-def test_create_goal_missing_title_400(client):
-    # Act
-    response = client.post("/goals", json={})
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 400
-    assert response_body == {
-        'details': "KeyError invalid Goal data, missing key: 'title'"
-    }
-
-
-
-
-
 # @pytest.mark.skip(reason="test to be completed by student")
-def test_get_goal_not_found_404(client):
-    # Act
-    response = client.get("/goals/1")
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 404
-    assert response_body["message"] == 'Goal 1 was not found.'
-
-# @pytest.mark.skip(reason="test to be completed by student")
-def test_delete_goal_not_found_404(client):
+def test_delete_goal_not_found(client):
     # Act
     response = client.delete("/goals/1")
     response_body = response.get_json()
@@ -149,61 +141,15 @@ def test_delete_goal_not_found_404(client):
     assert Goal.query.all() == []
     assert response_body == {'message': 'Goal 1 was not found.'}
 
-# @pytest.mark.skip(reason="test to be completed by student")
-def test_update_goal_not_found_404(client):
-    # Act
-    response = client.put("/goals/1", json={
-        "title": "Updated Goal Title",
-    })
-    response_body = response.get_json()
 
-    # Assert
-    assert response.status_code == 404
-    assert response_body == {'message': 'Goal 1 was not found.'}
-
-
-
-
-
-
-def test_create_goal_missing_title_400(client):
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_create_goal_missing_title(client):
     # Act
     response = client.post("/goals", json={})
     response_body = response.get_json()
-    print(response_body)
+
     # Assert
     assert response.status_code == 400
-    assert response_body == {'details': "KeyError invalid Goal data, missing key: 'title'"}
-
-
-def test_get_goal_not_found_404(client):
-    # Act
-    response = client.get("/goals/1")
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 404
-    assert response_body == {'message': 'Goal 1 was not found.'}
-
-
-def test_update_goal_not_found_404(client):
-    # Act
-    response = client.put("/goals/1", json={"title": "Updated Goal Title"})
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 404
-    assert response_body == {'message': 'Goal 1 was not found.'}
-
-
-def test_delete_goal_not_found_404(client):
-    # Act
-    response = client.delete("/goals/1")
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 404
-    assert response_body == {'message': 'Goal 1 was not found.'}
-
-
-
+    assert response_body == {
+        'details': "KeyError invalid Goal data, missing key: 'title'"
+    }

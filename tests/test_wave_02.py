@@ -55,7 +55,8 @@ def test_get_tasks_sorted_desc(client, three_tasks):
             "is_complete": False,
             "title": "Answer forgotten email 📧"},
     ]
-    
+
+
 def test_get_tasks_sorted_asc_by_description(client, three_tasks_with_description):
     # Act
     response = client.get("/tasks?sort=description_asc")
@@ -108,3 +109,4 @@ def test_get_tasks_sorted_desc_by_description(client, three_tasks_with_descripti
             "description": "1",
             "is_complete": False}
     ]
+

@@ -3,13 +3,13 @@ import pytest
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_post_task_ids_to_goal_200(client, one_goal, three_tasks):
+def test_post_task_ids_to_goal(client, one_goal, three_tasks):
     # Act
     response = client.post("/goals/1/tasks", json={
         "task_ids": [1, 2, 3]
     })
     response_body = response.get_json()
-    print(f"{response_body = }  1")
+
     # Assert
     assert response.status_code == 200
     assert "id" in response_body
@@ -22,14 +22,15 @@ def test_post_task_ids_to_goal_200(client, one_goal, three_tasks):
     # Check that Goal was updated in the db
     assert len(Goal.query.get(1).tasks) == 3
 
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_post_task_ids_to_goal_already_with_goals_200(client, one_task_belongs_to_one_goal, three_tasks):
+def test_post_task_ids_to_goal_already_with_goals(client, one_task_belongs_to_one_goal, three_tasks):
     # Act
     response = client.post("/goals/1/tasks", json={
         "task_ids": [1, 4]
     })
     response_body = response.get_json()
-    print(f"{response_body = }  2")
+
     # Assert
     assert response.status_code == 200
     assert "id" in response_body
@@ -42,7 +43,18 @@ def test_post_task_ids_to_goal_already_with_goals_200(client, one_task_belongs_t
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_tasks_for_specific_goal_no_tasks_200(client, one_goal):
+def test_get_tasks_for_specific_goal_no_goal(client):
+    # Act
+    response = client.get("/goals/1/tasks")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {'message': 'Goal 1 was not found.'}
+
+
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_get_tasks_for_specific_goal_no_tasks(client, one_goal):
     # Act
     response = client.get("/goals/1/tasks")
     response_body = response.get_json()
@@ -57,12 +69,13 @@ def test_get_tasks_for_specific_goal_no_tasks_200(client, one_goal):
         "tasks": []
     }
 
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_tasks_for_specific_goal_200(client, one_task_belongs_to_one_goal):
+def test_get_tasks_for_specific_goal(client, one_task_belongs_to_one_goal):
     # Act
     response = client.get("/goals/1/tasks")
     response_body = response.get_json()
-    print(f"{response_body = }  1")
+
     # Assert
     assert response.status_code == 200
     assert "tasks" in response_body
@@ -83,10 +96,11 @@ def test_get_tasks_for_specific_goal_200(client, one_task_belongs_to_one_goal):
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_task_includes_goal_id_200(client, one_task_belongs_to_one_goal):
+def test_get_task_includes_goal_id(client, one_task_belongs_to_one_goal):
     response = client.get("/tasks/1")
     response_body = response.get_json()
-    print(f"{response_body = }  2")
+
+    # Assert
     assert response.status_code == 200
     assert "task" in response_body
     assert "goal_id" in response_body["task"]
@@ -99,18 +113,6 @@ def test_get_task_includes_goal_id_200(client, one_task_belongs_to_one_goal):
             "is_complete": False
         }
     }
-
-
-# @pytest.mark.skip(reason="No way to test this feature yet")
-def test_get_tasks_for_specific_goal_no_goal_404(client):
-    # Act
-    response = client.get("/goals/1/tasks")
-    response_body = response.get_json()
-
-    # Assert
-    assert response.status_code == 404
-    assert response_body == {'message': 'Goal 1 was not found.'}
-
 
 
 def test_post_task_ids_to_goal_invalid_goal_id_404(client):
@@ -135,6 +137,3 @@ def test_post_task_ids_to_goal_invalid_task_ids_404(client, one_goal):
     # Assert
     assert response.status_code == 404
     assert response_body == {'message': 'Task 1 was not found.'}
-
-
-

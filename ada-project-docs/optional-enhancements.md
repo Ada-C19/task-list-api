@@ -16,59 +16,6 @@ How would you write tests for it? How would you implement it?
 
 Your decisions should not break the other tests.
 
-### Re-organize Routes
-
-Consider refactoring how endpoints are written in the `routes.py` file.
-
-Here are some ideas to start:
-
-- Instead of having `if/elif` blocks to handle many HTTP methods in one route method, separate them into different route methods
-
-### Model Instance Methods
-
-We can define instance methods in our model classes.
-
-Consider places in your code that deal with one model at a time. Is there any repeated logic or behavior?
-
-- Create a class method in `Task` named `from_json()`
-    - Converts JSON into a new instance of `Task`
-    - Takes in a dictionary in the shape of the JSON our API receives in the create and update routes
-    - Returns an instance of `Task` 
-
-### More Query Params
-
-Create the tests and implementation so that the user may
-
-- filter tasks by title
-- sort tasks by id
-- sort goals by title
-
-
-
-
-
-
-
-
-
-
-
-
-
-_________
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Optional Enhancements
 

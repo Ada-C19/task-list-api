@@ -5,8 +5,10 @@ from app.models.task import Task
 import pytest
 from app import db
 
+
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_mark_complete_on_incomplete_task_200(client, one_task):
+def test_mark_complete_on_incomplete_task(client, one_task):
     # Arrange
     """
     The future Wave 4 adds special functionality to this route,
@@ -43,7 +45,7 @@ def test_mark_complete_on_incomplete_task_200(client, one_task):
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_mark_incomplete_on_complete_task_200(client, completed_task):
+def test_mark_incomplete_on_complete_task(client, completed_task):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
     response_body = response.get_json()
@@ -63,7 +65,7 @@ def test_mark_incomplete_on_complete_task_200(client, completed_task):
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_mark_complete_on_completed_task_200(client, completed_task):
+def test_mark_complete_on_completed_task(client, completed_task):
     # Arrange
     """
     The future Wave 4 adds special functionality to this route,
@@ -98,8 +100,9 @@ def test_mark_complete_on_completed_task_200(client, completed_task):
     }
     assert db.session.get(Task, 1).completed_at
 
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_mark_incomplete_on_incomplete_task_200(client, one_task):
+def test_mark_incomplete_on_incomplete_task(client, one_task):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
     response_body = response.get_json()
@@ -119,7 +122,7 @@ def test_mark_incomplete_on_incomplete_task_200(client, one_task):
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_mark_complete_missing_task_404(client):
+def test_mark_complete_missing_task(client):
     # Act
     response = client.patch("/tasks/1/mark_complete")
     response_body = response.get_json()
@@ -129,9 +132,8 @@ def test_mark_complete_missing_task_404(client):
     assert response_body == {'message': 'Task 1 was not found.'}
 
 
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
-def test_mark_incomplete_missing_task_404(client):
+def test_mark_incomplete_missing_task(client):
     # Act
     response = client.patch("/tasks/1/mark_incomplete")
     response_body = response.get_json()
@@ -139,14 +141,3 @@ def test_mark_incomplete_missing_task_404(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {'message': 'Task 1 was not found.'}
-
-
-
-
-
-
-
-
-
-
-

@@ -11,6 +11,7 @@ import os
 
 load_dotenv()
 
+
 NOWTIME = datetime.utcnow()
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 CHANNEL = os.environ.get("CHANNEL")
