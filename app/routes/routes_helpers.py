@@ -1,4 +1,6 @@
 from flask import abort, make_response
+from datetime import datetime
+
 
 def validate_model(cls, id):
     try:
@@ -13,7 +15,11 @@ def validate_model(cls, id):
 
     return model 
 
-def validate_req(cls, req_body):
-    for i in cls().show_required():
-        if i not in req_body:
-            abort(make_response({"details": "Invalid data"}, 400))
+
+def find_date(date_str):
+    try:
+        date_obj = datetime.strptime(date_str, '%m/%d/%y')
+    except:
+        abort(make_response({"message": f"Invalid date format, please use mm/dd/yy format."}, 400))
+
+    return date_obj 

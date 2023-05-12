@@ -11,11 +11,12 @@ class Task(db.Model):
 
 
     @classmethod
-    def from_dict(cls, data_dict):
+    def from_dict(cls, data_dict, date=None):
+        
         return cls(
             title=data_dict["title"],
             description=data_dict["description"],
-            completed_at=None if not data_dict.get("completed_at") else data_dict["completed_at"]
+            completed_at=date
         )
 
 

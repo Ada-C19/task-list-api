@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, abort, make_response, request
 from dotenv import load_dotenv
 from app import db
 from app.models.task import Task
-from .routes_helpers import validate_model
+from .routes_helpers import validate_model, find_date
 
 load_dotenv()
 
@@ -18,7 +18,11 @@ def create_task():
     req_body = request.get_json()
 
     if "title" in req_body and "description" in req_body:
-        new_task = Task.from_dict(req_body)
+        if "completed_at" in req_body:
+            date = find_date(req_body["completed_at" ])
+            new_task = Task.from_dict(req_body, date)
+        else:
+            new_task = Task.from_dict(req_body)
     else:
         abort(make_response({"details": "Invalid data"}, 400))
 
@@ -62,6 +66,10 @@ def update_task(id):
 
     task.title = req_body["title"]
     task.description = req_body["description"]
+
+    if "completed_at" in req_body:
+        date = find_date(req_body["completed_at" ])
+        task.completed_at = date
 
     db.session.commit()
 

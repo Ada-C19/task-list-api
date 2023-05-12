@@ -26,7 +26,14 @@ def create_goal():
 # GET ALL ENDPOINT
 @goal_bp.route("", methods=["GET"])
 def handle_goals():
-    goal_query = Goal.query.all()
+    sort_param = request.args.get("sort")
+
+    if sort_param == "asc":
+        goal_query = Goal.query.order_by(Goal.title.asc())
+    elif sort_param == "desc":
+        goal_query = Goal.query.order_by(Goal.title.desc())
+    else:
+        goal_query = Goal.query.all()
 
     goals_response = [goal.to_dict() for goal in goal_query]
 
@@ -75,11 +82,9 @@ def assign_tasks(id):
         abort(make_response({"details": "Invalid data"}, 400))
 
     goal = validate_model(Goal, id)
-    task_list = []
 
-    for task_id in req_body["task_ids"]:
-        task = validate_model(Task, task_id)
-        task_list.append(task)
+    # Is this too long for comprehension?
+    task_list = [validate_model(Task, task_id) for task_id in req_body["task_ids"]]
     
     goal.tasks = task_list
     db.session.commit()
