@@ -58,16 +58,6 @@ def delete_task(id):
     message = {"details": f'Task 1 "{task_to_delete.title}" successfully deleted'}
     return make_response(message, 200)
 
-# PATCH tasks/<id>/mark_complete (UPDATE)
-# @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
-# def mark_completed(id):
-#     task_to_complete = validate_task(id)
-#     request_body = request.get_json()
-#     task_to_complete.patch_complete(request_body)
-#     db.session.commit()
-
-#     return jsonify({"task":task_to_complete.to_json()}), 200
-
 #PATCH /tasks/1/mark_incomplete" (UPDATE)
 @tasks_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
 def mark_incompleted(id):
@@ -77,8 +67,6 @@ def mark_incompleted(id):
     db.session.commit()
 
     return jsonify({"task":task_to_incomplete.to_json()}), 200
-
-
 
 # PATCH tasks/<id>/mark_complete (UPDATE)
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
