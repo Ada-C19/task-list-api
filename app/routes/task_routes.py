@@ -65,13 +65,25 @@ def delete_task(task_id):
 @tasks_bp.route("", methods=["GET"])
 def read_all_tasks():
     title_sort_param = request.args.get('sort', default='asc')
+    title_param = request.args.get("title")
+    description_param = request.args.get("description")
+    id_param = request.args.get("task_id")
+
     tasks_response=[]
     task_query = Task.query
     #tasks= Task.query.all()
     if title_sort_param == 'asc':
-        task_query = Task.query.order_by(Task.title.asc()).all()
+        task_query = task_query.order_by(Task.title.asc()).all()
     else:
-        task_query = Task.query.order_by(Task.title.desc()).all()
+        task_query = task_query.order_by(Task.title.desc()).all()
+
+    if title_param:
+        task_query = Task.query.filter_by(title=title_param)
+    if description_param:
+        task_query = Task.query.filter(Task.description.ilike(
+            f"%{description_param}%"))
+    if id_param:
+        task_query = Task.query.filter_by(task_id= id_param)
 
     tasks_response= [task.to_dict() for task in task_query]
 

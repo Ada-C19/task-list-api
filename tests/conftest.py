@@ -100,3 +100,15 @@ def completed_task_str_date(app):
     db.session.add(new_task)
     db.session.commit()
 
+#New fixture to check that the query param description works
+@pytest.fixture
+def three_tasks_descr(app):
+    db.session.add_all([
+        Task(
+            title="Water the garden 🌷", description="Water", completed_at=None),
+        Task(
+            title="Answer forgotten email 📧", description="Please answer!", completed_at=None),
+        Task(
+            title="Pay my outstanding tickets 😭", description="", completed_at=None)
+    ])
+    db.session.commit()
