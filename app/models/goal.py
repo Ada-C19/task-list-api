@@ -11,6 +11,9 @@ class Goal(db.Model):
             "title": self.title
         }
     
+    def update_dict(self, request_body):
+        self.title = request_body["title"]
+    
     @classmethod
     def create_dict(cls, response_body):
         try:
