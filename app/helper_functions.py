@@ -27,14 +27,14 @@ def update_model(model, request_body):
             # a named attribute of an object. It takes 3 arguments: the object to modify,
             # the name of the attribute to set, and the value to set 
         except KeyError:
-            return abort(make_response({"details": "Invalid data"}, 400))
+            abort(make_response({"details": "Invalid data"}, 400))
 
 
 def create_model(cls, request_body):
     try:
         model = cls.from_dict(request_body)
     except (KeyError, TypeError):
-        return abort(make_response({"details": "Invalid data"}, 400))
+        abort(make_response({"details": "Invalid data"}, 400))
     return model
 
 
