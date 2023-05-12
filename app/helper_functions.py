@@ -38,13 +38,13 @@ def create_model(cls, request_body):
     return model
 
 
-def sort_models(cls, models, sort_query):
+def sort_models(cls, model_query, sort_query):
     if sort_query == "desc":
-        models = models.order_by(cls.title.desc()).all()
+        models = model_query.order_by(cls.title.desc()).all()
     elif sort_query == "asc":
-        models = models.order_by(cls.title.asc()).all()
+        models = model_query.order_by(cls.title.asc()).all()
     else: # sort models by id in ascending order by default
-        models = models.order_by(cls.id.asc()).all()
+        models = model_query.order_by(cls.id.asc()).all()
     return models 
 
 
