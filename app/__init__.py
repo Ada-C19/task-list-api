@@ -1,8 +1,8 @@
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import os
 from dotenv import load_dotenv
+from flask import Flask
+import os
 
 
 db = SQLAlchemy()
@@ -20,7 +20,7 @@ def create_app(test_config=None):
     else:
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-            "SQLALCHEMY_TEST_DATABASE_URI")
+            "RENDER_DATABASE_URI")
 
     # Import models here for Alembic setup
     from app.models.task import Task
