@@ -107,14 +107,8 @@ def mark_complete(task_id):
     
     db.session.commit()
 
-    # load_dotenv()
     slack_token = os.environ.get("THE_SLACK_TOKEN")
-    # text = "omg???"
     task_name = task.title
-
-    # response = requests.post('https://slack.com/api/chat.postMessage', data={"token": slack_token, "channel": "task-notifications", "text": text})
-    # # print(response.status_code)
-    # print(response.json())
     
     slack_response = notify_slack(slack_token, task_name)
     
@@ -124,12 +118,7 @@ def mark_complete(task_id):
             "title": task.title,
             "description": task.description,
             "is_complete": task.is_complete, 
-        },
-        "slack_response": {
-            "status_code": slack_response.status_code,
-            "json": slack_response.json()
-        },
-        "token": {"slack token": slack_token}
+        }
     })
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
