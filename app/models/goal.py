@@ -12,7 +12,7 @@ class Goal(db.Model):
     def to_dict(self):
         return dict(
                 id=self.id,
-                title=self.title
+                title=self.title,
                 )
 
 

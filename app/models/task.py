@@ -15,7 +15,7 @@ class Task(db.Model):
                 id=self.id,
                 title=self.title,
                 description=self.description,
-                is_complete=bool(self.completed_at)
+                is_complete=bool(self.completed_at),
             )
         if self.goal_id:
             task_dict["goal_id"] = self.goal_id
@@ -31,7 +31,7 @@ class Task(db.Model):
     def from_dict(cls, task_data): 
         new_task = Task(
             title=task_data["title"],
-            description=task_data["description"]
+            description=task_data["description"],
         )
         if "completed_at" in task_data:
             new_task.completed_at=task_data["completed_at"]
