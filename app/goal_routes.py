@@ -32,8 +32,39 @@ def get_one_goal(id):
 
     return jsonify({"goal":goal.to_dict()}),200
 
+#GET all goals [GET]/goals  :(CREATE)
+@goals_bp.route("",methods=["GET"])
+def get_all_goals():
+    goals_response = []
+    goals = Goal.query.all()
+
+    for goal in goals:
+        goals_response.append(goal.to_dict())
+    
+    return jsonify(goals_response),200
 
 
+#UPDATE one task [PUT]/goals/<id> :(UPDATE)
+@goals_bp.route("/<id>",methods=["PUT"])
+def update_goal(id):
+    goal = Goal.query.get(id)
+    if goal is None:
+        return jsonify({"error": "Goal not found"}),404
+    
+    request_body = request.get_json()
+    goal.update_goal(request_body)
+    db.session.commit()
 
+    return jsonify({"goal":goal.to_dict()}),200
 
+#DELETE one goal [DELETE]/goals/<id> :(DELETE)
+@goals_bp.route("/<id>",methods=["DELETE"])
+def delete_goal(id):
+    goal_to_delete = validate_goal(id)
 
+    db.session.delete(goal_to_delete)
+    db.session.commit()
+
+    message = {'details': f'Goal {id} "{goal_to_delete.title}" successfully deleted'}
+
+    return make_response(message,200)
