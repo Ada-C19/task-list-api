@@ -1,5 +1,6 @@
 from flask import make_response, request, jsonify, abort
 from app.models.task import Task
+from app.models.goal import Goal
 from sqlalchemy import asc, desc
 from dotenv import load_dotenv
 from datetime import datetime
@@ -20,7 +21,7 @@ def create_response(cls, instance, status_code=HTTPStatus.OK):
     db.session.commit()
     instance = instance.to_json()
     cls_type = cls.__name__.lower()
-    return make_response(jsonify({cls_type: instance}), status_code)
+    return make_response({cls_type: instance}, status_code)
 
 
 def generate_error_message(cls, id):
@@ -54,14 +55,19 @@ def create_instance(cls):
         instance = cls.from_json(instance_info)
     except KeyError as err:
         error_message = {"details": f"KeyError invalid {cls.__name__} data, missing key: {err}"}
-        return make_response(jsonify(error_message), HTTPStatus.BAD_REQUEST)
+        return make_response(error_message, HTTPStatus.BAD_REQUEST)
 
     db.session.add(instance)
 
     return create_response(cls, instance, HTTPStatus.CREATED)
 
 
-def get_all_instances(cls):
+def get_all_instances(cls, id=None):
+    if id is not None:
+        instance = get_model_by_id(cls, id)
+        instance = instance.to_json(tasks=True)
+        return make_response(instance, HTTPStatus.OK)
+
     sort_order = request.args.get("sort")
 
     instances = cls.query
@@ -81,14 +87,14 @@ def get_all_instances(cls):
         elif sort_order == "description_desc":
             instances = instances.order_by(desc(cls.description))
 
-    instance_list = [instance.to_json() for instance in instances]
+    instance = [instance.to_json() for instance in instances]
 
-    return make_response(jsonify(instance_list), HTTPStatus.OK)
+    return make_response(instance, HTTPStatus.OK)
 
 
 def get_one_instance(cls, id):
     instance = get_model_by_id(cls, id)
-    return create_response(cls, instance, HTTPStatus.OK)
+    return create_response(cls, instance)
 
 
 def update_instance(cls, id):
@@ -148,15 +154,7 @@ def make_instance_incomplete(cls, id):
     return create_response(cls, instance)
 
 
-def get_instances_for_instance(cls, id):
-    model = get_model_by_id(cls, id)
-    
-    json_data = model.to_json(tasks=True)
-    
-    return make_response(json_data, HTTPStatus.OK)
-
-
-def add_instances_to_instance(cls, id):
+def add_tasks_to_class(cls, id):
     model = get_model_by_id(cls, id)
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
@@ -168,9 +166,117 @@ def add_instances_to_instance(cls, id):
         instance = get_model_by_id(Task, task_id)
         instance.goal_id = model.goal_id
     
-    model.title = request.args.get("title", model.title)
+    goal_id = model.goal_id
 
     db.session.commit()
 
-    return make_response({"id": model.goal_id, "task_ids": task_ids}, HTTPStatus.OK)
+    return make_response({"id": goal_id, "task_ids": task_ids}, HTTPStatus.OK)
 
+
+
+
+
+# goal_bp.route("/<goal_id>/tasks", methods=["POST"])
+# def post_task_to_goal(goal_id):
+#     goal = validate_model(Goal, goal_id)
+#     request_body = request.get_json()
+#     for task_id in request_body["task_id"]:
+#         task = validate_model(Task, task_id)
+#         task.goal_id = goal.goal_id
+#     db.session.commit()
+#     task_id_list = []
+#     for task_id in goal.tasks:
+#         task_id_list.append(task_id)
+
+#     response_body = {
+#         "id": goal.goal_id,
+#         "task_ids": [task_id_list]
+#     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def add_instances_to_instance(cls, id):
+#     instance = get_model_by_id(cls, id)
+#     request_body = request.get_json()
+#     task_ids = request_body["task_ids"]
+
+
+#     for task in instance.tasks:
+#         task.goal_id = None
+
+
+#     for task_id in task_ids:
+#         task = get_model_by_id(Task, task_id)
+#         task.goal_id = instance.goal_id
+
+#     instance.title = request_body.get("title", instance.title)
+
+#     return create_response(cls, instance, HTTPStatus.OK)
+
+
+# def add_instances_to_instance(cls, id):
+#     model = get_model_by_id(cls, id)
+#     request_body = request.get_json()
+#     task_ids = request_body["task_ids"]
+
+#     for instance in model.tasks:
+#         instance.goal_id = None
+
+#     for task_id in task_ids:
+#         instance = get_model_by_id(Task, task_id)
+#         instance.goal_id = model.goal_id
+    
+#     model.title = request.args.get("title", model.title)
+
+#     return create_response(cls, model, task_ids, HTTPStatus.OK)
+
+
+# def add_instances_to_instance(cls, id):
+#     model = get_model_by_id(cls, id)
+#     request_body = request.get_json()
+#     task_ids = request_body["task_ids"]
+
+#     for instance in model.tasks:
+#         instance.goal_id = None
+
+#     for task_id in task_ids:
+#         instance = get_model_by_id(Task, task_id)
+#         instance.goal_id = model.goal_id
+    
+#     # model.title = request.args.get("title", model.title) don't need at all
+#     goal_id = model.goal_id
+
+#     db.session.commit()
+#     wtf_is_TASK = instance
+#     wtf_is_this_GOAL = model
+#     test = {
+#             "id": goal_id,
+#             "task_ids": task_ids
+#         }
+#     just_breaking =""
+#     return make_response({"id": goal_id, "task_ids": task_ids}, HTTPStatus.OK)
+    # return create_response(cls, model, goal_id, task_ids, HTTPStatus.OK)
+    # return create_response(cls, model, HTTPStatus.OK)
