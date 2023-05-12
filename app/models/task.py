@@ -2,21 +2,33 @@ from app import db
 from flask import make_response, jsonify, abort
 from datetime import datetime
 
-
 class Task(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable = True)
+    goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
 
-    def to_dict(self):
+    def to_dict(self): 
         return {"task": {
             "task_id": self.task_id,
             "title": self.title,
             "description": self.description,
             "is_complete": self.completed_at is not None
-            }
+        }}
+    
+
+    def to_dict_with_goal_id(self): 
+        task_dict = {
+                "task_id": self.task_id,
+                "title": self.title,
+                "description": self.description,
+                "is_complete": self.completed_at is not None,
+                "goal_id": self.goal_id 
         }
+        return {"task": task_dict}
+
+    
 
 
     @classmethod
