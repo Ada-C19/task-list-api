@@ -5,11 +5,12 @@ import os
 from dotenv import load_dotenv
 
 
+
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
 
-
+# client = slack.WebClient(token=os.environ['SLACK_TOKEN'])
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -33,5 +34,7 @@ def create_app(test_config=None):
     from app.routes import tasks_bp
     # Register Blueprints here
     app.register_blueprint(tasks_bp)
+
+    # client = slack.WebClient(token=os.environ['SLACK_TOKEN'])
     return app
 

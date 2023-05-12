@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
 from app import db
+from app.say_bot import client
 from app.models.task import Task
 from datetime import datetime
 
@@ -102,6 +103,11 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.now()
     db.session.commit()
 
+    client.chat_postMessage(
+        channel="#task-notifications", 
+        text=f"Someone just completed the task {task.title}"
+    )
+    
     message = Task.generate_message(task)
     return make_response(jsonify(message), 200)
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
