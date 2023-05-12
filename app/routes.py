@@ -12,19 +12,20 @@ import requests
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-def validate_task(task_id):
+def validate_model(cls, model_id):
     try:
-        task_id = int(task_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
+        abort(make_response({"message":f"task {model_id} invalid"}, 400))
 
-    task = Task.query.get(task_id)
+    model = cls.query.get(model_id)
     
-    if not task:
-        abort(make_response({"message":f"task {task_id} not found"}, 404))
+    if not model:
+        abort(make_response({"message":f"{cls.__name__} {model_id} not found"}, 404))
     
-    return task
+    return model
 
 
 @tasks_bp.route("", methods=["POST"])
@@ -70,12 +71,12 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 
 def read_one_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -88,7 +89,7 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     
     db.session.delete(task)
@@ -99,7 +100,7 @@ def delete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
     
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     task.completed_at = datetime.utcnow()
 
@@ -114,7 +115,7 @@ def mark_task_complete(task_id):
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
     
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     
     if task.completed_at:
         task.completed_at = None
@@ -123,6 +124,8 @@ def mark_task_incomplete(task_id):
     db.session.commit()
 
     return {"task": task.to_dict()}
+
+
 
 
     
