@@ -58,9 +58,7 @@ def read_one_goal(goal_id):
 def read_task_by_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    tasks = Task.query.filter(Task.goal_id == goal.id)
-
-    tasks_body = [task.to_dict() for task in tasks]
+    tasks_body = [task.to_dict() for task in goal.tasks]
 
     return make_response(jsonify({
         "id": goal.id,
