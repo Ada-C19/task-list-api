@@ -1,5 +1,6 @@
-
+import os
 from datetime import datetime
+import requests
 from app import db
 
 from flask import Blueprint, jsonify, make_response, request, abort
@@ -124,6 +125,23 @@ def mark_complete(task_id):
     task.completed_at=datetime.utcnow()
     
     db.session.commit()
+    
+    # ID of the channel you want to send the message to
+    channel_id = "C057AARLUNR"
+    
+    slack_url = "https://slack.com/api/chat.postMessage"
+    
+    slack_data = {
+        "channel": channel_id,
+        "text": f"Someone completed the {task.title} task!"
+    }
+    
+    headers= {
+        "Authorization": f"Bearer {os.environ.get('SLACK_KEY')}"
+    }
+    
+    slack_request = requests.post(slack_url, headers=headers, json=slack_data)
+    print(slack_request.text)
     
     # return make_response(f"Task #{task.task_id} successfully updated"), 200
 
