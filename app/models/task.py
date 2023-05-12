@@ -21,3 +21,11 @@ class Task(db.Model):
             task_dict["goal_id"] = self.goal_id
 
         return task_dict
+
+    @classmethod
+    def from_dict(cls, data_dict):
+
+        return cls(
+            title = data_dict["title"],
+            description = data_dict["description"]
+        )

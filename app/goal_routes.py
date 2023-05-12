@@ -23,7 +23,7 @@ def create_goal():
     return jsonify(response_body), 201
 
 @goals_bp.route("", methods=["GET"])
-def get_all_goal():
+def get_all_goals():
 
     goals = Goal.query.all()
     goal_list = [goal.to_dict() for goal in goals]
@@ -32,7 +32,7 @@ def get_all_goal():
     return jsonify(goal_list), 200
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
-def get_one_task(goal_id):
+def get_one_goal(goal_id):
     goal = validate_model(Goal,goal_id)
     response_body = dict(goal = goal.to_dict())
 
@@ -72,7 +72,7 @@ def adding_task_ids(goal_id):
         task.goal_id = goal.id
 
         db.session.commit()
-        
+
     task_ids = [task.task_id for task in goal.tasks]
 
     response_body = {
@@ -91,6 +91,7 @@ def get_tasks_by_goal_id(goal_id):
     response_body = dict(
         id = goal.id,
         title = goal.title,
-        tasks = task_list)
+        tasks = task_list
+        )
 
     return jsonify(response_body), 200
