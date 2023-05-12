@@ -7,6 +7,7 @@ import requests
 import os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
 
 def validate_model(cls, model_id):
     try: 
@@ -80,7 +81,7 @@ def mark_complete_task(task_id):
     db.session.commit()
     
     message_to_slack = f"Someone just completed the task {task.title}"
-    header = {"Authorization": f"Bearer " + os.environ.get('SLACK_BOT_TOKEN')}
+    header = {"Authorization": f"Bearer {SLACK_BOT_TOKEN}"}
     json_response = {
         "channel": "C056ASC5SPQ",
         "text": message_to_slack
