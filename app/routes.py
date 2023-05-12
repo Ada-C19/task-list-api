@@ -1,5 +1,6 @@
 from app import db
 from .models.task import Task
+from .models.goal import Goal
 from sqlalchemy import asc, desc
 from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
@@ -44,7 +45,7 @@ def get_all_tasks():
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def get_one_planet(task_id):
+def get_one_task(task_id):
 
     task = validate_model(Task, task_id)
     response = {"task": task.to_dict()}
@@ -123,11 +124,56 @@ def mark_complete(task_id):
 
 
 
+"""GOAL ROUTES"""
+
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 
-# datetime.utcnow()
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    
+    if request_body.get("title") is None:
+        return make_response ({"details": "Invalid data"}, 400)
+        request_body = request.get_json()
+    
+    new_goal = Goal.from_dict(request_body)
 
-# HELPER FUNCTION
+    db.session.add(new_goal)
+    db.session.commit()
+
+    response = {"goal": new_goal.to_dict()}
+
+    return make_response(jsonify(response), 201)
+
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+    
+    goals = Goal.query.all()
+
+    goals_list =[goal.to_dict() for goal in goals]
+
+    return jsonify(goals_list), 200
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""HELPER FUNCTION"""
 def validate_model(cls, id):
     try:
         id = int(id)
