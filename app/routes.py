@@ -157,8 +157,40 @@ def get_all_goals():
     return jsonify(goals_list), 200
     
     
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+    response = {"goal": goal.to_dict()}
+
+    return make_response(jsonify(response), 200)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_task(goal_id):
+    goal=validate_model(Goal, goal_id)
+    request_body=request.get_json()
+
+    if request_body.get("title") is None:
+        return make_response(f"Some additional information needed to update goal{goal.goal_id}{goal.title}",400)
+
+    goal.title=request_body["title"]
 
 
+    db.session.commit()
+
+    response = {"goal": goal.to_dict()}
+
+    return make_response(jsonify(response), 200)
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+    response = {"details": (f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted")}
+
+    return make_response(jsonify(response), 200)
 
 
 
