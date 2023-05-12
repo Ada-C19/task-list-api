@@ -4,13 +4,13 @@ from http import HTTPStatus
 from sqlalchemy import asc, desc
 from datetime import timezone, datetime
 from dotenv import load_dotenv
+import os
+import requests
 
 load_dotenv()
 
-NOWTIME = datetime.now(timezone.utc)
-# SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
-
-
+NOWTIME = datetime.utcnow()
+SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 
 
 def create_response(cls, instance, status_code=HTTPStatus.OK):
@@ -23,18 +23,6 @@ def create_response(cls, instance, status_code=HTTPStatus.OK):
 def generate_error_message(cls, id):
     return {"message": f"{cls.__name__} {id} was not found."}
 
-
-
-
-
-
-def validate_id(cls, id):
-    try:
-        id = int(id)
-    except ValueError:
-        error_message = generate_error_message(cls, id)
-        return error_response(error_message, HTTPStatus.BAD_REQUEST)
-    return id
 
 def validate_id(cls, id):
     try:
@@ -134,6 +122,18 @@ def make_instance_complete(cls, id):
 
     instance.completed_at = NOWTIME
 
+    slack_api_url = "https://slack.com/api/chat.postMessage"
+
+    slack_request_body = {
+        "channel": "C0561UUDX4K",
+        "text": f"Someone just completed the task {cls.title}"
+    }
+    slack_request_headers = {
+        "Authorization": f"Bearer " + SLACK_TOKEN
+    }
+
+    slack_response = requests.post(slack_api_url, json=slack_request_body, headers=slack_request_headers)
+
     return create_response(cls, instance)
 
 
@@ -143,4 +143,3 @@ def make_instance_incomplete(cls, id):
     instance.completed_at = None
 
     return create_response(cls, instance)
-
