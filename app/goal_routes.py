@@ -3,6 +3,7 @@ from flask import Blueprint, request, make_response, jsonify, abort
 from app.models.goal import Goal
 import datetime, requests, json, os
 from app.task_routes import validate_model
+from app.models.task import Task
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -73,3 +74,38 @@ def delete_one_goal(goal_id):
 
     return {'details': f'Goal {goal_id} "{goal.title}" successfully deleted'}
 
+# NESTED ROUTES - POST
+@goals_bp.route("<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    response_body = {
+        "id": goal.goal_id,
+        "task_ids":request_body["task_ids"]
+    }
+
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        goal.tasks.append(task)
+
+    db.session.commit()
+    
+
+    return response_body
+
+@goals_bp.route("<goal_id>/tasks",  methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    tasks_response = []
+    for task in goal.tasks:
+        tasks_response.append(task.to_dict())
+
+    response_body = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+        }
+
+    return response_body
