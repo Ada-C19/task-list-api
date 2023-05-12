@@ -1,6 +1,6 @@
 from app import db
 from app.models.goal import Goal
-from flask import Blueprint, abort, make_response
+from flask import Blueprint, abort, make_response, request
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -16,3 +16,22 @@ def validate_goal(goal_id):
         abort(make_response({"details": f"Goal {goal_id} not found"}, 404))
     
     return goal
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+    
+    if "title" not in request_body:
+        abort(make_response({"details": "missing title"}, 400))
+    
+    new_goal = Goal(title=request_body["title"])
+    
+    db.session.add(new_goal)
+    db.session.commit()
+    
+    return {
+        "goal": {
+            "id": new_goal.goal_id,
+            "title": new_goal.title
+        }
+    }, 201
