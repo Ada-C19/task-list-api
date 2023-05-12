@@ -2,7 +2,7 @@ from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.goal import Goal
 from app.models.task import Task
-from .routes_helpers import validate_model, query_sort
+from .routes_helpers import *
 
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -16,7 +16,7 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    response_body = dict(goal=new_goal.to_dict())
+    response_body = dict(goal=to_dict(new_goal))
 
     return make_response(jsonify(response_body), 201)
 
@@ -25,14 +25,14 @@ def create_goal():
 def handle_goals():
     goals = query_sort(Goal)
 
-    response_body = [Goal.to_dict(goal) for goal in goals]
+    response_body = [to_dict(goal) for goal in goals]
 
     return make_response(jsonify(response_body),200)
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def handle_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-    response_body = dict(goal=goal.to_dict())
+    response_body = dict(goal=to_dict(goal))
 
     return make_response(jsonify(response_body), 200)
 
@@ -40,7 +40,7 @@ def handle_goal(goal_id):
 def handle_tasks_by_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    tasks_response = [task.to_dict() for task in goal.tasks]
+    tasks_response = [to_dict(task) for task in goal.tasks]
 
     response_body = dict(id=goal.id, tasks=tasks_response, title=goal.title)
     
@@ -56,7 +56,7 @@ def update_goal(id):
     
     db.session.commit()
 
-    response_body = dict(goal=goal.to_dict())
+    response_body = dict(goal=to_dict(goal))
 
     return make_response(jsonify(response_body), 200)
 

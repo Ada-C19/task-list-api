@@ -7,9 +7,6 @@ class Goal(db.Model):
     title = db.Column(db.String)
     tasks = db.relationship("Task", lazy=True, back_populates="goal")
 
-    def to_dict(goal):
-        return dict(id=goal.id, title=goal.title)
-    
     @classmethod
     def from_dict(cls, goal_data):
         try:

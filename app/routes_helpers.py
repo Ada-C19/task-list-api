@@ -23,10 +23,10 @@ def slack_call(task):
             "text": f"Someone just completed the task {task['title']}"
             }
     headers = {
-                'Authorization': token,
+                'Authorization': f'Bearer {token}',
                 }
 
-    response = requests.post(path, data=data, headers=headers)
+    response = requests.patch(path, data=data, headers=headers)
 
     return response.text
 
@@ -51,3 +51,17 @@ def query_sort(cls):
             else: cls_query = cls_query.order_by(cls.id.desc())
 
     return cls_query
+
+def to_dict(cls):
+    cls_dict = dict(id=cls.id, title=cls.title)
+    try:
+        cls_dict['description'] = cls.description
+        cls_dict['is_complete'] = cls.completed_at != None
+
+        if cls.goal_id:
+                cls_dict['goal_id'] = cls.goal_id
+        
+        return cls_dict
+    
+    except AttributeError:
+        return cls_dict

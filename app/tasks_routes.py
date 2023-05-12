@@ -1,7 +1,7 @@
 from app import db
 from flask import Blueprint, request, make_response, jsonify
 from app.models.task import Task
-from .routes_helpers import validate_model, slack_call, query_sort
+from .routes_helpers import *
 from datetime import date
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -15,7 +15,7 @@ def create_tasks():
     db.session.add(new_task)
     db.session.commit()
 
-    response_body = dict(task=new_task.to_dict())
+    response_body = dict(task=to_dict(new_task))
 
     return make_response(jsonify(response_body), 201)
 
@@ -23,14 +23,14 @@ def create_tasks():
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
     task = validate_model(Task, task_id)
-    response_body = dict(task=task.to_dict())
+    response_body = dict(task=to_dict(task))
     return jsonify(response_body), 200
 
 @tasks_bp.route("", methods=["GET"])
 def handle_tasks():
     task_query = query_sort(Task)
     
-    response_body = [Task.to_dict(task) for task in task_query]
+    response_body = [to_dict(task) for task in task_query]
 
     return make_response(jsonify(response_body),200)
 
@@ -45,7 +45,7 @@ def update_task(id):
     
     db.session.commit()
 
-    response_body = dict(task=task.to_dict())
+    response_body = dict(task=to_dict(task))
 
     return make_response(jsonify(response_body), 200)
 
@@ -58,7 +58,7 @@ def mark_complete(id):
     
     db.session.commit()
 
-    response_body = dict(task=task.to_dict())
+    response_body = dict(task=to_dict(task))
 
     # Slack API call
     slack_call(response_body['task'])
@@ -73,7 +73,7 @@ def mark_incomplete(id):
     
     db.session.commit()
 
-    response_body = dict(task=task.to_dict())
+    response_body = dict(task=to_dict(task))
 
     return make_response(jsonify(response_body), 200)
 
