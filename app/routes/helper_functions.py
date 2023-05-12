@@ -143,3 +143,32 @@ def make_instance_incomplete(cls, id):
     instance.completed_at = None
 
     return create_response(cls, instance)
+
+
+# def get_instances_for_instance(cls, id):
+#     goal = get_model_by_id(cls, id)
+#     return make_response(cls.to_dict(tasks=True), HTTPStatus.OK)
+
+
+# def add_instances_to_instance(cls, id):
+#     goal = get_model_by_id(cls, id)
+#     request_body = request.get_json()
+#     task_ids = request_body["task_ids"]
+
+#     for task in goal.tasks:
+#         task.goal_id = None
+
+#     for task_id in task_ids:
+#         task = get_model_by_id(cls, task_id)
+#         task.goal_id = goal.id
+
+#     goal.title = request.args.get("title", goal.title)
+
+#     db.session.commit()
+
+#     return make_response({"id": goal.id, "task_ids": task_ids}, HTTPStatus.OK)
+
+
+
+
+
