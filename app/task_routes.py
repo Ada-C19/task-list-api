@@ -42,10 +42,8 @@ def list_specific_task(task_id):
 def update_task_info(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
-    
     task.update_data(request_body)
     db.session.commit()
-
     return make_response({"task": task.to_dict()})
 
 
@@ -53,7 +51,6 @@ def update_task_info(task_id):
 def mark_task_complete(task_id):
     task = validate_model(Task, task_id)
     task.completed_at = datetime.utcnow()
-
     db.session.commit()
     response = send_slack_message(task)
 
@@ -68,10 +65,8 @@ def mark_task_complete(task_id):
 @tasks_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
     task = validate_model(Task, task_id)
-
     task.completed_at = None
     db.session.commit()
-
     return make_response({"task": task.to_dict()})
 
 
@@ -79,10 +74,8 @@ def mark_task_incomplete(task_id):
 @tasks_bp.route("<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
-
     db.session.delete(task)
     db.session.commit()
-
     return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
 
 

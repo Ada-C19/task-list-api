@@ -37,7 +37,6 @@ def add_tasks_to_goal(goal_id):
 def list_all_goals():
     goals = Goal.query.all()
     goals_response = [goal.to_dict() for goal in goals]
-
     return jsonify(goals_response)
 
 
@@ -63,10 +62,8 @@ def list_tasks_for_goal(goal_id):
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
-
     goal.update_data(request_body)
     db.session.commit()
-
     return make_response({"goal": goal.to_dict()})
 
 
@@ -74,8 +71,6 @@ def update_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-
     db.session.delete(goal)
     db.session.commit()
-
     return make_response({"details": f"Goal {goal.id} \"{goal.title}\" successfully deleted"})
