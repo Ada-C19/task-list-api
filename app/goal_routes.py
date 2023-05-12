@@ -92,25 +92,15 @@ def create_task(goal_id):
     # validate goal_id
     goal = validate_model_goal(Goal, goal_id)
 
-    # specify request format
     request_body = request.get_json()
-    new_tasks = Task(
-        task_ids = request_body["task_ids"],
-        goal=goal
-    )
-    
-    # create 3 new tasks for the goal_id given
-    # new_tasks = [Task.task_from_dict(request_body) for task in task_ids]
-
-    db.session.add(new_tasks)
+        
+    db.session.add(request_body)
     db.session.commit()
 
-    response_body = {
-        "id": int(goal_id),
-        "task_ids": new_tasks
-    }
+    tasks_resp = [tasks_resp for task in ask.task_with_goal_to_dict]
+    goal.goal_to_dict_with_task() // t
 
-    return response_body
+    return jsonify(response_body) 
 
 @goal_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_tasks_one_goal(goal_id):
@@ -125,9 +115,10 @@ def get_tasks_one_goal(goal_id):
             "title": task.title,
             "description": task.description,
             "completed_at": None
+            "goal_id": 
             }
         )
-    
+    # 
     # tasks_response = [response_dict for task in goal.tasks]
 
     return jsonify(tasks_response)

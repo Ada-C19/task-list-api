@@ -1,4 +1,5 @@
 from app import db
+from app.models.goal import Goal
 
 
 class Task(db.Model):
@@ -30,5 +31,16 @@ class Task(db.Model):
         task_as_dict["title"] = self.title
         task_as_dict["description"] = self.description
         task_as_dict["is_complete"] = self.completed_at != None
+
+        return task_as_dict
+    
+    def task_with_goal_to_dict(self):
+        task_as_dict = {}
+
+        task_as_dict["id"] = self.task_id
+        task_as_dict["title"] = self.title
+        task_as_dict["description"] = self.description
+        task_as_dict["is_complete"] = self.completed_at != None
+        task_as_dict["goal_id"] = self.goal_id
 
         return task_as_dict
