@@ -71,7 +71,6 @@ def read_tasks_for_specific_goal(goal_id):
     try:
         goal = validate_model(Goal, goal_id)
         tasks_response = []
-        # tasks_response = [{"tasks": task.task_id for task in goal.tasks}]
         for task in goal.tasks:
             tasks_response.append(task.validate_complete())
         return jsonify({"id": goal.goal_id, "tasks": tasks_response, "title": goal.title}), 200
