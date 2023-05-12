@@ -37,8 +37,9 @@ def get_all_tasks():
 @tasks_bp.route("/<id>",methods=["GET"])
 def get_one_task(id):
     task = validate_task(id)
-
+    ex = task.to_dict()
     return jsonify({'task':task.to_dict()}),200
+
 
 #CREATE one task/must contain title+description [POST]/tasks/<id> :(CREATE)
 @tasks_bp.route("", methods = ["POST"])
@@ -48,13 +49,14 @@ def create_tasks():
     if "title" not in request_body or "description" not in request_body:
         return make_response({"details": "Invalid data"}), 400
 
-    new_task = Task.create_dict(request_body)
+    new_task = Task.from_dict(request_body)
     
     db.session.add(new_task)
     db.session.commit()
 
     return make_response({"task":new_task.to_dict()}), 201
-  
+
+
 #UPDATE a task/ RETURN msg not found -PUT / tasks/<id> - (UPDATE)
 @tasks_bp.route("/<id>",methods=["PUT"])
 def update_task(id):
@@ -100,9 +102,7 @@ def mark_completed(id):
     headers = {"Authorization": os.environ.get("SLACK_API_KEY")}
     response = requests.post(path,params=params,headers=headers)
     
-
     return jsonify({"task":task_to_complete.to_dict()}),200
-
 
 
 #PATCH mark as incomplete on in/complete [PATCH]/tasks/<id>/mark_incomplete :(UPDATE)
@@ -117,3 +117,5 @@ def mark_incomplete(id):
     db.session.commit()
 
     return jsonify({"task":task_incomplete.to_dict()}),200
+
+

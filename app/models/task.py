@@ -6,31 +6,47 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime,default = None, nullable=True)
-    # goal = db.relationship("Goal",back_populates="goals")
-    # goal_id = db.Column(db.Integer,db.ForeignKey("goal_id"))
+    goal = db.relationship("Goal",back_populates="tasks")
+    goal_id_parent = db.Column(db.Integer,db.ForeignKey("goal.goal_id"))
     
-    def to_dict(self):
-        is_complete= True if self.completed_at else False;
-
-        return{
-            "id": self.task_id,
-            "title": self.title,
-            "description": self.description,
-            "is_complete": is_complete
-        }
-
+    @classmethod
+    def from_dict(cls,response_body):
+        return cls(
+            title=response_body["title"],
+            description=response_body["description"]
+        )
+        
+    def update_dict(self,request_body):
+        self.title = request_body["title"]
+        self.description = request_body["description"]
+        
     def update_dict(self,request_body):
         self.title = request_body["title"]
         self.description = request_body["description"]
     
-    @classmethod
-    def create_dict(cls,response_body):
-        return cls(
-            title=response_body.get("title"),
-            description=response_body.get("description"),
-            # completed_at = response_body.get("completed_at",None)
-        )
+    def to_dict(self):
+        # is_complete= True if self.completed_at else False;
+        dictionary = {}
+        if self.goal:
+            dictionary = {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "goal_id": self.goal_id_parent,
+            "is_complete": self.completed_at != None
+        }
+
+        else:
+            dictionary = {
+            "id": self.task_id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": self.completed_at != None
+        }
     
+        return dictionary
+
+
     def patch_complete(self):
         self.completed_at = datetime.utcnow()
     
