@@ -21,18 +21,15 @@ class Task(db.Model):
 
 
     def to_dict(self):
-        if not self.goal_id:
-            return dict(
+        # Was inspired by another classmae for this one!
+        task_dict = dict(
                 id=self.task_id,
                 title=self.title,
                 description=self.description,
                 is_complete=True if self.completed_at else False
             ) 
-        else:
-            return dict(
-                id=self.task_id,
-                title=self.title,
-                description=self.description,
-                is_complete=True if self.completed_at else False,
-                goal_id=self.goal_id
-            )     
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
+
+        return task_dict
+
