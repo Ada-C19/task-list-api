@@ -26,10 +26,10 @@ def post_tasks_to_goal(goal_id):
     goal.tasks = [task for task in tasks]
     db.session.commit()
 
-    return make_response({
-                            "id": int(goal_id),
-                            "task_ids": task_ids
-                        })
+    return make_response(dict(
+                            id=int(goal_id),
+                            task_ids=task_ids
+                        ))
 
 
 # Read
@@ -52,11 +52,11 @@ def get_goal(goal_id):
 def get_tasks_for_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_list = [task.to_dict() for task in goal.tasks]
-    return make_response({
-                            "id": goal.id,
-                            "title": goal.title,
-                            "tasks": task_list
-                        })
+    return make_response(dict(
+                            id=goal.id,
+                            title=goal.title,
+                            tasks=task_list
+                        ))
 
 
 # Update
