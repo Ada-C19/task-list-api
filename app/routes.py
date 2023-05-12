@@ -105,3 +105,19 @@ def sort_in_descending_order():
     for task in task_list:
         task_list_dict.append(task.to_dict())
     return jsonify(task_list_dict)
+
+@task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_title_as_complete(task_id):
+    task = validate_model(Task,task_id)
+    task.completed_at = datetime.datetime.now()
+    
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
+
+@task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_title_as_incomplete(task_id):
+    task = validate_model(Task,task_id)
+    task.completed_at = None
+    
+    db.session.commit()
+    return {"task": task.to_dict()}, 200
