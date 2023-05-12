@@ -1,5 +1,5 @@
 from app import db
-from flask import Blueprint, jsonify, abort, make_response, request
+from flask import Blueprint, jsonify,make_response, request
 from app.models.task import Task
 from app.models.goal import Goal
 from app.helper_functions import slack_mark_complete, validate_model
@@ -42,7 +42,7 @@ def read_all_tasks():
 
     elif request.args.get("sort") == "desc":
         tasks = Task.query.order_by(Task.title.desc()).all()
-        # tasks = Task.query.order_by(Task.title.asc()).all()
+        
     else:
         tasks = Task.query.all()
         

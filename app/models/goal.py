@@ -22,16 +22,9 @@ class Goal(db.Model):
         return{
             "id": self.goal_id,
             "title": self.title,
-            "tasks": json_tasks
         }
 
     @classmethod
     def from_dict(cls, goal_data):
         new_goal = Goal(title=goal_data["title"])
         return new_goal
-    
-    # def mark_complete(self, request_body):
-    #     self.completed_at = datetime.utcnow()
-
-    # def mark_incomplete(self, request_body):
-    #     self.completed_at = None

@@ -1,5 +1,8 @@
 from flask import abort, make_response, request, jsonify
 import requests
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 def validate_model(cls, model_id):
     try:
@@ -15,6 +18,7 @@ def validate_model(cls, model_id):
     return model
 
 def slack_mark_complete(self):
+        API_KEY= os.environ.get("API_KEY")
         url = "https://slack.com/api/chat.postMessage"
 
         data = {
@@ -22,7 +26,7 @@ def slack_mark_complete(self):
         "text": f"Someone just completed the task {self.title}"
         }
         headers = {
-    'Authorization': 'Bearer xoxb-5245529664147-5239168009126-Tl7hTy4y6CCqqpi9jP6BJuVv'
+    'Authorization': f'{API_KEY}'
         }
 
         response = requests.post(url, headers=headers, data=data)
