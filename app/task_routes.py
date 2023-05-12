@@ -3,7 +3,7 @@ from app.models.task import Task
 from app import db
 from datetime import datetime
 import requests, os
-from app.helper_functions import validate_model, create_model
+from app.helper_functions import validate_model, create_model, sort_by_title
 
 
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
@@ -22,10 +22,8 @@ def create_task():
 @tasks_bp.route("", methods=["GET"])
 def list_all_tasks():
     sort_query = request.args.get("sort")
-    if sort_query == "desc":
-        tasks = Task.query.order_by(Task.title.desc()).all()
-    else:
-        tasks = Task.query.order_by(Task.title.asc()).all()
+    tasks = sort_by_title(Task, sort_query)
+    
 
     tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response)

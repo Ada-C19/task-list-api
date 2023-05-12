@@ -18,3 +18,13 @@ def create_model(cls, request_body):
     except KeyError:
         return abort(make_response({"details": "Invalid data"}, 400))
     return model
+
+
+def sort_by_title(cls, sort_query):
+    if sort_query == "desc":
+        models = cls.query.order_by(cls.title.desc()).all()
+    elif sort_query == "asc":
+        models = cls.query.order_by(cls.title.asc()).all()
+    else:
+        models = cls.query.order_by(cls.id.asc()).all()
+    return models 

@@ -8,6 +8,7 @@ class Goal(db.Model):
     # lazy is set to True by default. explicitly set to True here for learning's sake :) related models will
     # only be loaded when access is needed, which can improve performance 
 
+
     def to_dict(self):
         return dict(
                 id=self.id,
