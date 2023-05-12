@@ -87,7 +87,6 @@ def mark_complete_task(task_id):
         "text": message_to_slack
         }
     response = requests.post("https://slack.com/api/chat.postMessage", headers=header, json=json_response)
-    
     if response.status_code != 200:
         return make_response({"details": "Failed to send message to Slack"}, 500)
 
