@@ -7,7 +7,6 @@ import os
 import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -80,8 +79,9 @@ def complete_one_task(task_id):
         task.completed_at = datetime.now()
 
     db.session.commit()
-
+    
     url = "https://slack.com/api/chat.postMessage"
+    SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
     headers = {"Authorization": f"Bearer {SLACK_API_TOKEN}"}
     message = f"Someone just completed the task {task.title}"
     data = {"channel": "random", "text": message}
