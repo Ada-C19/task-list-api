@@ -10,31 +10,7 @@ import os
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-# Route to get tasks
-@tasks_bp.route("", methods=["GET"])
-def get_all_tasks():
-    
-    query_sort = request.args.get("sort")
-    
-    if query_sort == "asc":
-        tasks = db.session.query(Task).order_by(asc(Task.title)).all()
-    elif query_sort == "desc":
-        tasks = db.session.query(Task).order_by(desc(Task.title)).all()
-    else:
-        tasks = Task.query.all()
-    
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append({
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-            })
-    
-    return jsonify(tasks_response), 200
-
-
+## Helper Functions
 # Validate ID function
 def validate_model(cls, model_id):
     model_item = cls.query.get(model_id)
@@ -44,12 +20,39 @@ def validate_model(cls, model_id):
 
     return model_item
 
+def query_sort(cls):
+    query_sort = request.args.get("sort")
+
+    if query_sort == "asc":
+        model_items = db.session.query(cls).order_by(asc(cls.title)).all()
+    elif query_sort == "desc":
+        model_items = db.session.query(cls).order_by(desc(cls.title)).all()
+    else:
+        model_items = cls.query.all()
+
+    return model_items
+
+## Routes
+# Route to get tasks
+@tasks_bp.route("", methods=["GET"])
+def get_all_tasks():
+    
+    tasks = query_sort(Task)
+    
+    tasks_response = []
+    for task in tasks:
+        tasks_response.append(task.to_json())
+    
+    return jsonify(tasks_response), 200
+
+
+
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task_by_id(task_id):
 
     task = validate_model(Task, task_id)
 
-    return task.to_dict(), 200
+    return {"task": task.to_json()}, 200
 
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -68,12 +71,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return {"task": {
-        "id": new_task.id,
-        "title": new_task.title,
-        "description": new_task.description,
-        "is_complete": False
-        }}, 201
+    return {"task": new_task.to_json()}, 201
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -85,12 +83,7 @@ def update_task(task_id):
     
     db.session.commit()
 
-    return {"task": {
-        "id": task.id,
-        "title": task.title,
-        "description": task.description,
-        "is_complete": False
-        }}, 200
+    return {"task": task.to_json()}, 200
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -111,12 +104,7 @@ def mark_incomplete(task_id):
 
     db.session.commit()
 
-    return {"task": {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        }}, 200
+    return {"task": task.to_json()}, 200
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
@@ -140,12 +128,7 @@ def mark_complete(task_id):
     except:
         pass
 
-    return {"task": {
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": True
-        }}, 200
+    return {"task": task.to_json()}, 200
 
 
 @goals_bp.route("", methods=["POST"])
@@ -163,22 +146,15 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    return jsonify({"goal": {
-            "id": new_goal.id,
-            "title": new_goal.title
-        }
-    }), 201
+    return {"goal": new_goal.to_json()}, 201
 
 @goals_bp.route("", methods=["GET"])
 def get_all_goals():
-    goals = Goal.query.all()
-    
+    goals = query_sort(Goal)
+        
     goals_response = []
     for goal in goals:
-        goals_response.append({
-            "id": goal.id,
-            "title": goal.title
-            })
+        goals_response.append(goal.to_json())
     
     return jsonify(goals_response), 200
 
@@ -186,12 +162,7 @@ def get_all_goals():
 def get_goal_by_id(goal_id):
     goal = validate_model(Goal, goal_id)
     
-    return {
-        "goal": {
-            "id": goal.id,
-            "title": goal.title
-        }
-    }, 200
+    return {"goal": goal.to_json()}, 200
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
@@ -203,10 +174,7 @@ def update_goal(goal_id):
     
     db.session.commit()
 
-    return jsonify({"goal": {
-            "id": goal.id,
-            "title": goal.title
-            }}), 200
+    return {"goal": goal.to_json()}, 200
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
@@ -243,13 +211,7 @@ def get_tasks_by_goal_id(goal_id):
     tasks_response = []
 
     for task in goal.tasks:
-        tasks_response.append({
-            "id": task.id,
-            "goal_id": goal.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": False
-        })
+        tasks_response.append(task.to_json())
 
     return jsonify({
         "id": goal.id,

@@ -9,21 +9,21 @@ class Task(db.Model):
     goal = db.relationship("Goal", back_populates="tasks")
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=True)
 
-    def to_dict(self):
+    def to_json(self):
+        task = {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "is_complete": True
+        }
         
         if self.goal_id == None:
-            return {"task": {
-                    "id": self.id,
-                    "title": self.title,
-                    "description": self.description,
-                    "is_complete": False
-                }}
-        elif self.goal_id >= 1:
-            return {
-                "task": {
-                    "id": self.id,
-                    "goal_id": self.goal_id,
-                    "title": self.title,
-                    "description": self.description,
-                    "is_complete": False
-                }}
+            if self.completed_at == None:
+                task["is_complete"] = False
+        
+        elif self.goal_id:
+            task["goal_id"] = self.goal_id
+            if self.completed_at == None:
+                task["is_complete"] = False
+
+        return task
