@@ -1,5 +1,6 @@
 from flask import abort, make_response
 from datetime import datetime
+import os, requests
 
 def validate_model(cls, model_id):
     try:
@@ -45,3 +46,13 @@ def sort_models(cls, models, sort_query):
     else: # sort models by id in ascending order by default
         models = models.order_by(cls.id.asc()).all()
     return models 
+
+
+def send_slack_message(task):
+    token = os.environ.get("SLACK_BOT_TOKEN")
+    external_url = 'https://slack.com/api/chat.postMessage'
+    headers = {"Authorization": f"Bearer {token}"}
+    data = {"channel": "task-notifications", 
+            "text": f"Someone just completed the task \"{task.title}\""}
+    response = requests.post(external_url, headers=headers, json=data)
+    return response

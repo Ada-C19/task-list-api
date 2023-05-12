@@ -1,9 +1,8 @@
-from flask import Blueprint, request, jsonify, make_response, abort
+from flask import Blueprint, request, jsonify, make_response
 from app.models.task import Task
 from app import db
 from datetime import datetime
-import requests, os
-from app.helper_functions import validate_model, create_model, sort_models, update_model
+from app.helper_functions import validate_model, create_model, sort_models, update_model, send_slack_message
 
 
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
@@ -78,14 +77,3 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
-
-
-# Helper Functions
-def send_slack_message(task):
-    token = os.environ.get("SLACK_BOT_TOKEN")
-    external_url = 'https://slack.com/api/chat.postMessage'
-    headers = {"Authorization": f"Bearer {token}"}
-    data = {"channel": "task-notifications", 
-            "text": f"Someone just completed the task \"{task.title}\""}
-    response = requests.post(external_url, headers=headers, json=data)
-    return response
