@@ -1,6 +1,7 @@
 from app import db
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, abort, request
+from app.task_routes import validate_task
 
 goals_bp = Blueprint("goals'", __name__, url_prefix = "/goals")
 
@@ -30,6 +31,27 @@ def create_goal():
             }
         }, 201
     )
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_task_to_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    request_body = request.get_json()
+    task_ids = request_body.get("task_ids")
+
+    for task_id in task_ids:
+        task = validate_task(task_id)
+        task.goal_id = goal.goal_id
+    
+    db.session.commit()
+
+    return make_response(
+        {
+            "id": goal.goal_id,
+            "task_ids": task_ids
+        }
+    ), 200
+        
 
 @goals_bp.route("", methods=["GET"])
 def read_goals():
