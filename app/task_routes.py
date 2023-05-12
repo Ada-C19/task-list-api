@@ -67,7 +67,7 @@ def read_tasks():
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def read_one_saved_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     if task.goal_id:
         return {
@@ -92,7 +92,7 @@ def read_one_saved_task(task_id):
 ###### Update Route ######
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -115,7 +115,7 @@ def update_task(task_id):
 ###### Patch Route ######
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -152,7 +152,7 @@ def mark_task_complete(task_id):
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     request_body = request.get_json()
 
@@ -175,7 +175,7 @@ def mark_task_incomplete(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -186,13 +186,15 @@ def delete_task(task_id):
         }, 200
     )
 
-def validate_task(task_id):
-    task = Task.query.get(task_id)
+def validate_model(cls, model_id):
+    try:
+        model_id = int(model_id)
+    except:
+        abort(make_response({"details":f"Invalid data"}, 400))
 
-    if not task:
-        abort(make_response(
-            {
-                "details": "Task ID not found"
-            }, 404
-        ))
-    return task
+    model = cls.query.get(model_id)
+
+    if not model:
+        abort(make_response({"details":f"{cls.__name__} ID not found"}, 404))
+
+    return model
