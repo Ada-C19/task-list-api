@@ -3,7 +3,7 @@ from app.models.task import Task
 from app import db
 from datetime import datetime
 import requests, os
-from app.helper_functions import validate_model, create_model, sort_by_title
+from app.helper_functions import validate_model, create_model, sort_items
 
 
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
@@ -26,7 +26,7 @@ def list_all_tasks():
     tasks = Task
     if title_query:
         tasks = Task.query.filter(Task.title.ilike(f'%{title_query}%'))
-    tasks = sort_by_title(tasks, sort_query)
+    tasks = sort_items(tasks, sort_query)
     tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response)
 

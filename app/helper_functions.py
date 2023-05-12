@@ -20,11 +20,11 @@ def create_model(cls, request_body):
     return model
 
 
-def sort_by_title(items, sort_query):
+def sort_items(items, sort_query):
     if sort_query == "desc":
         models = items.query.order_by(items.title.desc()).all()
     elif sort_query == "asc":
         models = items.query.order_by(items.title.asc()).all()
-    else:
+    else: # sort items by id in ascending order by default
         models = items.query.order_by(items.id.asc()).all()
     return models 
