@@ -167,14 +167,18 @@ def create_goal():
 # READ ALL GOALS- GET request to /goals
 @goals_bp.route("", methods=["GET"])
 def read_all_goals():
-    goals = Goal.query.all()
+    goal_sort_query = request.args.get("sort")
+
+    if goal_sort_query:
+        goals = Goal.query.order_by(Goal.title).all()
+    else:
+        goals = Goal.query.all()
         
     goals_response = []
+    
     for goal in goals:
-        goals_response.append({
-            "id": goal.goal_id,
-            "title": goal.title,
-        })
+        goals_response.append(goal.to_dic()["goal"])
+        
     return jsonify(goals_response), 200
 
 # READ ONE GOAL- GET request to /goals/<goal_id>
@@ -182,11 +186,7 @@ def read_all_goals():
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    return { "goal": {
-        "id": goal.goal_id,
-        "title": goal.title,
-        }
-    }, 200
+    return goal.to_dic(), 200
     
     
 # UPDATE GOAL- PATCH request to /goals/<goal_id>/mark_incomplete
