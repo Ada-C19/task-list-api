@@ -3,9 +3,12 @@ from flask import Blueprint
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
-
+import requests
+import os
+from dotenv import load_dotenv
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+# load_dotenv()
 
 def validate_task(task_id):
     try:
@@ -102,13 +105,25 @@ def mark_complete(task_id):
     task.is_complete = True
     
     db.session.commit()
+
+    load_dotenv()
+    slack_token = os.environ.get("SLACK_BOT_USER_OAUTH_TOKEN")
+    text = "omg???"
+
+    response = requests.post('https://slack.com/api/chat.postMessage', data={"token": slack_token, "channel": "task-notifications", "text": text})
+    # print(response.status_code)
+    print(response.json())
     
     return make_response({
         "task": {
             "id": task.task_id,
             "title": task.title,
             "description": task.description,
-            "is_complete": task.is_completem 
+            "is_complete": task.is_complete, 
+        },
+        "slack_response": {
+            "status_code": response.status_code,
+            "json": response.json()
         }
     })
 
