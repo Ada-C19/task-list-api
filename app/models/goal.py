@@ -3,7 +3,7 @@ from app import db
 
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.Text)
+    title = db.Column(db.Text, nullable=False)
     tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
     def to_dict(self):
@@ -21,5 +21,4 @@ class Goal(db.Model):
                 title=goal_dict["title"]
             )
         except KeyError as error:
-            return f"Missing or invalid key {error}"
-
+            return f"Missing key {error}"

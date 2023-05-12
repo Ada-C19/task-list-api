@@ -63,7 +63,7 @@ def delete_goal(goal_id):
 
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def create_tasks(goal_id):
+def create_tasks_for_a_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     request_body = request.get_json()
@@ -80,7 +80,7 @@ def create_tasks(goal_id):
          
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def get_tasks(goal_id):
+def get_tasks_for_a_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     tasks = goal.tasks

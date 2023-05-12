@@ -14,7 +14,8 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def create_task():
     request_body = request.get_json()
 
-    if not request_body.get("title") or not request_body.get("description"):
+    if (not request_body.get("title") or
+            not request_body.get("description")):
         abort(make_response({"details": "Invalid data"}, 400))
 
     task = Task.from_dict(request_body)
