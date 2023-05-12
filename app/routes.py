@@ -1,12 +1,14 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 import requests
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 from app import db
 import os
 
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 #POST /tasks
 @tasks_bp.route("", methods=["POST"])
@@ -104,25 +106,7 @@ def delete_task(model_id):
     message = {"details": f"Task 1 \"{task.title}\" successfully deleted"}
     return make_response(message, 200)
 
-
-#---------------------------------------------
-    
-    # Send the message to Slack
-    # token = os.environ.get('SLACK_API_TOKEN')
-    # message = f"Someone just completed the task {new_task.title} My Beautiful Task"
-    # slack_message = {
-    #     "text": message,
-    #     "channel": "api-test-channel",
-    #     "token": token 
-    # }
-    # response = requests.post("https://slack.com/api/chat.postMessage", data=slack_message)
-
-
-    # db.session.commit()
-
-    # return jsonify({"task": new_task.to_dict(), "slack_response": response.json()}), 200
-
-
+#Patch /<task_id>/mark_complete
 @tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
     try:
@@ -169,23 +153,92 @@ def send_slack_message(completed_task):
             }
     
         requests.post(SLACK_URL, data = payload, headers = AUTH_HEADERS)
-        # r.json()
-        # return make_response(r.json(), 201)
     
     except:
         print("There was an error making the call to Slack")
 
 
+#-----------------------------------------------------------
+# goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-# @tasks_bp.route("<model_id>/mark_complete", methods=["PATCH"])
-# def mark_task_complete(model_id):
-#     try:
-#         new_task = validate_model(Task, model_id)
-#     except:
-#         return jsonify({"Message": "Invalid id"}), 404
+def validate_model(cls, goal_id):
+    try:
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"details": "Invalid data"}, 400))
 
-#     new_task.completed_at = datetime.utcnow()
+    goal = cls.query.get(goal_id)
 
-#     db.session.commit()
+    if not goal:
+        message = {"details": "Invalid data"}
+        abort(make_response(message, 404))
 
-#     return jsonify({"task": new_task.to_dict()}), 200
+    return goal
+
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    try:
+        request_body = request.get_json()
+        new_goal = Goal.from_dict(request_body)
+    except KeyError as err:
+        return make_response({"details": "Invalid data"}, 400)
+
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return jsonify({"goal": new_goal.to_dict()}), 201
+
+
+@goals_bp.route("", methods=["GET"])
+def get_all_goals():
+
+    goals = Goal.query.all()
+    
+    goal_response = []
+    for goal in goals:
+        goal_response.append(goal.to_dict())
+
+    return jsonify(goal_response), 200
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    if goal:
+        return {"goal": goal.to_dict()}, 200
+    
+    else:
+        return {'details': 'Invalid data'}, 404
+    
+
+@goals_bp.route("<goal_id>", methods=["PUT"])
+def update_task(goal_id):
+    try:
+        goal = validate_model(Goal, goal_id)
+    except:
+        return jsonify({"Message": "Invalid id"}), 404
+
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return jsonify({"goal": goal.to_dict()}), 200
+
+
+@goals_bp.route("<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    if goal is None:
+        return {'details': 'Invalid data'}, 404
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    message = {"details": f"Task 1 \"{goal.title}\" successfully deleted"}
+    return make_response(message, 200)
+
+
+
+########Change model_id to task_id ############
