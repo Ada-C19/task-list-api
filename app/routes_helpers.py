@@ -26,7 +26,7 @@ def slack_call(task):
                 'Authorization': f'Bearer {token}',
                 }
 
-    response = requests.patch(path, data=data, headers=headers)
+    response = requests.post(path, data=data, headers=headers)
 
     return response.text
 
