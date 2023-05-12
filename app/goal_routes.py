@@ -14,3 +14,5 @@ def validate_goal(goal_id):
     
     if not goal:
         abort(make_response({"details": f"Goal {goal_id} not found"}, 404))
+    
+    return goal
