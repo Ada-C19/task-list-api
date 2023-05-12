@@ -1,5 +1,5 @@
 from app import db
-from flask import abort, make_response, jsonify
+from app.models.goal import Goal
 
 
 class Task(db.Model):
@@ -31,16 +31,4 @@ class Task(db.Model):
             completed_at = data.get("is_complete", None),
             goal_id = data.get("goal_id", None)
         )
-    
-    @classmethod
-    def validate_model(cls, model_id):
-        try:
-            model_id = int(model_id)
-        except ValueError:
-            abort(make_response(jsonify({"details": f"{cls.__name__} {model_id} invalid"}), 400))
-        
-        model = cls.query.get(model_id)
-        if not model:
-            abort(make_response(jsonify({"details": f"{cls.__name__} {model_id} not found"}), 404))
 
-        return model
