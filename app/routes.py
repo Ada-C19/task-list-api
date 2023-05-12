@@ -4,15 +4,17 @@ from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy.types import DateTime
 from sqlalchemy.sql.functions import now
-import requests, logging
+import requests, json
 import os
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
+# import logging
+# from slack_sdk import WebClient
+# from slack_sdk.errors import SlackApiError
 
 
 
 
 task_list_bp = Blueprint("task_list_bp", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goal_bp", __name__, )
 
 def validate_model_task(cls, model_id):
     try:
@@ -95,6 +97,7 @@ def delete_task(task_id):
 @task_list_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
     request_body = request.get_json()
+
     try:
         task = Task.query.get(task_id)
         task.completed_at = now()
@@ -102,26 +105,41 @@ def mark_task_complete(task_id):
         return abort(make_response({"message": f"{task_id} not found"}, 404))
 
     db.session.commit()
+
     response_body = {
         "task": task.task_to_dict()
     }
 
-    client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
-    logger = logging.getLogger(__name__)
-    channel_id = "task-notifications"
+    data_payload = {
+        "token": os.environ.get("SLACK_BOT_TOKEN"),
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task {task.title}"
+    }
 
-    try:
-        # Call the chat.postMessage method using the WebClient
-        result = client.chat_postMessage(
-            channel=channel_id, 
-            text=f"Someone just completed the task {task.title}."
-        )
-        logger.info(result)
-
-    except SlackApiError as e:
-        logger.error(f"Error posting message: {e}")
-
+    requests.post("https://slack.com/api/chat.postMessage",
+                    data=data_payload)
+    
     return jsonify(response_body)
+
+
+    # ~~Below is the the code I would have used given Slack documentation for calling their API~~
+
+    # client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+    # logger = logging.getLogger(__name__)
+    # channel_id = "task-notifications"
+
+    # try:
+    #     # Call the chat.postMessage method using the WebClient
+    #     result = client.chat_postMessage(
+    #         channel=channel_id, 
+    #         text=f"Someone just completed the task {task.title}."
+    #     )
+    #     logger.info(result)
+
+    # except SlackApiError as e:
+    #     logger.error(f"Error posting message: {e}")
+
+    
 
 @task_list_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
