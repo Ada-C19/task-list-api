@@ -4,6 +4,7 @@ from sqlalchemy import asc, desc
 from datetime import datetime
 from flask import Blueprint, jsonify, make_response, request, abort
 import requests
+import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -106,7 +107,7 @@ def mark_complete(task_id):
 
     path = "https://slack.com/api/chat.postMessage"
 
-    SLACK_TOKEN = "xoxb-5256635652369-5250803635203-5JNwfXzwvXuJifEe1iBlNnOi"
+    SLACK_TOKEN = os.environ.get("SLACK_API_KEY")
 
     request_body = {
         "token": SLACK_TOKEN,
