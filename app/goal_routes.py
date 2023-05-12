@@ -2,14 +2,14 @@ from flask import Blueprint, request, abort, make_response, jsonify
 from app.models.goal import Goal
 from app.models.task import Task
 from app import db
-from app.helper_functions import validate_model, create_model, sort_items
+from app.helper_functions import validate_model, create_model, sort_items, update_model
 
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 # Create
 @goals_bp.route("", methods=["POST"])
-def create_goal():
+def post_goal():
     request_body = request.get_json()
     new_goal = create_model(Goal, request_body)
     db.session.add(new_goal)
@@ -18,7 +18,7 @@ def create_goal():
 
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def add_tasks_to_goal(goal_id):
+def post_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_ids = request.json.get("task_ids")
 
@@ -34,7 +34,7 @@ def add_tasks_to_goal(goal_id):
 
 # Read
 @goals_bp.route("", methods=["GET"])
-def list_all_goals():
+def get_all_goals():
     sort_query = request.args.get("sort")
     goals = sort_items(Goal, sort_query)
     goals_response = [goal.to_dict() for goal in goals]
@@ -42,13 +42,13 @@ def list_all_goals():
 
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
-def list_specific_goal(goal_id):
+def get_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     return make_response({"goal": goal.to_dict()})
 
 
 @goals_bp.route("<goal_id>/tasks", methods=["GET"])
-def list_tasks_for_goal(goal_id):
+def get_tasks_for_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     task_list = [task.to_dict() for task in goal.tasks]
     return make_response({
@@ -63,7 +63,7 @@ def list_tasks_for_goal(goal_id):
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     request_body = request.get_json()
-    goal.update_data(request_body)
+    update_model(goal, request_body)
     db.session.commit()
     return make_response({"goal": goal.to_dict()})
 

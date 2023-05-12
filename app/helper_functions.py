@@ -12,10 +12,21 @@ def validate_model(cls, model_id):
     return model
 
 
+def update_model(model, request_body):
+    for attribute, value in request_body.items():
+        try:
+            setattr(model, attribute, value)
+            # setattr() is a built-in Python function that sets the value of 
+            # a named attribute of an object. It takes 3 arguments: the object to modify,
+            # the name of the attribute to set, and the value to set 
+        except (KeyError, TypeError):
+            return abort(make_response({"details": "Invalid data"}, 400))
+
+
 def create_model(cls, request_body):
     try:
         model = cls.from_dict(request_body)
-    except KeyError:
+    except (KeyError, TypeError):
         return abort(make_response({"details": "Invalid data"}, 400))
     return model
 

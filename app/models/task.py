@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 
 class Task(db.Model):
@@ -22,10 +23,6 @@ class Task(db.Model):
         return task_dict
 
 
-    def update_data(self, request_body):
-        self.title = request_body["title"]
-        self.description = request_body["description"]
-
 
     @classmethod
     def from_dict(cls, task_data): 
@@ -34,5 +31,6 @@ class Task(db.Model):
             description=task_data["description"],
         )
         if "completed_at" in task_data:
-            new_task.completed_at=task_data["completed_at"]
+            completed_at = datetime(task_data["completed_at"])
+            new_task.completed_at = completed_at
         return new_task

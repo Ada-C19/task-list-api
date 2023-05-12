@@ -3,14 +3,14 @@ from app.models.task import Task
 from app import db
 from datetime import datetime
 import requests, os
-from app.helper_functions import validate_model, create_model, sort_items
+from app.helper_functions import validate_model, create_model, sort_items, update_model
 
 
 tasks_bp = Blueprint("tasks_db", __name__, url_prefix="/tasks")
 
 # Create
 @tasks_bp.route("", methods=["POST"])
-def create_task():
+def post_task():
     request_body = request.get_json()
     new_task = create_model(Task, request_body)
     db.session.add(new_task)
@@ -20,7 +20,7 @@ def create_task():
 
 # Read
 @tasks_bp.route("", methods=["GET"])
-def list_all_tasks():
+def get_all_tasks():
     sort_query = request.args.get("sort")
     title_query = request.args.get("title")
     tasks = Task
@@ -32,7 +32,7 @@ def list_all_tasks():
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
-def list_specific_task(task_id):
+def get_task(task_id):
     task = validate_model(Task, task_id)
     return make_response({"task": task.to_dict()})
 
@@ -42,7 +42,7 @@ def list_specific_task(task_id):
 def update_task_info(task_id):
     task = validate_model(Task, task_id)
     request_body = request.get_json()
-    task.update_data(request_body)
+    update_model(task, request_body)
     db.session.commit()
     return make_response({"task": task.to_dict()})
 
