@@ -105,3 +105,18 @@ def test_create_task_with_invalid_completed_at(client):
         "details": "Invalid data"
     }
     assert Task.query.all() == []
+
+
+def test_update_task_invalid_completed_at(client, one_task):
+    response = client.put("/tasks/1", json={
+        "title": "Updated Task Title",
+        "description": "Updated Test Description",
+        "completed_at": "Updated Completed At"
+    })
+    response_body = response.get_json()
+
+    assert response.status_code == 400
+    assert "details" in response_body
+    assert response_body == {
+        "details": "Invalid data"
+    }

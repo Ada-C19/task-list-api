@@ -1,4 +1,5 @@
 from flask import abort, make_response
+from datetime import datetime
 
 def validate_model(cls, model_id):
     try:
@@ -13,13 +14,18 @@ def validate_model(cls, model_id):
 
 
 def update_model(model, request_body):
+    if "completed_at" in request_body:
+        try:
+            request_body["completed_at"] = datetime(request_body["completed_at"])
+        except TypeError:
+            abort(make_response({"details": "Invalid data"}, 400))
     for attribute, value in request_body.items():
         try:
             setattr(model, attribute, value)
             # setattr() is a built-in Python function that sets the value of 
             # a named attribute of an object. It takes 3 arguments: the object to modify,
             # the name of the attribute to set, and the value to set 
-        except (KeyError, TypeError):
+        except KeyError:
             return abort(make_response({"details": "Invalid data"}, 400))
 
 
