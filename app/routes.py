@@ -23,7 +23,12 @@ def make_a_task():
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
-    
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        return sort_in_ascending_order()
+    elif sort_query == "desc":
+        return sort_in_descending_order()
+
     tasks = Task.query.all()
     
     task_response = []
@@ -76,3 +81,27 @@ def delete_task(task_id):
     return  {
         "details": f"Task {task_id} \"{task.title}\" successfully deleted"
     }, 200
+
+def sort_in_ascending_order():
+    tasks = Task.query.all()
+    task_list = []
+    for task in tasks:
+        task_list.append(task)
+    
+    task_list = sorted(task_list, key = lambda task: task.title)
+    task_list_dict = []
+    for task in task_list:
+        task_list_dict.append(task.to_dict())
+    return jsonify(task_list_dict)
+
+def sort_in_descending_order():
+    tasks = Task.query.all()
+    task_list = []
+    for task in tasks:
+        task_list.append(task)
+    
+    task_list = sorted(task_list, key = lambda task: task.title, reverse=True)
+    task_list_dict = []
+    for task in task_list:
+        task_list_dict.append(task.to_dict())
+    return jsonify(task_list_dict)
