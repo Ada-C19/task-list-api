@@ -1,37 +1,42 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.task import Task
-# from app.models.task import Goal
+from app.models.goal import Goal
 from datetime import datetime
 import os
 import requests
-from app.models.goal import Goal
 
 task_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
-# definbe a route for creating a task resource
 
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
     except:
-        abort(make_response({"details":f"Invalid data"}, 400))
+        abort(make_response({"details":"Invalid data"}, 400))
 
     model = cls.query.get(model_id)
-
+    
     if not model:
-        abort(make_response({"message:" f"{cls.__name__} {model_id} The id is invalid"}, 404))
+        abort(make_response({"details": f"{cls.__name__} {model_id} is not found"}, 404))
+    
     return model
 
+def validate_request(cls, request):
+    request_body = request.get_json()
+
+    if not request_body.get("title"):
+        abort(make_response({"details":"Invalid data"}, 400))
+    
+    elif not request_body.get("description") and cls == Task:
+        abort(make_response({"details":f"Invalid data"}, 400))
+    
+    return request_body
+  
 
 @task_bp.route("", methods=["POST"])
 def create_task():
-    request_body = request.get_json()
-    if not request_body.get("title"):
-        return jsonify({"details": "Invalid data"}), 400
-    elif not request_body.get("description"):
-        return jsonify({"details": "Invalid data"}), 400
-    
+    request_body = validate_request(Task, request)
+
     new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
@@ -48,7 +53,6 @@ def read_all_tasks():
    
 
     if sort_query == "asc":
-        # tasks = Task.query.order_by(sort = sort_query)
         tasks = Task.query.order_by(Task.title.asc())
 
     elif sort_query == "desc":
@@ -68,13 +72,23 @@ def read_all_tasks():
     for task in tasks:
         tasks_response.append(task.to_dict())
     return jsonify(tasks_response), 200
+   
 
-@task_bp.route("/<task_id>", methods=["GET"])
-def read_single_task(task_id):
-    task = validate_model(Task, task_id)
+@task_bp.route("/<id>", methods=["GET"])
+def read_single_task(id):
+    task = validate_model(Task, id)
 
-    return task.to_dict_one_task(), 200    
+    goal = Goal.query.get(id)
 
+    if goal != None:
+        task_dict = task.to_dict()
+        task_dict["goal_id"] = goal.goal_id
+
+    else:
+        task_dict = task.to_dict()
+
+    return ({"task":task_dict}),200
+    
 
 @task_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -96,65 +110,36 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
 
-    # return jsonify(f"Task {task_id} is succesfully deleted!")
-
     return jsonify({"details":f'Task {task_id} "{task.title}" successfully deleted'}), 200
 
-    # return jsonify(f"{"details":task_id} successfully deleted"),200
-
-# @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-# def mark_complete(task_id):
-#     task = validate_model(Task, task_id)
-
-#     if task is None:
-#         abort(make_response({"message:" f"{task_id} Task not found"}, 404))
-#     elif task.completed_at is None:
-#         task.completed_at = datetime.utcnow()
-#         task.is_complete = True
-
-#         db.session.commit()
-#         return jsonify({"task": task.to_dict()}), 200
-#     else:
-#         task.is_complete = True
-
-#         db.session.commit()
-#         return jsonify({"task": task.to_dict()}), 200
     
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)
 
-    if task is None:
-        abort(make_response({"message:" f"{task_id} Task not found"}, 404))
-    elif task.completed_at is None:
-        task.is_complete = False
-
-        db.session.commit()
-        return jsonify({"task": task.to_dict()}), 200
-    else:
+    if task.completed_at is not None:
         task.completed_at = None
-        task.is_complete = False
-
-        db.session.commit()
-        return jsonify({"task": task.to_dict()}), 200
+    
+    task.is_complete = False
+    db.session.commit()
+    return jsonify({"task": task.to_dict()}), 200
 
 
 @task_bp.route("<task_id>/mark_complete", methods=['PATCH'])
 def mark_task_complete_slack(task_id):
-    task = Task.query.get(task_id)
-    if task is None:
-        abort(404)
+    task = validate_model(Task, task_id)
     
     if task.completed_at is not None:
         return jsonify({"task": task.to_dict()}), 200
-    
     
     task.completed_at = datetime.utcnow()
     db.session.commit()
 
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     SLACK_CHANNEL = '#task-notifications'
-    #respone notification to Slack
+
+ #respone notification to Slack
+
     message = f"Someone just completed the task{task.title}"
     slack_data = {'text': message, 'channel': SLACK_CHANNEL}
     headers = {'Authorization': f'Bearer {SLACK_BOT_TOKEN}'}
@@ -162,34 +147,19 @@ def mark_task_complete_slack(task_id):
     try:
         response = requests.post('https://slack.com/api/chat.postMessage', json=slack_data, headers=headers)
         response.raise_for_status()
+
     except requests.exceptions.RequestException as e:
         return jsonify({'message': 'Failed to send Slack notification: {e}'})
 
     return jsonify({"task": task.to_dict()}), 200
 
-def validate_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"details":f"goal {goal_id} invalid"}, 400))
-
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response({"message":f"goal {goal_id} not found"}, 404))
-
-    return goal
-
 goal_bp = Blueprint("goals", __name__, url_prefix="/goals")
 @goal_bp.route("", methods=['POST'])
-# define a route for creating a crystal resource
 
+# creating a goal resource
 def create_goal():
-    request_body = request.get_json()
+    request_body = validate_request(Goal, request)
 
-    if not request_body.get("title"):
-        return jsonify({"details": "Invalid data"}), 400
-    
     new_goal = Goal(
         title=request_body["title"]
     )
@@ -201,7 +171,6 @@ def create_goal():
 
 @goal_bp.route("", methods=['GET'])
 def read_all_goals():
-    
     goals = Goal.query.all()
         
     goals_response = []
@@ -214,13 +183,13 @@ def read_all_goals():
 @goal_bp.route("/<goal_id>", methods=['GET'])
 def read_one_goal(goal_id):
     
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
      
     return ({"goal": goal.goal_dict()}), 200
 
 @goal_bp.route("/<goal_id>", methods=['PUT'])
 def update_goal(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     request_body = request.get_json()
 
@@ -231,7 +200,7 @@ def update_goal(goal_id):
 
 @goal_bp.route("/<goal_id>", methods=['DELETE'])
 def delete_task(goal_id):
-    goal = validate_goal(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
@@ -242,10 +211,7 @@ def delete_task(goal_id):
 @goal_bp.route("/<goal_id>/tasks", methods=["POST"])
 
 def add_tasks_to_goal(goal_id):
-    goal = Goal.query.get(goal_id)
-
-    if goal is None:
-        abort(404)
+    goal = validate_model(Goal, goal_id)
 
     if 'task_ids' not in request.json:
         abort(400)
@@ -273,12 +239,16 @@ def get_tasks_for_specific_goal(goal_id):
     tasks_response = []
 
     for task in goal.tasks:
-        tasks_response.append(task.to_dict())
+        task_dict = task.to_dict()
+        task_dict["goal_id"] = goal.goal_id
+        tasks_response.append(task_dict)
 
     goal_dict = goal.goal_dict()
     goal_dict["tasks"] = tasks_response
 
     return jsonify(goal_dict), 200
+
+
 
 
 
