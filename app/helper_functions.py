@@ -1,6 +1,7 @@
 from app import db
 from sqlalchemy import desc, asc
 from flask import make_response, abort, request
+import requests
 import os
 
 ## Helper Functions
