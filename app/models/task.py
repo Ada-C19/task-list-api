@@ -10,7 +10,6 @@ class Task(db.Model):
     goal = db.relationship("Goal", back_populates="tasks")
 
     def to_dict(self):
-        # add goal_id only if there are goal
         task_as_dict = {
             "id": self.task_id,
             "title": self.title,
