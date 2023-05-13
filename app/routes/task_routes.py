@@ -94,8 +94,6 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_as_complete(task_id):
     task = validate_model(Task, task_id)
-    # path = "https://slack.com/api/chat.postMessage"
-    # SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
     
     response_body = {}
     if task.completed_at is None:
@@ -106,15 +104,6 @@ def mark_task_as_complete(task_id):
     db.session.commit()
     
     send_message_to_slack(task.title)
-    #code to send a message to Slack when a task is completed
-    # channel = "task-notifications"
-    # text = f"Someone just completed the task {task.title}"
-    # message_slack={
-    #     "token": SLACK_API_KEY,
-    #     "channel": channel,
-    #     "text": text
-    # }
-    # response_slack = requests.post(path, message_slack)
 
     return jsonify(response_body) 
 
