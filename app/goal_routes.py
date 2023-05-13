@@ -58,6 +58,16 @@ def read_one_goal(goal_id):
 
     return make_response({"goal": goal.to_dict()}, 200)
 
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_tasks_under_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    task_list = []
+    for task in goal.tasks:
+        task_list.append(task.to_dict())
+    
+    return make_response({"id": goal.goal_id, "title": goal.title, "tasks": task_list})
+
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
