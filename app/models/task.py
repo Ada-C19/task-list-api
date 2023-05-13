@@ -19,9 +19,10 @@ class Task(db.Model):
                 is_complete=True
             )
         
-        if not self.completed_at:
+        if self.goal_id and not self.completed_at:
             return dict(
                 id=self.task_id,
+                goal_id=self.goal_id,
                 title=self.title,
                 description=self.description,
                 is_complete=False
