@@ -9,9 +9,9 @@ class Task(db.Model):
 
     @classmethod
     def from_dict(cls, task_data):
-        new_book = Task(title=task_data["title"],
+        new_task = Task(title=task_data["title"],
                     description=task_data["description"])
-        return new_book
+        return new_task
 
     def make_dict(self):
         return dict(
