@@ -3,7 +3,6 @@ from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from .task_routes import validate_model
-from datetime import datetime
 import requests
 
 goals_bp = Blueprint("goals",__name__,url_prefix="/goals")
@@ -13,7 +12,6 @@ def create_goal():
 
     request_body = request.get_json()
 
-    
     try:
         new_goal = Goal(title=request_body["title"])
 
@@ -24,7 +22,6 @@ def create_goal():
 
     db.session.add(new_goal)
     db.session.commit()
-
 
     return make_response(jsonify({"goal":{
         "id" : new_goal.goal_id,
@@ -40,25 +37,21 @@ def get_goals():
 
     for goal in goals:
         goals_response.append(
-            {
-                "id":goal.goal_id,
-                "title":goal.title
-            }
+            goal.to_dict()
         )
     
     return jsonify(goals_response)
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
+
     goal = validate_model(Goal, goal_id)
     
-    return {"goal":{
-        "id": goal.goal_id,
-        "title" : goal.title
-    }}, 200
+    return {"goal":goal.to_dict()}, 200
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_one_goal(goal_id):
+
     goal = validate_model(Goal, goal_id)
     
     request_body = request.get_json()
@@ -67,19 +60,15 @@ def update_one_goal(goal_id):
     
     db.session.commit()
 
-    return make_response(jsonify({"goal":{
-        "id" : goal.goal_id,
-        "title" : goal.title,
-        }}),200)
+    return make_response(jsonify({"goal":goal.to_dict()}),200)
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def remove_one_goal(goal_id):
+
     goal = validate_model(Goal, goal_id)
 
     db.session.delete(goal)
     db.session.commit()
-
-
 
     return make_response({
         "details": f'{Goal.__name__} {goal_id} "{goal.title}" successfully deleted'
@@ -88,6 +77,7 @@ def remove_one_goal(goal_id):
 # nested routes
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def create_tasks_for_goal(goal_id):
+    
     goal = validate_model(Goal, goal_id)
     
     request_body = request.get_json()
@@ -130,16 +120,3 @@ def get_tasks_for_goal(goal_id):
         "tasks" : tasks_list
     }, 200
 
-# @goals_bp.route("/<goal_id>/tasks/<task_id>", methods=["GET"])
-# def get_one_task_for_goal(goal_id,task_id):
-#     goal = validate_model(Goal, goal_id)
-#     task = validate_model(Task, task_id)
-#     return {
-#         "task": {
-#             "id": task.task_id,
-#             "goal_id": task.goal_id,
-#             "title": task.title,
-#             "description": task.description,
-#             "is_complete": False
-#         }
-#     }
