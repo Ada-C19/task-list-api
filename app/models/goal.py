@@ -20,10 +20,3 @@ class Goal(db.Model):
             "id": self.goal_id,
             "title": self.title
         }
-
-    def to_dict_goals_tasks(self):
-        return {
-            "id": self.goal_id,
-            "title": self.title,
-            "tasks": self.tasks
-        }

@@ -73,7 +73,10 @@ def read_all_tasks():
 
 def read_one_task(task_id):
     task = validate_model(Task, task_id)
-    return {"task": task.to_dict()}
+    if task.goal_id:
+        return {"task": task.to_dict_with_goal()}
+    else:
+        return {"task": task.to_dict()}
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
@@ -179,7 +182,7 @@ def update_goal(goal_id):
 
     request_body = request.get_json()
 
-    goal.title = request_body["goal"]
+    goal.title = request_body["title"]
     
 
     db.session.commit()
