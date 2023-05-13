@@ -16,3 +16,16 @@ class Goal(db.Model):
     def from_dict(cls, goal_data):
         new_goal = Goal(title=goal_data["title"])
         return new_goal
+    
+
+# _______________ 
+# |             |
+# |    Thank    |
+# |   you for   |
+# |  reviewing  |
+# |   my code!  | 
+# |_____________|  
+#       || 
+# (\__/ || 
+# (•ㅅ•) || 
+# / 　 >||
