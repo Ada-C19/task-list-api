@@ -42,10 +42,6 @@ class Task(db.Model):
                 self.title = value
             if key == "description":
                 self.description = value
-            if key == "completed_at":
-                self.completed_at = value
-            if key == "is_complete":
-                self.is_complete = value
         
         return self.task_to_dict()
     

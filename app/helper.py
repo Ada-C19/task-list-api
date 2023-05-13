@@ -17,6 +17,7 @@ def filter_by_params(cls, query_params):
     
     return items
 
+
 def get_sorted_items_by_params(cls, query_params):
     sort_param = query_params.pop('sort', None)
 

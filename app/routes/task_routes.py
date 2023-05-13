@@ -60,7 +60,7 @@ def delete_task(task_id):
 def mark_task_complete(task_id):
     task = validate_model(Task, task_id)
     task.is_complete = True
-    task.completed_at = datetime.now()
+    task.completed_at = datetime.now().isoformat()
     db.session.commit()
 
     slack_post_message(task)
