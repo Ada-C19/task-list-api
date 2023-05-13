@@ -169,7 +169,8 @@ def mark_goal_complete(goal_id):
     goal = validate_model(Goal, goal_id)
 
     for task in goal.tasks:
-        task.completed_at = datetime.utcnow()
+        if not task:
+            task.completed_at = datetime.utcnow()
     
     db.session.commit()
     
