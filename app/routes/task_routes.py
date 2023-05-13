@@ -4,7 +4,7 @@ from app.models.task import Task
 import requests
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
-from .routes_helper import validate_model, validate_data
+from .routes_helper import validate_model, validate_data, send_message_to_slack
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -94,8 +94,8 @@ def read_all_tasks():
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_as_complete(task_id):
     task = validate_model(Task, task_id)
-    path = "https://slack.com/api/chat.postMessage"
-    SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
+    # path = "https://slack.com/api/chat.postMessage"
+    # SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
     
     response_body = {}
     if task.completed_at is None:
@@ -104,16 +104,17 @@ def mark_task_as_complete(task_id):
     response_body["task"] = task.to_dict()
 
     db.session.commit()
-
+    
+    send_message_to_slack(task.title)
     #code to send a message to Slack when a task is completed
-    channel = "task-notifications"
-    text = f"Someone just completed the task {task.title}"
-    message_slack={
-        "token": SLACK_API_KEY,
-        "channel": channel,
-        "text": text
-    }
-    response_slack = requests.post(path, message_slack)
+    # channel = "task-notifications"
+    # text = f"Someone just completed the task {task.title}"
+    # message_slack={
+    #     "token": SLACK_API_KEY,
+    #     "channel": channel,
+    #     "text": text
+    # }
+    # response_slack = requests.post(path, message_slack)
 
     return jsonify(response_body) 
 

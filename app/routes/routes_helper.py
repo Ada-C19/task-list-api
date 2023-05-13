@@ -1,5 +1,7 @@
 from flask import abort, make_response
 from datetime import datetime
+import os
+import requests
 
 def validate_model(cls, id):
     try:
@@ -28,3 +30,20 @@ def validate_data(cls, request_body):
 
     return request_body
 
+def send_message_to_slack(title):
+    path = "https://slack.com/api/chat.postMessage"
+    SLACK_API_KEY = os.environ.get("SLACK_API_KEY")
+
+    headers = {
+        "Authorization": f"Bearer {SLACK_API_KEY}"
+    }
+    channel = "task-notifications"
+    text = f"Someone just completed the task {title}"
+    data={
+        "channel": channel,
+        "text": text
+    }
+
+    response = requests.post(path, headers=headers, data= data)
+
+    return response
