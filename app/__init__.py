@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
@@ -25,6 +25,10 @@ def create_app(test_config=None):
         app.config["TESTING"] = True
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
             "SQLALCHEMY_TEST_DATABASE_URI")
+        
+    @app.route('/')
+    def homepage():
+        return render_template('index.html')
 
     db.init_app(app)
     migrate.init_app(app, db)
