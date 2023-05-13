@@ -80,20 +80,6 @@ def mark_complete(task_id):
     db.session.commit()
     
     send_slack_message(Task, task)
-    # key = os.environ.get("key")
-    # url_path = "https://slack.com/api/chat.postMessage"
-    # body = {
-    #     "channel": "C056TH84MSN",
-    #     "text": f"Task '{task.title}' has been completed! Well done!"
-    # }
-    # header = {
-    #     "Authorization": f"Bearer {key}"
-    # }
-    
-    # try:
-    #     slack = requests.post(url_path, headers=header, json=body)
-    # except:
-    #     pass
 
     return {"task": task.to_json()}, 200
 
@@ -180,7 +166,7 @@ def get_tasks_by_goal_id(goal_id):
 
 @goals_bp.route("/<goal_id>/mark_complete", methods=["PATCH"])
 def mark_goal_complete(goal_id):
-    goal = validate_model(Goal, task_id)
+    goal = validate_model(Goal, goal_id)
 
     for task in goal.tasks:
         task.completed_at = datetime.utcnow()
@@ -188,20 +174,6 @@ def mark_goal_complete(goal_id):
     db.session.commit()
     
     send_slack_message(Goal, goal)
-    # key = os.environ.get("key")
-    # url_path = "https://slack.com/api/chat.postMessage"
-    # body = {
-    #     "channel": "C056TH84MSN",
-    #     "text": f"Goal '{goal.title}' has been completed! Well done!"
-    # }
-    # header = {
-    #     "Authorization": f"Bearer {key}"
-    # }
-    
-    # try:
-    #     slack = requests.post(url_path, headers=header, json=body)
-    # except:
-    #     pass
 
     return {"goal": {
         "id": goal.id,
