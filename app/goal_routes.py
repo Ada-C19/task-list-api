@@ -22,6 +22,21 @@ def create_goal():
 
     return make_response({"goal": new_goal.to_dict()}, 201)
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_tasks_under_goal(goal_id):
+    request_body = request.get_json()
+    goal = validate_model(Goal, goal_id)
+
+    task_list = []
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        task.goal = goal
+        task_list.append(task_id)
+    
+    db.session.commit()
+
+    return make_response({"id": goal.goal_id, "task_ids": task_list}, 200)
+
 @goals_bp.route("", methods=["GET"])
 def read_all_goals():
     sort_query = request.args.get("sort")
