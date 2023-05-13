@@ -57,7 +57,6 @@ def test_get_goal_not_found(client):
     assert response_body == {"message": "Goal 1 not found"}
 
 
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal(client):
     # Act

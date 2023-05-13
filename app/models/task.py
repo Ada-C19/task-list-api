@@ -6,22 +6,25 @@ class Task(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
+    goal = db.relationship("Goal", back_populates="tasks")
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'), nullable=True)
 
-    # FROM_DICT (request)
-    @classmethod
-    def from_dict(cls, task_data):
-        return cls(
-            title=task_data["title"],
-            description=task_data["description"],
-            completed_at=task_data.get("completed_at")
-        )
-
-    # TASK TO_DICT (response should be a dict that is the value of key "task" in a dict)
     def to_dict(self):
-        task_as_dict = {}
-        task_as_dict["id"] = self.task_id
-        task_as_dict["title"] = self.title
-        task_as_dict["description"] = self.description
-        task_as_dict["is_complete"] = self.completed_at != None
+        task_dict = {}
+        task_dict["id"] = self.task_id
+        task_dict["title"] = self.title
+        task_dict["description"] = self.description
+        task_dict["is_complete"] = self.completed_at != None
 
-        return task_as_dict
+        if self.goal_id:
+            task_dict["goal_id"] = self.goal_id
+
+        return task_dict
+
+    @classmethod
+    def from_dict(cls, task_dict):
+        return cls(
+            title=task_dict["title"],
+            description=task_dict["description"],
+            completed_at=task_dict.get("completed_at")
+        )

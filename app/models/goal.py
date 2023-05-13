@@ -4,18 +4,20 @@ from app import db
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
+    tasks = db.relationship("Task", back_populates="goal", lazy=True)
 
-    # FROM_DICT (request)
+    def to_dict(self, tasks=False):
+        goal_dict = {
+            "id": self.goal_id,
+            "title": self.title
+        }
+        if tasks:
+            goal_dict["tasks"] = [task.to_dict() for task in self.tasks]
+
+        return goal_dict
+
     @classmethod
-    def from_dict(cls, goal_data):
-        return cls(
-            title=goal_data["title"]
+    def from_dict(cls, goal_dict):
+        return Goal(
+            title=goal_dict["title"]
         )
-
-    # goal TO_DICT (response should be a dict that is the value of key "goal" in a dict)
-    def to_dict(self):
-        goal_as_dict = {}
-        goal_as_dict["id"] = self.goal_id
-        goal_as_dict["title"] = self.title
-
-        return goal_as_dict

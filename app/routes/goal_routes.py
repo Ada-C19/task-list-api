@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, make_response, abort 
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
+from flask import Blueprint, request, jsonify, make_response, abort 
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -31,10 +32,10 @@ def create_goal():
     db.session.add(new_goal)
     db.session.commit()
 
-    goal_message = {}
-    goal_message["goal"] = new_goal.to_dict()
+    goal_dict = {}
+    goal_dict["goal"] = new_goal.to_dict()
 
-    return jsonify(goal_message), 201
+    return jsonify(goal_dict), 201
 
 
 # GET ALL AND SORT GOALS BY TITLE 
@@ -57,26 +58,24 @@ def sort_by_title():
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
+    goal_dict = {"goal": goal.to_dict()}
 
-    goal_message = {"goal": goal.to_dict()}
-
-    return jsonify(goal_message)
+    return jsonify(goal_dict)
 
 
 # UPDATE GOAL
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
-
+    
     request_body = request.get_json()
-
     goal.title = request_body["title"]
 
     db.session.commit()
 
-    goal_message = {"goal": goal.to_dict()}
+    goal_dict = {"goal": goal.to_dict()}
 
-    return jsonify(goal_message)
+    return jsonify(goal_dict)
 
 
 # DELETE GOAL
@@ -92,4 +91,31 @@ def delete_goal(goal_id):
     return jsonify(goal_message)
 
 
+# GET GOAL AND TASKS
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    goal_response = goal.to_dict(tasks=True)
+    return make_response(goal_response), 200
 
+
+# POST GOAL AND TASKS
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def post_tasks_to_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+
+    for task in goal.tasks:
+        task.goal_id = None
+
+
+    for task_id in task_ids:
+        task = validate_model(Task, task_id)
+        task.goal_id = goal.goal_id
+
+    goal.title = request.args.get("title", goal.title)
+    
+    db.session.commit()
+
+    return make_response({"id": goal.goal_id, "task_ids": task_ids}, 200)
