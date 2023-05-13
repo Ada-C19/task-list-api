@@ -1,6 +1,8 @@
 from app import db
 from sqlalchemy import desc, asc
 from flask import make_response, abort, request
+from app.models.task import Task
+from app.models.goal import Goal
 import requests
 import os
 
