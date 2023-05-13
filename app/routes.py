@@ -1,30 +1,24 @@
 from flask import Blueprint, request, jsonify
-import requests
 from app import db
 from app.models.task import Task
 from app.models.goal import Goal
 from app.helper_functions import validate_model, query_sort, filter_results, filter_and_sort, send_slack_message
 from datetime import datetime
-import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
 @tasks_bp.route("", methods=["GET"])
-def get_all_tasks():
-    
+def get_all_tasks():    
     tasks = filter_and_sort(Task)
     
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_json())
+    tasks_response = [task.to_json() for task in tasks]
     
     return jsonify(tasks_response), 200
 
 # Route to get task by task id
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_task_by_id(task_id):
-
     task = validate_model(Task, task_id)
 
     return {"task": task.to_json()}, 200
@@ -97,9 +91,7 @@ def create_goal():
 def get_all_goals():
     goals = filter_and_sort(Goal)
         
-    goals_response = []
-    for goal in goals:
-        goals_response.append(goal.to_json())
+    goals_response = [goal.to_json() for goal in goals]
     
     return jsonify(goals_response), 200
 
@@ -153,10 +145,7 @@ def sending_tasks_to_goal(goal_id):
 def get_tasks_by_goal_id(goal_id):
     goal = validate_model(Goal, goal_id)
 
-    tasks_response = []
-
-    for task in goal.tasks:
-        tasks_response.append(task.to_json())
+    tasks_response = [task.to_json() for task in goal.tasks]
 
     return jsonify({
         "id": goal.id,
