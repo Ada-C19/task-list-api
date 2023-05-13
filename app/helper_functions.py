@@ -46,12 +46,12 @@ def filter_and_sort(cls):
 
     return query_sort(cls)
 
-def send_slack_message(cls):
+def send_slack_message(cls, model_item):
     key = os.environ.get("key")
     url_path = "https://slack.com/api/chat.postMessage"
     body = {
         "channel": "C056TH84MSN",
-        "text": f"{cls.__name__} '{cls.title}' has been completed! Well done!"
+        "text": f"{cls.__name__} '{model_item.title}' has been completed! Well done!"
     }
     header = {
         "Authorization": f"Bearer {key}"

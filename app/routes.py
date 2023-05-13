@@ -79,7 +79,7 @@ def mark_complete(task_id):
     task.completed_at = datetime.utcnow()
     db.session.commit()
     
-    send_slack_message(Task)
+    send_slack_message(Task, task)
     # key = os.environ.get("key")
     # url_path = "https://slack.com/api/chat.postMessage"
     # body = {
@@ -187,7 +187,7 @@ def mark_goal_complete(goal_id):
     
     db.session.commit()
     
-    send_slack_message(Goal)
+    send_slack_message(Goal, goal)
     # key = os.environ.get("key")
     # url_path = "https://slack.com/api/chat.postMessage"
     # body = {
