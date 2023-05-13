@@ -198,6 +198,8 @@ def handle_goal_get(goal_id):
         db.session.delete(goal)
         db.session.commit()
 
+        if not goal in Goal.query:
+            abort(make_response({"message": f"Goal {goal_id} not found"}, 404))
         return jsonify({
             "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
         }),200
