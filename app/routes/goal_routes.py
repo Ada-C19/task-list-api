@@ -84,6 +84,7 @@ def get_task_of_goal(goal_id):
             "description": task.description,
             "is_complete": task.is_complete
         })
+        task_data
     response = {
         "id": goal.goal_id,
         "title": goal.title,

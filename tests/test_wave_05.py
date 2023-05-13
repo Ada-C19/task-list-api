@@ -12,7 +12,6 @@ def test_get_goals_no_saved_goals(client):
     assert response.status_code == 200
     assert response_body == []
 
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goals_one_saved_goal(client, one_goal):
     # Act
@@ -28,7 +27,6 @@ def test_get_goals_one_saved_goal(client, one_goal):
             "title": "Build a habit of going outside daily"
         }
     ]
-
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goal(client, one_goal):
@@ -46,7 +44,6 @@ def test_get_goal(client, one_goal):
         }
     }
 
-
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
     # Act
@@ -57,7 +54,6 @@ def test_get_goal_not_found(client):
     assert response_body == {
             "message": "Goal not found"
             }
-
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal(client):
@@ -76,7 +72,6 @@ def test_create_goal(client):
             "title": "My New Goal"
         }
     }
-
 
 # @pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal(client, one_goal):
@@ -109,7 +104,6 @@ def test_update_goal_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"message": "Goal not found"}
-
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_goal(client, one_goal):
