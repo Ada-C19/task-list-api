@@ -109,7 +109,7 @@ def test_update_goal(client, one_goal):
 
 #@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
-    #raise Exception("Complete test")
+    # raise Exception("Complete test")
 
     # Act
     # ---- Complete Act Here ----
@@ -125,7 +125,7 @@ def test_update_goal_not_found(client):
     # ---- Complete Assertions Here ----
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+#@pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_goal(client, one_goal):
     # Act
     response = client.delete("/goals/1")
@@ -141,8 +141,11 @@ def test_delete_goal(client, one_goal):
     # Check that the goal was deleted
     response = client.get("/goals/1")
     assert response.status_code == 404
+    assert response_body == {
+        "details": 'Goal 1 "Build a habit of going outside daily" successfully deleted'
+    }
 
-    raise Exception("Complete test with assertion about response body")
+    # raise Exception("Complete test with assertion about response body")
     # *****************************************************************
     # **Complete test with assertion about response body***************
     # *****************************************************************
