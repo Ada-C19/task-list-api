@@ -174,9 +174,4 @@ def mark_goal_complete(goal_id):
     db.session.commit()
     
     send_slack_message(Goal, goal)
-
-    return {"goal": {
-        "id": goal.id,
-        "title": goal.title,
-        "tasks": tasks_response
-    }}, 200
+    return {"goal": goal.to_json()}, 200
