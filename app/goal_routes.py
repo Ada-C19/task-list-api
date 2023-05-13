@@ -23,7 +23,7 @@ def create_goal():
     return make_response({"goal": new_goal.to_dict()}, 201)
 
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
-def create_tasks_under_goal(goal_id):
+def create_tasks_under_one_goal(goal_id):
     request_body = request.get_json()
     goal = validate_model(Goal, goal_id)
 
@@ -59,7 +59,7 @@ def read_one_goal(goal_id):
     return make_response({"goal": goal.to_dict()}, 200)
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def read_tasks_under_goal(goal_id):
+def read_tasks_under_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
    
     goal_task_list = [task.to_dict() for task in goal.tasks]
