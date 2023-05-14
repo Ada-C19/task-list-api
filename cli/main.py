@@ -1,4 +1,14 @@
 import task_list
+from flask import Flask
+from app.routes.tasks import tasks_bp
+
+app = Flask(__name__)
+
+app.register_blueprint(tasks_bp)
+
+if __name__ == '__main__':
+    app.run()
+
 
 OPTIONS = {
         "1": "List all tasks", 
