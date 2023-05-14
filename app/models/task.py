@@ -19,6 +19,15 @@ class Task(db.Model):
                     completed_at=None)
         return new_task
     
+    # @classmethod
+    # def from_dict(cls, request_body):
+    #     return cls(
+    #         title = request_body["title"],
+    #         description = request_body["description"],
+    #         completed_at = request_body.get("completed_at"),
+    #         goal_id = request_body.get("goal_id")
+    #     )
+    
     def to_dict(self):
         return dict(
             id = self.id,
@@ -26,6 +35,8 @@ class Task(db.Model):
             description = self.description,
             is_complete = self.is_task_complete()
         )
+    
+
     
     def is_task_complete(self):
         if self.completed_at == None:
