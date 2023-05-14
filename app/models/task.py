@@ -1,18 +1,19 @@
 from app import db
+from datetime import datetime
 
 
 class Task(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
-    completed_at = db.Column(db.DateTime, nullable=False)
+    completed_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self):
         task_as_dict = {
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "is_complete": bool(self.completed_at)
+            "is_complete": self.completed_at != None,
         }
         return task_as_dict
 

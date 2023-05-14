@@ -1,8 +1,8 @@
-"""added attributes to task model
+"""empty message
 
-Revision ID: e43cc40474e5
+Revision ID: 113f35842cfc
 Revises: 
-Create Date: 2023-05-13 20:01:29.335689
+Create Date: 2023-05-14 13:01:13.690308
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e43cc40474e5'
+revision = '113f35842cfc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,11 +23,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('goal_id')
     )
     op.create_table('task',
-    sa.Column('task_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.Column('date_time', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('task_id')
+    sa.Column('completed_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 
