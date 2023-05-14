@@ -1,6 +1,6 @@
 from app import db
 from app.models.task import Task
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, make_response, request, abort
 
 
 task_list_bp = Blueprint("task_list", __name__, url_prefix="/tasks")
@@ -36,6 +36,9 @@ def get_all_tasks():
     tasks = Task.query.all()
     
     for task in tasks:
+        if not tasks:
+            return jasonify(task_response)
+
         if not task.completed_at:
             task_response.append({"id":task.task_id,
             "title":task.title,
@@ -51,6 +54,38 @@ def get_all_tasks():
             "completed_at":task.completed_at
         })
     return jsonify(task_response)
+
+
+def validate_task(task_id):
+    try:
+        task_id = int(task_id)
+    except:
+        abort(make_response({"message": f"Book_id {task_id} invalid"}, 400))
+    task = Task.query.get(task_id)
+    
+    if not task:
+        abort(make_response({"message": f"task: {task_id} not found"}, 404))
+    return book 
+    
+#read one task/ read if empty task. 
+
+@task_list_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_task(task_id)
+    if not task.completed_at:
+        return {"id":task.task_id,
+        "title":task.title,
+        "description": task.description,
+        "is_complete": False
+
+        }
+    else:
+        return {
+        "id":task.task_id,
+        "title":task.title,
+        "description": task.description,
+        "completed_at":task.completed_at
+    }
 
 
 # #update
