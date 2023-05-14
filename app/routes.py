@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
+from app import db
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -56,4 +57,9 @@ def update_task(task_id):
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    
+    task = validate_model(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response(f"Task #{task.id} successfully deleted!", 200)
