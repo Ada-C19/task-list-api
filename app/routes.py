@@ -9,9 +9,6 @@ import os
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
-tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
 
 
 #POST /tasks
@@ -30,13 +27,13 @@ def create_task():
     
 
 #Validate Model
-def validate_model(cls, model_id):
+def validate_model(cls, task_id):
     try:
-        model_id = int(model_id)
+        task_id = int(task_id)
     except:
         abort(make_response({"details": "Invalid data"}, 400))
 
-    task = cls.query.get(model_id)
+    task = cls.query.get(task_id)
 
     if not task:
         message = {"details": "Invalid data"}
@@ -68,9 +65,9 @@ def get_all_tasks():
 
 
 #GET /tasks/<id>
-@tasks_bp.route("/<model_id>", methods=["GET"])
-def get_one_task(model_id):
-    task = validate_model(Task, model_id)
+@tasks_bp.route("/<task_id>", methods=["GET"])
+def get_one_task(task_id):
+    task = validate_model(Task, task_id)
     if task:
         return {"task": task.to_dict()}, 200
     
@@ -79,10 +76,10 @@ def get_one_task(model_id):
     
 
 #PUT /tasks/<id>
-@tasks_bp.route("<model_id>", methods=["PUT"])
-def update_task(model_id):
+@tasks_bp.route("<task_id>", methods=["PUT"])
+def update_task(task_id):
     try:
-        task = validate_model(Task, model_id)
+        task = validate_model(Task, task_id)
     except:
         return jsonify({"Message": "Invalid id"}), 404
 
@@ -97,9 +94,9 @@ def update_task(model_id):
 
 
 #DELETE /tasks/<id>
-@tasks_bp.route("<model_id>", methods=["DELETE"])
-def delete_task(model_id):
-    task = validate_model(Task, model_id)
+@tasks_bp.route("<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
 
     if task is None:
         return {'details': 'Invalid data'}, 404
@@ -258,44 +255,71 @@ def create_goal_with_tasks(goal_id):
         
 @goals_bp.route("/<goal_id>/tasks", methods=['GET'])
 def get_all_tasks_one_goal(goal_id):
+    try:
+        goal = validate_model(Goal, goal_id)
+    except:
+        return make_response({"details": "Invalid data"}, 404)
     
-    goal = validate_model(Goal, goal_id)
+    # tasks = Task.query.filter_by(goal_id=goal_id)
+
+    task_list = []
+
+    for task in goal.tasks:
+        task = validate_model(Task, task.id)
+        # task_dict = task.to_dict()
+        # task_dict[goal_id] = goal_id
+        # task_list.append(task.to_goal_id_dict())
+        # task = {
+        #     "id": task.id,
+        #     "goal_id": goal.goal_id,
+        #     "title": task.title,
+        #     "description": task.description,
+        #     "is_complete": task.
+        # }
+
+        task_list.append(task.to_dict())
+        
+
+    # for task in goal.tasks:
+    #     task = validate_model(Task, task.id)
+    #     task_list.append(task.to_dict())
+
+    message = {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": task_list
+    }
+
+    # message = {
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": [{
+    #         "id": task.id,
+    #         "goal_id": goal.goal_id,
+    #         "title": task.title,
+    #         "description": task.description,
+    #         "is_complete": task.completed_at
+    #     }]
+    # }
+
+    return make_response((message, 200))
+
+# @tasks_bp.route("", methods=["GET"])
+# def get_all_tasks():
+
+#     sort_query = request.args.get("sort")
+
+#     if sort_query == "asc":
+#         tasks = Task.query.order_by(Task.title)
     
-    tasks = Task.query.filter_by(goal_id=goal_id)
+#     elif sort_query == "desc":
+#         tasks = Task.query.order_by(Task.title.desc())
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append({
-            "id": task.task_id,
-            "goal_id": goal_id,
-            "title": goal_id.title,
-            "description": task.title,
-            "is_complete": task.completed_at
-        })
-
-    return {
-        "id": goal_id,
-        # "title": goal.title,
-        "tasks": [tasks_response]
-        }
+#     else:
+#         tasks = Task.query.all()
     
+#     tasks_response = []
+#     for task in tasks:
+#         tasks_response.append(task.to_dict())
 
-@tasks_bp.route("", methods=["GET"])
-def get_all_tasks():
-
-    sort_query = request.args.get("sort")
-
-    if sort_query == "asc":
-        tasks = Task.query.order_by(Task.title)
-    
-    elif sort_query == "desc":
-        tasks = Task.query.order_by(Task.title.desc())
-
-    else:
-        tasks = Task.query.all()
-    
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
-
-    return jsonify(tasks_response), 200
+#     return jsonify(tasks_response), 200

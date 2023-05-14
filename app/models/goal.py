@@ -1,10 +1,11 @@
 from app import db
 
 
+
 class Goal(db.Model):
     goal_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
-    tasks = db.relationship("Task", backref="goal", lazy = True)
+    tasks = db.relationship("Task",backref="goal", lazy = True)
 
     # tasks = db.relationship("Task", back_populates="goal", lazy = True)
 
@@ -18,8 +19,20 @@ class Goal(db.Model):
             id = self.goal_id,
             title = self.title)
     
-    # def goal_task_dict(self):
-    #     return dict(
-    #         id = self.goal_id,
-    #         task_ids = self.tasks
-    #     )
+    # from app.models.task import Task
+    
+    def connected_dict(self, task_data):
+        return dict(
+            id = self.goal_id,
+            title = self.title,
+            tasks = [
+                dict(
+            id = task_data["id"],
+            goal_id = self.goal_id,
+            title = task_data["title"],
+            description = task_data["description"],
+            completed_at = task_data["completed_at"]
+            )
+        ]
+    )
+    
