@@ -1,9 +1,13 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from datetime import datetime
+import os
+import requests
 from dotenv import load_dotenv
 from app import db
 
+load_dotenv()
+SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
@@ -19,6 +23,19 @@ def validate_model(cls, model_id):
         abort(make_response({"message":f"task {model_id} not found"}, 404))
 
     return task
+
+def send__slack_msg(task_title):
+    slack_url = "https://slack.com/api/chat.postMessage"
+    headers = {
+        "Authorization": f"Bearer {SLACK_TOKEN}"
+    }
+    data = {
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task {task_title}"
+    }
+
+    return requests.post(slack_url, headers=headers, data=data)
+
 
 
 @tasks_bp.route("", methods=["POST"])
