@@ -5,7 +5,7 @@ from app.models.goal import Goal
 from app import db
 from datetime import datetime
 from flask.signals import request_finished
-from slack_sdk import WebClient
+
 
 
 @pytest.fixture
