@@ -106,7 +106,7 @@ def test_update_goal(client, one_goal):
     assert goal.title == "Updated Goal Title"
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+#@pytest.mark.skip(reason="test to be completed by student")
 def test_update_goal_not_found(client):
     response = client.put("/goals/1", json={
         "title": "Updated Goal Title"

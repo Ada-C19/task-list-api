@@ -181,3 +181,32 @@ def delete_goal(goal_id):
 
     message = {f"details": 'Goal 1 \"Build a habit of going outside daily\" successfully deleted'}
     return make_response(jsonify(message)), 200
+
+
+@goals_bp.route("/<goal_id>/tasks", methods =["POST"])
+def sending_list_of_task_to_goal(goal_id):
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+
+    for task_id in request_body["task_ids"]:
+        task = validate_task(task_id)
+        goal.tasks.append(task)
+
+    db.session.commit()
+
+    return make_response(jsonify(id=goal.goal_id, task_ids=request_body["task_ids"]))
+
+@goals_bp.route("/<goal_id>/tasks", methods =["GET"])
+def task_of_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+    response = {"id": goal.goal_id,
+                "title": goal.title,
+                "tasks": []}
+    
+    for task in goal.tasks:
+        response["tasks"].append(task.make_dict()) 
+
+    return make_response(response)
+
+
+
