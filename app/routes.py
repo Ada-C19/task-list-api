@@ -6,6 +6,8 @@ from flask import Blueprint, jsonify, make_response, request
 task_list_bp = Blueprint("task_list", __name__, url_prefix="/tasks")
 
 
+
+
 # create
 @task_list_bp.route("", methods=["POST"])
 
@@ -25,25 +27,30 @@ def post_task():
     
     return make_response(f"New task: {new_task.title},  created", 201)
 
-# if not completed_at:
-#         return make_response({
-#             "task": {"id": new_task.id,
-#             "title": new_task.title,
-#             "description": new.task.description,
-#             "is_complete": false}
-#   }, 201
-#         )
-
-
-
-
-
-
-
-
-
 # #read
-# @task_list_bp.route("/tasks", methods=["GET"])
+@task_list_bp.route("", methods=["GET"])
+
+def get_all_tasks():
+    
+    task_response = []
+    tasks = Task.query.all()
+    
+    for task in tasks:
+        if not task.completed_at:
+            task_response.append({"id":task.task_id,
+            "title":task.title,
+            "description": task.description,
+            "is_complete": False
+
+            })
+        else:
+            task_response.append({
+            "id":task.task_id,
+            "title":task.title,
+            "description": task.description,
+            "completed_at":task.completed_at
+        })
+    return jsonify(task_response)
 
 
 # #update
