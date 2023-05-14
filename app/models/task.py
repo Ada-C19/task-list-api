@@ -13,7 +13,7 @@ class Task(db.Model):
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "is_complete": self.completed_at != None,
+            "is_complete": self.completed_at != None
         }
         return task_as_dict
 

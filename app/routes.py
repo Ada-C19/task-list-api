@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
-import datetime
+from datetime import datetime
 from dotenv import load_dotenv
 from app import db
 
@@ -67,6 +67,27 @@ def update_task(task_id):
 
     db.session.commit()
     return make_response({"task":task.to_dict()}, 200)
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def complete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    if task.completed_at == None:
+        task.completed_at = datetime.now()
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()}, 200)
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    if task.completed_at != None:
+        task.completed_at = None
+    db.session.commit()
+
+    return make_response({"task": task.to_dict()}, 200)
+
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
