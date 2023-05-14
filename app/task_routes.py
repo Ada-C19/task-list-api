@@ -1,13 +1,13 @@
-import os
-import requests
+import os, requests
 from flask import Blueprint, jsonify, make_response, request
 from app import db
 from app.models.task import Task
 from app.helper import validate_task
 
+#CREATE BP/ENDPOINT
 tasks_bp = Blueprint("tasks", __name__, url_prefix= "/tasks") 
 
-# GET all task - GET[READ] - /tasks
+# GET all tasks - /tasks [READ] 
 @tasks_bp.route("", methods =["GET"])
 def get_all_tasks():
     if request.args.get("sort") == "asc":
@@ -22,32 +22,35 @@ def get_all_tasks():
 
     return jsonify(tasks_response), 200
 
-# GET one task - /tasks/<id>  - [READ]
+# GET one task - /tasks/<id>  [READ]
 @tasks_bp.route("/<id>", methods=["GET"])
 def get_one_task(id):
     task = validate_task(id)
     return jsonify({"task":task.to_json()}), 200
 
-#POST  - /tasks - [CREATE]
+#POST  - /tasks [CREATE]
 @tasks_bp.route("", methods= ["POST"])
 def create_task():
     request_body = request.get_json()
     new_task = Task.create_dict(request_body)
+    
     db.session.add(new_task)
     db.session.commit()
+    
     return make_response({"task":new_task.to_json()}), 201
 
-#UPDATE one task- PUT /tasks/<id>  (UPDATE)
+#PUT one task - /tasks/<id>  [UPDATE]
 @tasks_bp.route("/<id>",methods=["PUT"])
 def update_task(id):
     task = validate_task(id)
     request_body = request.get_json()
     task.update_dict(request_body)
+    
     db.session.commit()
 
     return jsonify({"task":task.to_json()}), 200
 
-#DELETE one task -DELETE /tasks/<id> (DELETE)
+#DELETE one task - /tasks/<id> [DELETE]
 @tasks_bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task_to_delete = validate_task(id)
@@ -58,17 +61,18 @@ def delete_task(id):
     message = {"details": f'Task 1 "{task_to_delete.title}" successfully deleted'}
     return make_response(message, 200)
 
-#PATCH /tasks/1/mark_incomplete" (UPDATE)
+#PATCH /tasks/1/mark_incomplete" [UPDATE]
 @tasks_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
 def mark_incompleted(id):
     task_to_incomplete = validate_task(id)
     request_body = request.get_json()
     task_to_incomplete.patch_incomplete(request_body)
+    
     db.session.commit()
 
     return jsonify({"task":task_to_incomplete.to_json()}), 200
 
-# PATCH tasks/<id>/mark_complete (UPDATE)
+# PATCH tasks/<id>/mark_complete [UPDATE]
 @tasks_bp.route("/<id>/mark_complete", methods=["PATCH"])
 def mark_completed(id):
     task_to_complete = validate_task(id)
@@ -84,8 +88,8 @@ def mark_completed(id):
         "text": f'Task {task_to_complete.title} has been completed!'
     }
 
-    headers = {"Authorization": os.environ.get("SLACK_API_KEY")}
+    the_headers = {"Authorization": os.environ.get("SLACK_API_KEY")}
     
-    requests.post(PATH, params=query_params, headers=headers)
+    requests.post(PATH, params=query_params, headers=the_headers)
 
     return jsonify({"task":task_to_complete.to_json()}), 200
