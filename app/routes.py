@@ -24,3 +24,15 @@ def create_task():
         'description': task.description,
         'is_complete': False
     }}), 201
+
+@tasks_bp.route('', methods=['GET'])
+def get_tasks():
+    tasks = Task.query.all()
+    task_list = [{
+        'id': task.task_id,
+        'title': task.title,
+        'description': task.description,
+        'is_complete': False
+    } for task in tasks]
+
+    return jsonify(task_list), 200
