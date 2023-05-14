@@ -46,15 +46,15 @@ class Task(db.Model):
         else:
             return True
     
-    from app.models.goal import Goal
-    def to_goal_id_dict(self, goal_id):
-        return dict(
-            id = self.id,
-            goal_id = goal_id,
-            title = self.title,
-            description = self.description,
-            is_complete = self.is_task_complete()
-        )
+    # from app.models.goal import Goal
+    # def to_goal_id_dict(self, goal_id):
+    #     return dict(
+    #         id = self.id,
+    #         goal_id = goal_id,
+    #         title = self.title,
+    #         description = self.description,
+    #         is_complete = self.is_task_complete()
+        # )
     # from app.models.goal import Goal
     # def to_dict_with_goal(self, goal_id):
     #     return dict(
