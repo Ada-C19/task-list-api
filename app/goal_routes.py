@@ -62,14 +62,12 @@ def create_goal_with_tasks(goal_id):
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
     
-    validated_task_ids = []
     for task_id in task_ids:
         current_task = validate_model(Task, task_id)
         current_task.goal = goal
-        validated_task_ids.append(current_task.task_id)
     
     db.session.commit()
-    return jsonify({"id": goal.goal_id, "task_ids": validated_task_ids}), 200
+    return jsonify({"id": goal.goal_id, "task_ids": request_body}), 200
 
 ####### GET ONE-TO-MANY TASKS ###############################
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
