@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, abort 
 from app import db
 from app.models.task import Task
+from datetime import datetime 
 from sqlalchemy.types import DateTime
 from sqlalchemy.sql.functions import now
 import requests, os
@@ -94,18 +95,16 @@ def delete_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
-    request_body = request.get_json()
 
     try:
         task = Task.query.get(task_id)
-        task.completed_at = now()
+        task.completed_at = datetime.now()
         
-        db.session.commit()
-
-        post_to_slack(task)
-
         task_message = {"task": task.to_dict()}
-        return jsonify(task_message), 200
+
+        db.session.commit()
+        post_to_slack(task)
+        return make_response(jsonify(task_message), 200)
 
     except:
         abort(make_response({"message": f"{task_id} not found"}, 404)) 
@@ -129,10 +128,8 @@ def mark_incomplete(task_id):
 
 def post_to_slack(task):
     slack_url = "https://slack.com/api/chat.postMessage"
-    API_KEY = os.environ["API_KEY"]
-    headers = {
-        "Authorization": f"Bearer {API_KEY}"
-    }
+    token = os.environ.get("SLACK_BOT_TOKEN")
+    headers = {"Authorization": f"Bearer {token}"}
 
     data = {
         "channel": "api-test-channel",
