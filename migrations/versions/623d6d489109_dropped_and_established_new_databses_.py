@@ -1,8 +1,8 @@
-"""Dropped prior databases, creating new
+"""Dropped and established new databses for deployment
 
-Revision ID: 5c1b99b6d55b
+Revision ID: 623d6d489109
 Revises: 
-Create Date: 2023-05-14 18:02:04.127203
+Create Date: 2023-05-15 10:12:34.890880
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5c1b99b6d55b'
+revision = '623d6d489109'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -25,8 +25,8 @@ def upgrade():
     )
     op.create_table('task',
     sa.Column('task_id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('title', sa.String(), nullable=False),
-    sa.Column('description', sa.String(), nullable=False),
+    sa.Column('title', sa.String(), nullable=True),
+    sa.Column('description', sa.String(), nullable=True),
     sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('goal_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['goal_id'], ['goal.goal_id'], ),

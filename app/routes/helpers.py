@@ -1,5 +1,4 @@
 from flask import jsonify, abort, make_response, request
-from app.models.task import Task
 from dotenv import load_dotenv
 import requests
 from datetime import datetime
@@ -57,7 +56,6 @@ def create_item(cls):
         return make_response({"details": "Invalid data"}, 400)
     
 
-
 def get_all_items(cls):
 
     sort_query = request.args.get("sort")
@@ -74,9 +72,7 @@ def get_all_items(cls):
     if request.args.get("title"):
         items = cls.query.filter(cls.title== request.args.get("title"))
 
-    items_response = []
-    for item in items:
-        items_response.append(item.to_dict())
+    items_response = [item.to_dict() for item in items]
 
     return jsonify(items_response), 200
 

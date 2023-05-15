@@ -30,7 +30,7 @@ def test_get_tasks_one_saved_tasks(client, one_task):
             "is_complete": False
         }
     ]
- 
+
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task(client, one_task):
