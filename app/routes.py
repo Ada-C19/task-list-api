@@ -134,6 +134,38 @@ def update_task(task_id):
             "completed_at":task.completed_at
             }}), 200
 
+@task_list_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def update_task_to_complete(task_id):
+    task = validate_task(task_id)
+
+    db.session.commit()
+
+    
+    if not task.completed_at:
+        return jsonify({"task":
+        {"id":task.task_id,
+        "title":task.title,
+        "description": task.description,
+        "is_complete": True
+
+        }}), 200
+
+@task_list_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+
+def update_task_to_incomplete(task_id):
+
+    task = validate_task(task_id)
+    db.session.commit()
+
+    if task.completed_at:
+        return jsonify({"task":
+        {"id":task.task_id,
+        "title":task.title,
+        "description": task.description,
+        "is_complete": False
+
+        }}), 200
+
 # # delete
 @task_list_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
