@@ -2,7 +2,7 @@ from app.models.goal import Goal
 import pytest
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goals_no_saved_goals(client):
     # Act
     response = client.get("/goals")
@@ -13,7 +13,7 @@ def test_get_goals_no_saved_goals(client):
     assert response_body == []
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goals_one_saved_goal(client, one_goal):
     # Act
     response = client.get("/goals")
@@ -30,7 +30,7 @@ def test_get_goals_one_saved_goal(client, one_goal):
     ]
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_goal(client, one_goal):
     # Act
     response = client.get("/goals/1")
@@ -47,7 +47,7 @@ def test_get_goal(client, one_goal):
     }
 
 
-@pytest.mark.skip(reason="test to be completed by student")
+# @pytest.mark.skip(reason="test to be completed by student")
 def test_get_goal_not_found(client):
     # Act
     response = client.get("/goals/1")
@@ -57,7 +57,7 @@ def test_get_goal_not_found(client):
     response_body == {'details': 'Invalid data'}
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal(client):
     # Act
     response = client.post("/goals", json={

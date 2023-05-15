@@ -2,10 +2,7 @@ from app.models.task import Task
 import pytest
 
 
-# print(f"{response = }")
-    # print(f"{response_body = }")
-
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_no_saved_tasks(client):
     # Act
     response = client.get("/tasks")
@@ -16,7 +13,7 @@ def test_get_tasks_no_saved_tasks(client):
     assert response_body == []
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_tasks_one_saved_tasks(client, one_task):
     # Act
     response = client.get("/tasks")
@@ -33,9 +30,9 @@ def test_get_tasks_one_saved_tasks(client, one_task):
             "is_complete": False
         }
     ]
+ 
 
-
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task(client, one_task):
     # Act
     response = client.get("/tasks/1")
@@ -53,7 +50,7 @@ def test_get_task(client, one_task):
         }
     }
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_get_task_not_found(client):
     # Act
     response = client.get("/tasks/1")
@@ -64,7 +61,7 @@ def test_get_task_not_found(client):
     assert response_body == {'details': 'Invalid data'}
 
 
-@pytest.mark.skip(reason="No way to test this feature yet")
+# @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_task(client):
     # Act
     response = client.post("/tasks", json={
@@ -129,11 +126,6 @@ def test_update_task_not_found(client):
     # Assert
     assert response.status_code == 404
     assert response_body == {"Message": "Invalid id"}, 404
-
-    # raise Exception("Complete test with assertion about response body")
-    # *****************************************************************
-    # **Complete test with assertion about response body***************
-    # *****************************************************************
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")

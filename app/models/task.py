@@ -4,9 +4,9 @@ import datetime
 
 
 class Task(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String) # nullable=False)
-    description = db.Column(db.String) #nullable=False)
+    task_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String, nullable=False)
+    description = db.Column(db.String, nullable=False)
     # completed_at = db.Column(db.DateTime, default = None)
     completed_at = db.Column(db.DateTime(timezone=True), nullable=True)
     goal_id = db.Column(db.Integer, db.ForeignKey("goal.goal_id"), nullable=True)
@@ -26,7 +26,7 @@ class Task(db.Model):
         if self.goal_id:
 
             return dict(
-            id = self.id,
+            id = self.task_id,
             goal_id = self.goal_id,
             title = self.title,
             description = self.description,
@@ -34,7 +34,7 @@ class Task(db.Model):
         )
 
         return dict(
-            id = self.id,
+            id = self.task_id,
             title = self.title,
             description = self.description,
             is_complete = self.is_task_complete()
@@ -46,24 +46,5 @@ class Task(db.Model):
         else:
             return True
     
-    # from app.models.goal import Goal
-    # def to_goal_id_dict(self, goal_id):
-    #     return dict(
-    #         id = self.id,
-    #         goal_id = goal_id,
-    #         title = self.title,
-    #         description = self.description,
-    #         is_complete = self.is_task_complete()
-        # )
-    # from app.models.goal import Goal
-    # def to_dict_with_goal(self, goal_id):
-    #     return dict(
-    #         id = self.id,
-    #         goal_id = int(goal_id),
-    #         title = self.title,
-    #         description = self.description,
-    #         is_complete = self.is_task_complete()
-    #     )
-    
-    
+
 
