@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 import requests
 from app.models.goal import Goal
-import requests, json
+import json
 
 
 
@@ -103,6 +103,19 @@ def delete_task(task_id):
 
     return make_response({"details":f'Task {task.task_id} "{task.title}" successfully deleted'})
 
+def slack_notification(task):
+    token = os.environ.get("slack_token")
+    slack_url = "https://slack.com/api/chat.postMessage"
+    headers = {"Authorization":token}
+    body = {
+        "channel": "task-notifications",
+        "text": f"Someone just completed the task {task.title}", 
+    }
+
+    requests.post(slack_url, headers=headers, json=body)
+    return
+
+
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
     
@@ -110,26 +123,13 @@ def mark_task_complete(task_id):
     
     task.completed_at = datetime.utcnow()
 
+    
+
 #use requests instead of WebClient and add bearer... add token to .env look up requests.post
     # client = WebClient(token=os.environ.get("slack_token"))
     # client.chat_postMessage(channel="C0570RZGHDL", text=f"Someone just completed the task {task.title}")
 
-    # payload = {"text":f"Someone just completed the task {task.title}"}
-    # url = os.environ.get("SLACK_URL")
-
-    # requests.post(url, json.dumps(payload))
-    # token = os.environ.get("slack_token")
-    # url="https://slack.com/api/chat.postMessage"
-    # data = {
-
-    #     "token": f"{token}",
-    #     "channel": 'C0570RZGHDL',
-    #     "text": f"Someone just completed the task {task.title}", 
-    # }
-
-    # response = requests.post(
-    #      url=url, data=data,
-    #      headers={})
+  
 
     
     
@@ -139,8 +139,13 @@ def mark_task_complete(task_id):
    
    
     db.session.commit()
+    
+    slack_notification(task)
+    
 
     return {"task": task.to_dict()}
+
+
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
