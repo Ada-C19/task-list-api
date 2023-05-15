@@ -4,11 +4,13 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import asc, desc
 from datetime import datetime
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
+# from slack_sdk import WebClient
+# from slack_sdk.errors import SlackApiError
 import os
 import requests
 from app.models.goal import Goal
+import requests, json
+
 
 
 
@@ -109,8 +111,32 @@ def mark_task_complete(task_id):
     task.completed_at = datetime.utcnow()
 
 #use requests instead of WebClient and add bearer... add token to .env look up requests.post
-    client = WebClient(token=os.environ.get("slack_token"))
-    client.chat_postMessage(channel="C0570RZGHDL", text=f"Someone just completed the task {task.title}")
+    # client = WebClient(token=os.environ.get("slack_token"))
+    # client.chat_postMessage(channel="C0570RZGHDL", text=f"Someone just completed the task {task.title}")
+
+    # payload = {"text":f"Someone just completed the task {task.title}"}
+    # url = os.environ.get("SLACK_URL")
+
+    # requests.post(url, json.dumps(payload))
+    # token = os.environ.get("slack_token")
+    # url="https://slack.com/api/chat.postMessage"
+    # data = {
+
+    #     "token": f"{token}",
+    #     "channel": 'C0570RZGHDL',
+    #     "text": f"Someone just completed the task {task.title}", 
+    # }
+
+    # response = requests.post(
+    #      url=url, data=data,
+    #      headers={})
+
+    
+    
+
+
+
+   
    
     db.session.commit()
 
