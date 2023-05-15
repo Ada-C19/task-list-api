@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, make_response, abort, request, render_temp
 from app import db
 from app.models.task import Task
 from datetime import datetime
+import pytz
 import requests
 import os
 
@@ -21,11 +22,12 @@ def validate_model(cls, model_id):
     return task
 
 def call_slack_api(task):
-    formatted_date = f"{task.completed_at.day}/{task.completed_at.month}/{task.completed_at.year}"
+    formatted_date = task.completed_at.strftime('%a %d %b %Y, %I:%M%p')
     
     channel_id = 'task-notifications'
+    text_msg = f"Someone just completed the task {task.title} on {formatted_date}"
     url_endpoint = 'https://slack.com/api/chat.postMessage'
-    params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title} on {formatted_date}"}
+    params = {'channel': channel_id, 'text': text_msg}
     headers = {'Authorization': f"Bearer {os.environ.get('SLACK_API_KEY')}"}
     
     requests.post(url=url_endpoint, json=params, headers=headers)
@@ -63,7 +65,10 @@ def update_task(task_id):
 def patch_task_complete(task_id):
     task = validate_model(Task, task_id)
     #refactor to have mark_complete and mark_incomplete in same route
-    task.completed_at = datetime.today()
+    now = datetime.now()
+    tz = pytz.timezone('America/New_York')
+    aware_obj = tz.localize(now)
+    task.completed_at = now
     call_slack_api(task)
     
     db.session.commit()
