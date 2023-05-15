@@ -1,2 +1,0 @@
-from Flask import
-from app import db

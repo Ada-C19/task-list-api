@@ -15,12 +15,12 @@ def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
     except:
-        abort(make_response({"message":f"task {model_id} invalid"}, 400))
+        abort(make_response({"message":f"{cls.__name__.lower()} {model_id} invalid data"}, 400))
 
     task = cls.query.get(model_id)
 
     if not task:
-        abort(make_response({"message":f"task {model_id} not found"}, 404))
+        abort(make_response({"message":f"{cls.__name__.lower()} {model_id} not found"}, 404))
 
     return task
 
@@ -51,7 +51,7 @@ def create_task():
     db.session.add(new_task)
     db.session.commit()
 
-    return make_response(jsonify({"task":new_task.to_dict()}), 201)
+    return make_response(jsonify({"task": new_task.to_dict()}), 201)
 
 
 @tasks_bp.route("", methods=["GET"])
@@ -84,6 +84,7 @@ def update_task(task_id):
 
     db.session.commit()
     return make_response({"task":task.to_dict()}, 200)
+
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def complete_task(task_id):
