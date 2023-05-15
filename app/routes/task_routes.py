@@ -7,7 +7,6 @@ import requests, os
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
-# VALIDATE MODEL
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
@@ -21,7 +20,7 @@ def validate_model(cls, model_id):
 
     return model
 
-# CREATE TASK
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -40,7 +39,6 @@ def create_task():
     return jsonify(task_message), 201
 
 
-# GET ALL AND SORT TASKS BY TITLE 
 @tasks_bp.route("", methods=["GET"])
 def sort_by_title():
     sort_query = request.args.get("sort")
@@ -56,7 +54,6 @@ def sort_by_title():
     return jsonify(task_response)
 
 
-# GET ONE TASK
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
@@ -66,7 +63,6 @@ def get_one_task(task_id):
     return jsonify(task_message)
 
 
-# UPDATE TASK
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     task = validate_model(Task, task_id)
@@ -83,7 +79,6 @@ def update_task(task_id):
     return jsonify(task_message)
 
 
-# DELETE TASK
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_model(Task, task_id)
@@ -96,7 +91,6 @@ def delete_task(task_id):
     return jsonify(task_message)
 
 
-# MARK COMPLETE TASK
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
@@ -117,7 +111,6 @@ def mark_complete(task_id):
         abort(make_response({"message": f"{task_id} not found"}, 404)) 
 
 
-# MARK INCOMPLETE TASK
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
     task = validate_model(Task, task_id)

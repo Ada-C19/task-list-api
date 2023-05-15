@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify, make_response, abort
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
-# VALIDATE MODEL
+
 def validate_model(cls, model_id):
     try:
         model_id = int(model_id)
@@ -19,7 +19,7 @@ def validate_model(cls, model_id):
 
     return model
 
-# CREATE GOAL
+
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -38,7 +38,6 @@ def create_goal():
     return jsonify(goal_dict), 201
 
 
-# GET ALL AND SORT GOALS BY TITLE 
 @goals_bp.route("", methods=["GET"])
 def sort_by_title():
     sort_query = request.args.get("sort")
@@ -54,7 +53,6 @@ def sort_by_title():
     return jsonify(goal_response)
 
 
-# GET ONE GOAL
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -63,7 +61,6 @@ def get_one_goal(goal_id):
     return jsonify(goal_dict)
 
 
-# UPDATE GOAL
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -78,7 +75,6 @@ def update_goal(goal_id):
     return jsonify(goal_dict)
 
 
-# DELETE GOAL
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -91,7 +87,6 @@ def delete_goal(goal_id):
     return jsonify(goal_message)
 
 
-# GET GOAL AND TASKS
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_all_tasks_for_goal(goal_id):
     goal = validate_model(Goal, goal_id)
@@ -99,7 +94,6 @@ def get_all_tasks_for_goal(goal_id):
     return make_response(goal_response), 200
 
 
-# POST GOAL AND TASKS
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def post_tasks_to_goal(goal_id):
     goal = validate_model(Goal, goal_id)
