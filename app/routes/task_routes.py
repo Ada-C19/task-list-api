@@ -2,6 +2,7 @@ from flask import Blueprint
 from app.models.task import Task
 from app.routes.helpers import create_item, get_all_items, get_one_item, update_item, delete_item, mark_item_complete, mark_item_incomplete
 
+
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 

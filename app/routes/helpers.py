@@ -1,8 +1,12 @@
 from flask import jsonify, abort, make_response, request
+from app.models.task import Task
+from dotenv import load_dotenv
 import requests
 from datetime import datetime
 from app import db
 import os
+
+load_dotenv()
 
 def send_slack_message(completed_task):
     TOKEN = os.environ['SLACK_API_TOKEN']

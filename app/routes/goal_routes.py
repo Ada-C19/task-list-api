@@ -34,41 +34,44 @@ def delete_goal(goal_id):
 @goals_bp.route("/<goal_id>/tasks", methods=['POST'])
 def create_goal_with_tasks(goal_id):
 
-    request_body = request.get_json()
     goal = validate_model(Goal, goal_id)
-    task_list = request_body.get("task_ids")
+    request_body = request.get_json()
+    task_ids = request_body.get("task_ids")
 
-    tasks = []
-    for task_id in task_list:
+    # for task in goal.tasks:
+    #     task.goal_id = None
+
+    for task_id in task_ids:
         task = validate_model(Task, task_id)
-        task.goal = goal
-        tasks.append(task_id)
+        task.goal_id = goal.goal_id
+
+    # goal.title = request.args.get("title", goal.title)
 
     db.session.commit()
 
     message = {
         "id": goal.goal_id, 
-        "task_ids": tasks
+        "task_ids": task_ids
         }
+
     return make_response(message, 200)
 
         
 @goals_bp.route("/<goal_id>/tasks", methods=['GET'])
 def get_all_tasks_one_goal(goal_id):
-    try:
-        goal = validate_model(Goal, goal_id)
-    except:
-        return make_response({"details": "Invalid data"}, 404)
 
-    task_list = []
+    goal = validate_model(Goal, goal_id)
+    return make_response(goal.to_dict(tasks=True), 200)
+    
+    # task_list = []
 
-    for task in goal.tasks:
-        task = validate_model(Task, task.task_id)
-        task_list.append(task.to_dict())
+    # for task in goal.tasks:
+    #     task = validate_model(Task, task.task_id)
+    #     task_list.append(task.to_dict())
         
-    message = {
-        "id": goal.goal_id,
-        "title": goal.title,
-        "tasks": task_list
-    }
-    return make_response((message, 200))
+    # message = {
+    #     "id": goal.goal_id,
+    #     "title": goal.title,
+    #     "tasks": task_list
+    # }
+    # return make_response((message, 200))
