@@ -21,9 +21,11 @@ def validate_model(cls, model_id):
     return task
 
 def call_slack_api(task):
+    formatted_date = f"{task.completed_at.day}/{task.completed_at.month}/{task.completed_at.year}"
+    
     channel_id = 'task-notifications'
     url_endpoint = 'https://slack.com/api/chat.postMessage'
-    params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title} at {task.completed_at}"}
+    params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title} on {formatted_date}"}
     headers = {'Authorization': f"Bearer {os.environ.get('SLACK_API_KEY')}"}
     
     requests.post(url=url_endpoint, json=params, headers=headers)
