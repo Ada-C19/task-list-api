@@ -89,9 +89,7 @@ def read_all_tasks():
     else:
         tasks = Task.query.all()
 
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in tasks]
     return jsonify(tasks_response), 200
 
 ####### DELETE #############################
