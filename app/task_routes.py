@@ -51,15 +51,15 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def patch_task_complete(task_id):
     task = validate_model(Task, task_id)
-    
+    #refactor to have mark_complete and mark_incomplete in same route
     task.completed_at = datetime.today()
-    
+    #refactor this to helper function
     channel_id = 'task-notifications'
     url_endpoint = 'https://slack.com/api/chat.postMessage'
     params = {'channel': channel_id, 'text': f"Someone just completed the task {task.title}"}
     headers = {'Authorization': f"Bearer {os.environ.get('SLACK_API_KEY')}"}
     
-    requests.post(url=url_endpoint, params=params, headers=headers)
+    requests.post(url=url_endpoint, json=params, headers=headers)
 
     db.session.commit()
     return jsonify({'task': task.to_dict()}), 200
