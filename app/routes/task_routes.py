@@ -1,10 +1,30 @@
 from app import db
 from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
+from app.models.goal import Goal
 from sqlalchemy import text
 import datetime
+import requests
+import os
+
+
+def post_slack_message(task_title):
+    slack_url = "https://slack.com/api/chat.postMessage"
+    channel_id = "task-notifications"
+    slack_message = f"Someone just completed the task {task_title}"
+    headers = dict(
+        Authorization = os.environ.get("SLACK_AUTH")
+    )
+    data = dict(
+        channel = channel_id,
+        text = slack_message
+    )
+    response = requests.post(slack_url, headers=headers, data=data)
+    return response
+
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
 
 @tasks_bp.route("", methods = ["POST"])
 def create_task():
@@ -113,6 +133,8 @@ def mark_complete(task_id):
     task_dict["is_complete"] = True
 
     db.session.commit()
+
+    post_slack_message(task.title)
 
     return make_response(jsonify({"task" : task_dict}))
 
