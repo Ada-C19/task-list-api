@@ -68,7 +68,7 @@ def patch_task_complete(task_id):
     now = datetime.now()
     tz = pytz.timezone('America/New_York')
     aware_obj = tz.localize(now)
-    task.completed_at = now
+    task.completed_at = aware_obj
     call_slack_api(task)
     
     db.session.commit()
