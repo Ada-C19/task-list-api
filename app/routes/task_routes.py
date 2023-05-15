@@ -113,7 +113,6 @@ def mark_task_complete(task_id):
 
     requests.post(url, json=body, headers=header)
 
-
     return jsonify(response_body), 200
 
 # update task to be incomplete

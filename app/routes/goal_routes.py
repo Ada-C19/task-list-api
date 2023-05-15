@@ -64,13 +64,9 @@ def add_tasks_to_goals(goal_id):
 
     db.session.commit()
 
-
     return jsonify({"id": goal.goal_id, "task_ids": request_body['task_ids']}), 200
 
 @goal_bp.route("/<goal_id>/tasks", methods=['GET'])
 def get_tasks_of_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     return jsonify(goal.to_dict_with_tasks()), 200
-
-# @goal_bp.route("/<goal_id>/tasks", methods=['GET'])
-# def 

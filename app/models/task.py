@@ -16,20 +16,10 @@ class Task(db.Model):
                 "description": self.description,
                 "is_complete": bool(self.completed_at)
                 }
-        if not self.goal_id:
-            return task_dict
-        else:
+        if self.goal_id:
             task_dict['goal_id'] = self.goal_id
         return task_dict
-    
-    # def to_dict_with_goal(self):
-    #     return {"id": self.task_id,
-    #             "goal_id": self.goal_id,
-    #             "title": self.title,
-    #             "description": self.description,
-    #             "is_complete": bool(self.completed_at)
-    #             }
-    
+
     @classmethod
     def from_dict(cls, dict):
         return Task(title=dict['title'],
