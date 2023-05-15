@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, make_response, request, abort
 from app.models.task import Task
+from datetime import datetime 
 from app import db
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-#Wave 1- CRUD
+#WAVE 1- CRUD
 #CREATES NEW TASK ENDPOINT
 @tasks_bp.route("", methods=["POST"])
 def create_task():
@@ -97,6 +98,12 @@ def validate_task(task_id):
 
 #WAVE 3 - PATCH
 
+def validate_task(task_id):
+    task = Task.query.get(task_id)
+    if task is None:
+        abort(404, "Task not found")
+    return task
+
 @tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     
@@ -122,3 +129,6 @@ def mark_incomplete(task_id):
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
+
+
+#xoxb-4680452269380-5265102669844-cwaf1y2RJchsv5Az9NdAJt9r

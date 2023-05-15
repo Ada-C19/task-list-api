@@ -37,11 +37,3 @@ class Task(db.Model):
         return new_cls
 
 
-
-    # @classmethod
-    # def from_dict(cls, data_dict):
-    #     return cls(
-    #         name=data_dict["name"],
-    #         color=data_dict["color"],
-    #         personality=data_dict["personality"]
-    #     )
