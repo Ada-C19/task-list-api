@@ -19,27 +19,26 @@ def create_task():
     return make_response(jsonify({"task": new_task.to_dict()}), 201) 
 
 
-#GET ALL TASK ENDPOINTS
+#GET ALL TASK ENDPOINTS -- WAVE 2 QUERY PARAM
 @tasks_bp.route("", methods=["GET"])
-def read_all_tasks(): 
 
-    tasks = Task.query.all()
-
-    #Wave 2- Query Params-----
+def read_all_tasks():
     sort_query_param = request.args.get("sort")
-
+    
     if sort_query_param == "asc":
-        tasks = Task.query.order_by(task.title)
+        tasks = Task.query.order_by(Task.title).all()
 
     elif sort_query_param == "desc":
-        tasks = Task.query.order_by(task.title) 
-    
-    #-----------
+        tasks = Task.query.order_by(Task.title.desc()).all()
+
+    else:
+        tasks = Task.query.all()
 
     response_body = []
-
+    
     for task in tasks:
        response_body.append(task.to_dict())
+
 
     return jsonify(response_body)
 
@@ -96,16 +95,30 @@ def validate_task(task_id):
     return task 
 
 
-#WAVE 3 - Patch
-# @tasks_bp.route("/<task_id>/mark_complete", methods = ["PATCH"])
-# def mark_complete(task_id):
-#     task = validate_task(task_id)
+#WAVE 3 - PATCH
 
-#     task.completed_at = #date/time
+@tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    
+    task = validate_task(task_id)
 
-#     db.session.patch(task)
-#     db.session.commit()
+    if task.completed_at is None:
+        task.completed_at = datetime.now()
+        
+        db.session.patch(task)
+        db.session.commit()
 
-#     return make_response()
+    return make_response(jsonify({"task": task.to_dict()}), 200)
 
-#WAVE 4- Slack API 
+@tasks_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+
+    task = validate_task(task_id)
+
+    if task.completed_at is not None:
+        task.completed_at = None
+
+        db.session.commit()
+
+    return make_response(jsonify({"task": task.to_dict()}), 200)
+
