@@ -24,8 +24,8 @@ def upgrade():
     )
     op.create_table('tasks',
     sa.Column('task_id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('description', sa.String(length=255), nullable=False),
+    sa.Column('title', sa.String(length=56), nullable=True),
+    sa.Column('description', sa.String(length=200), nullable=True),
     sa.Column('completed_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('task_id')
     )

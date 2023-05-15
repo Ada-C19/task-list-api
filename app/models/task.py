@@ -2,9 +2,8 @@ from app import db
 
 # create task model, define 'Task' using SQLAlchemy 
 class Task(db.Model):
-    __tablename__ = "tasks"
     task_id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=False)
+    title = db.Column(db.String(56))
+    description = db.Column(db.String(200))
     completed_at = db.Column(db.DateTime, nullable=True)
     
