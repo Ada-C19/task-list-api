@@ -6,6 +6,9 @@ from sqlalchemy import desc
 from sqlalchemy import asc 
 from datetime import date
 
+import requests
+import os
+
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 
@@ -110,5 +113,9 @@ def patch_completed(task_id):
     if not task.completed_at:
         task.completed_at = date.today()
         db.session.commit()
+        
+    requests.post('https://slack.com/api/chat.postMessage', data={'channel': 'task-notifications', 'text': 'Someone just completed the task ' + task.title}, 
+    headers={'Authorization': 'Bearer ' + os.environ.get("SLACK_TOKEN")})
+
     return {"task": task.to_dict()}
 
