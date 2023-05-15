@@ -19,13 +19,20 @@ def post_task():
     new_task = Task(
         title = request_body["title"],
         description = request_body["description"],
-        completed_at = request_body["completed_at"]
+        # completed_at = request_body["completed_at"]
     )
 
     db.session.add(new_task)
     db.session.commit() 
     
-    return make_response(f"New task: {new_task.title},  created", 201)
+    return jsonify({
+        "task": {
+            "id": new_task.task_id,
+            "title": new_task.title,
+            "is_complete": False,
+            "description": new_task.description
+        }
+    }), 201
 
 # #read
 @task_list_bp.route("", methods=["GET"])
@@ -33,7 +40,17 @@ def post_task():
 def get_all_tasks():
     
     task_response = []
-    tasks = Task.query.all()
+    sort_query = request.args.get("sort")
+
+    if sort_query == 'asc':
+        tasks = Task.query.order_by(Task.title).all()
+    elif sort_query == 'desc':
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    
+    else:
+        tasks = Task.query.all()
+
+
     
     for task in tasks:
         if not tasks:
@@ -100,9 +117,22 @@ def update_task(task_id):
     task.description = request_body["description"]
 
     db.session.commit()
+    
+    if not task.completed_at:
+        return jsonify({"task":
+        {"id":task.task_id,
+        "title":task.title,
+        "description": task.description,
+        "is_complete": False
 
-    return make_response(f"Task {task.task_id} succsefully updated", 200)
-
+        }}), 200
+    else:    
+        return jsonify({"task":{
+            "id":task.task_id,
+            "title":task.title,
+            "description": task.description,
+            "completed_at":task.completed_at
+            }}), 200
 
 # # delete
 @task_list_bp.route("/<task_id>", methods=["DELETE"])
