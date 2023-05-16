@@ -67,7 +67,7 @@ def update_goal(goal_id):
     
     db.session.commit()
     
-    return {"goal": {"id": goal.goal_id, "title": goal.title}}
+    return make_response({"goal": {"id": goal.goal_id, "title": goal.title}})
 
 # Delete goal
 @goals_bp.route("/<goal_id>", methods=["DELETE"])

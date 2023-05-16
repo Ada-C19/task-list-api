@@ -72,12 +72,8 @@ def test_create_goal(client):
     # Assert
     assert response.status_code == 201
     assert "goal" in response_body
-    assert response_body == {
-        "goal": {
-            "id": 1,
-            "title": "My New Goal"
-        }
-    }
+    print(response_body)
+    assert response_body == {"goal": {"id": 1, "title": "My New Goal"}}
 
 
 # @pytest.mark.skip(reason="test to be completed by student")
@@ -94,12 +90,7 @@ def test_update_goal(client, one_goal):
     # assertion 2 goes here
     assert "goal" in response_body
     # assertion 3 goes here
-    assert response_body == {
-        {"goal": {
-            "id": 1,
-            "title": "Updated Goal Title"
-        }}
-    }
+    assert response_body ==        {"goal": {"id": 1, "title": "Updated Goal Title"}}
     # ---- Complete Assertions Here ----
 
 
