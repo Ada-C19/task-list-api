@@ -98,12 +98,6 @@ def validate_task(task_id):
 
 #WAVE 3 - PATCH
 
-def validate_task(task_id):
-    task = Task.query.get(task_id)
-    if task is None:
-        abort(404, "Task not found")
-    return task
-
 @tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     
@@ -132,3 +126,78 @@ def mark_incomplete(task_id):
 
 
 #xoxb-4680452269380-5265102669844-cwaf1y2RJchsv5Az9NdAJt9r
+
+#------------------------------------------------------------------------------------
+
+@goals_bp.route("", methods=["POST"])
+
+def create_goal():
+    request_data = request.get_json()
+    goal = Goal.from_dict(request_data)
+
+    db.session.add(goal)
+    db.session.commit()
+
+    response_body = {"goal": goal.to_dict()}
+
+    return make_response(jsonify(response_body), 201)
+
+@goals_bp.route("", methods=["GET"])
+
+def get_goals():
+
+    goals = Goal.query.all()
+
+    for goal in goals:
+       response_body.append(goal.to_dict())
+
+    return make_response(jsonify(response_body), 200)
+
+@goals_bp.route("/<goal_id>", methods=["GET"])
+
+def get_goal(goal_id):
+
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        abort(make_response({"message": f"Task {goal_id} was not found."}, 404))
+
+    response_body = {"goal": goal.to_dict()}
+
+    return make_response(jsonify(response_body), 200)
+
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+
+def update_goal(goal_id):
+
+    goal = Goal.query.get(goal_id)
+
+    if goal is None:
+        abort(make_response({"message": f"Task {goal_id} was not found."}, 404))
+
+    request_data = request.get_json()
+    goal.title = request_data["title"]
+
+    db.session.commit()
+
+    response_body = {"goal": goal.to_dict()}
+
+    return make_response(jsonify(response_body), 200)
+
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+
+def delete_goal(goal_id):
+
+    goal = Goal.query.get(goal_id)
+
+    if goal is None:
+        abort(make_response({"message": f"Task {goal_id} was not found."}, 404))
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    response_body = {
+        "details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"
+    }
+
+    return make_response(jsonify(response_body), 200)
