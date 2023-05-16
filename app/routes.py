@@ -84,10 +84,13 @@ def update_task(task_id):
         }
     })
     
-# detele a task 
+# detele a task & return 404 + message if not found
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
-    task = Task.query.get_or_404(task_id)
+    task = Task.query.get(task_id)
+    
+    if task is None:
+        return jsonify({"details": f"Task {task_id} was not found."}), 404
     
     db.session.delete(task)
     db.session.commit()
