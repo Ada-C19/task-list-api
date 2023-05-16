@@ -8,8 +8,8 @@ tasks_bp = Blueprint("read_all_tasks", __name__, url_prefix=("/tasks"))
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
-    tasks = Task.query.all() 
-    
+    tasks = Task.query.all()
+
     for task in tasks: 
         tasks_response.append({
             "id": task.task_id,
@@ -30,9 +30,9 @@ def create_task():
         return jsonify({"details": "Invalid data"}), 400
     
     new_task = Task(
-        title = request_body.get["title"],
-        description = request_body.get["description"],
-        completed_at = request_body.get["completed_at"]
+        title = request_body.get("title"),
+        description = request_body.get("description"),
+        completed_at = request_body.get("completed_at")
         )
     
     db.session.add(new_task)
@@ -40,10 +40,10 @@ def create_task():
     
     return jsonify({
         "task": {
-            "id": task.task_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.completed_at != None
+            "id": new_task.task_id,
+            "title": new_task.title,
+            "description": new_task.description,
+            "is_complete": new_task.completed_at != None
         }
     }), 201
     
@@ -65,10 +65,13 @@ def get_specific_task(task_id):
 
 
 # update a task
-@tasks_bp.route("/<int:task_id>", methods=["PUT"])
+@tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
-    task = Task.query.get_or_404(task_id)
+    task = Task.query.get(task_id)
     request_body = request.get_json()
+    
+    if task is None:
+        return jsonify({"details": f"Task {task_id} was not found."}), 404
     
     task.title = request_body.get("title", task.title)
     task.description = request_body.get("description", task.description)
@@ -84,6 +87,7 @@ def update_task(task_id):
         }
     })
     
+    
 # detele a task & return 404 + message if not found
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
@@ -97,4 +101,22 @@ def delete_task(task_id):
     
     return jsonify({
         "details": f'Task {task_id} "{task.title}" successfully deleted'
+    })
+
+
+# Get task not found
+@tasks_bp.route("/<int:task_id>", methods=["GET"])
+def get_task_not_found(task_id):
+    task = Task.query.get(task_id)
+    
+    if task is None:
+        return jsonify({"details": f"Task {task_id} was not found."}), 404
+    
+    return jsonify({
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.completed_at != None
+        }
     })
