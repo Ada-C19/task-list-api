@@ -7,3 +7,4 @@ class Task(db.Model):
     description = db.Column(db.String(200))
     completed_at = db.Column(db.DateTime, nullable=True)
     
+ 

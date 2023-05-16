@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app import db
 from app.models.task import Task
+from datetime import datetime
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix=("/tasks"))
 
@@ -125,5 +126,47 @@ def get_task_not_found(task_id):
             "title": task.title,
             "description": task.description,
             "is_complete": task.completed_at != None
+        }
+    })
+    
+# mark task complete
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_complete(task_id):
+    task = Task.query.get(task_id)
+    
+    if task is None:
+        return jsonify({"details": f"Task {task_id} was not found."}), 404
+    
+    task.completed_at = datetime.now()
+    db.session.add(task)
+    db.session.commit()
+    
+    return jsonify({
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": True
+        }
+    })
+
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_incomplete(task_id):
+    task = Task.query.get(task_id)
+    
+    if task is None:
+        return jsonify({"details": f"Task {task_id} was not found."}), 404
+    
+    task.completed_at = None
+    db.session.add(task)
+    db.session.commit()
+    
+    return jsonify({
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": False
         }
     })
