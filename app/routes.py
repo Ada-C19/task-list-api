@@ -2,14 +2,21 @@ from flask import Blueprint, jsonify, request
 from app import db
 from app.models.task import Task
 
-tasks_bp = Blueprint("read_all_tasks", __name__, url_prefix=("/tasks"))
+tasks_bp = Blueprint("tasks", __name__, url_prefix=("/tasks"))
 
 # create route (get) to get all tasks
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     tasks_response = []
-    tasks = Task.query.all()
-
+    sort = request.args.get("sort")
+    
+    if sort == "asc":
+        tasks = Task.query.order_by(Task.title.asc()).all()
+    elif sort == "desc":
+        tasks = Task.query.order_by(Task.title.desc()).all()
+    else:
+        tasks = Task.query.all()
+        
     for task in tasks: 
         tasks_response.append({
             "id": task.task_id,
