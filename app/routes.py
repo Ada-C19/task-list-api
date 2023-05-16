@@ -84,3 +84,14 @@ def update_task(task_id):
         }
     })
     
+# detele a task 
+@tasks_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    
+    db.session.delete(task)
+    db.session.commit()
+    
+    return jsonify({
+        "details": f'Task {task_id} "{task.title}" successfully deleted'
+    })
