@@ -172,7 +172,10 @@ As a client, I want to be able to make a `DELETE` request to `/tasks/1` when the
   "details": "Task 1 \"Go on my daily walk 🏞\" successfully deleted"
 }
 ```
-
+##########################fla
+Just a quick follow-on from today about a spurious requirement in the project description for Task List.
+In the README for Wave 1, the final behavioral requirement is that a 400 response should be returned if the completed_at value is missing from the request.
+This requirement should be ignored. If the completed_at value is missing, it should be treated the same as though the value were supplied with a null value.
 ### No matching Task: Get, Update, and Delete
 
 As a client, if I make any of the following requests:
