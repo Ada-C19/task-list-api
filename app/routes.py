@@ -1,14 +1,17 @@
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
+from datetime import datetime
 
 
 task_list_bp = Blueprint("task_list", __name__, url_prefix="/tasks")
+goals_bp = Blueprint("goals_list", __name__, url_prefix="/goals")
 
 
 
 
-# create
+# create tasks
 @task_list_bp.route("", methods=["POST"])
 
 def post_task():
@@ -34,7 +37,31 @@ def post_task():
         }
     }), 201
 
-# #read
+
+#create goals 
+@goals_bp.route("", methods=["POST"])
+
+def post_goal():
+
+    request_body = request.get_json()
+    if "title" not in request_body:
+        return make_response({"details": "Invalid data"}, 400)
+    
+    new_goal = Goal(
+        title = request_body["title"]
+    )
+    db.session.add(new_goal)
+    db.session.commit()
+
+    
+    return jsonify({
+        "goal": {
+            "id": new_goal.goal_id,
+            "title": new_goal.title} }), 201
+
+
+
+# #read all tasks
 @task_list_bp.route("", methods=["GET"])
 
 def get_all_tasks():
@@ -83,7 +110,43 @@ def validate_task(task_id):
     if not task:
         abort(make_response({"details": "Invalid Data"}, 404))
     return task
+
+#validate goal id
+def validate_goal(goal_id):
+    try:
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"message": f"Task {task_id} invalid"}, 400))
+    goal = Goal.query.get(goal_id)
     
+    if not goal:
+        abort(make_response({"details": "Invalid Data"}, 404))
+    return goal
+    
+
+#read all goals
+@goals_bp.route("", methods=["GET"]) 
+def read_all_goals():
+    goal_response = []
+    goals = Goal.query.all()
+
+    for goal in goals:
+        if not goals:
+            return jsonify(goal_response)
+        else:
+            goal_response.append({ "goal": {
+            "id":goal.goal_id,
+            "title":goal.title}})
+
+    return jsonify(goal_response)
+
+
+        
+
+
+
+
+
 #read one task/ read if empty task. 
 
 @task_list_bp.route("/<task_id>", methods=["GET"])
@@ -105,8 +168,16 @@ def get_one_task(task_id):
         "completed_at":task.completed_at
         }}
 
+#read one goal 
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_one_goal(goal_id):
+    goal = validate_goal(goal_id)
 
-# #update
+    return jsonify({"id":goal.goal_id,
+            "title":goal.title}), 200
+
+
+# #update task
 @task_list_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
 
@@ -134,39 +205,49 @@ def update_task(task_id):
             "completed_at":task.completed_at
             }}), 200
 
+
+#update goal
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit
+    return goal.to_dict_goal()
+
+
 @task_list_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def update_task_to_complete(task_id):
     task = validate_task(task_id)
 
-    db.session.commit()
+    task.completed_at = datetime.now()
 
     
-    if not task.completed_at:
-        return jsonify({"task":
-        {"id":task.task_id,
-        "title":task.title,
-        "description": task.description,
-        "is_complete": True
+    db.session.commit()
 
-        }}), 200
+    return task.to_dict(), 200
+
+    
+
 
 @task_list_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 
 def update_task_to_incomplete(task_id):
 
     task = validate_task(task_id)
+    
+    task.completed_at = None
+
     db.session.commit()
+    return task.to_dict()
+   
+    
 
-    if task.completed_at:
-        return jsonify({"task":
-        {"id":task.task_id,
-        "title":task.title,
-        "description": task.description,
-        "is_complete": False
 
-        }}), 200
-
-# # delete
+# delete task
 @task_list_bp.route("/<task_id>", methods=["DELETE"])
 def delete_task(task_id):
     task = validate_task(task_id)
@@ -175,3 +256,13 @@ def delete_task(task_id):
     db.session.commit()
 
     return abort(make_response({"details":f"Task {task.task_id} \"{task.title}\" successfully deleted"}))
+
+#delete goal:
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_goal(goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return abort(make_response({"details":f"Task {goal.goal_id} \"{goal.title}\" successfully deleted"}))

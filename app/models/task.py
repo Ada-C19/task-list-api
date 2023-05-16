@@ -8,6 +8,26 @@ class Task(db.Model):
     completed_at = db.Column(db.DateTime, default=None, nullable=True) 
 
 
+    @classmethod
+    def from_dict(cls, task_data):
+        new_task = Task(
+            title=task_data["title"],
+            description=task_data["description"],
+            completed_at=task_data["completed_at"]
+        )
+
+        return new_task
+
+
+
+
+
+    def to_dict(self):
+        return{ "task": {
+            "id":self.task_id,
+            "title":self.title,
+            "description":self.description,
+            "is_complete": True if self.completed_at else False}}
 # wave 1
 #Our task list API should be able to work with an entity called Task.
 # Tasks are entities that describe a task a user wants to complete. They contain a:
