@@ -77,7 +77,10 @@ def read_one_task(task_id):
     tasks = Task.query.all()
     for task in tasks:
         if task.id == task_id:
-            return make_response(jsonify({"task" : task.to_dict()}))
+            task_dict = task.to_dict()
+            if task.goal_id:
+                task_dict["goal_id"] = int(task.goal_id)
+            return make_response(jsonify({"task" : task_dict}))
         
     abort(make_response({"message":f"task {task_id} not found"}, 404))
 

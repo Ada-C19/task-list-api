@@ -28,12 +28,6 @@ def create_goal():
 def read_all_goals():
     goals = Goal.query.all()
 
-    # sort_query = request.args.get("sort")
-    # if sort_query == "asc":
-    #     goals = Goal.query.order_by(Goal.title.asc()).all()
-    # elif sort_query == "desc":
-    #     goals = Goal.query.order_by(Goal.title.desc()).all()
-
     goals_response = []
     if not goals:
         return jsonify(goals_response)
@@ -93,3 +87,54 @@ def delete_goal(goal_id):
     response= (f"Goal {goal_id} \"{goal.title}\" successfully deleted")
 
     return make_response(jsonify({"details": response}))
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def add_tasks_to_goal(goal_id):
+    request_body = request.get_json()
+    task_ids = request_body["task_ids"]
+    try: 
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
+       
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))  
+
+    for task_id in task_ids:
+        task = Task.query.get(task_id)
+        task.goal_id = goal.id
+
+    db.session.commit()
+
+    response_message = {"id": goal_id, "task_ids": task_ids}
+
+    return make_response(jsonify(response_message))
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_all_tasks_one_goal(goal_id):
+    try: 
+        goal_id = int(goal_id)
+    except:
+        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
+       
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))  
+
+    response_message = goal.to_dict()
+    tasks = Task.query.filter_by(goal=goal)
+    tasks_response = []
+
+    if tasks:
+        for task in tasks:
+            task_dict = task.to_dict()
+            task_dict["goal_id"] = int(goal_id)
+            tasks_response.append(task_dict)
+
+    response_message["tasks"] = tasks_response
+
+    return make_response(jsonify(response_message))
+
+    
