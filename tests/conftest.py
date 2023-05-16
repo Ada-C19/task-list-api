@@ -76,6 +76,8 @@ def completed_task(app):
 @pytest.fixture
 def one_goal(app):
     new_goal = Goal(title="Build a habit of going outside daily")
+    # new_goal = Goal(goal_title="Build a habit of going outside daily")
+
     db.session.add(new_goal)
     db.session.commit()
 
