@@ -1,13 +1,12 @@
-from flask import Blueprint, make_response
-from flask.json import jsonify
-# from app import db
+from flask import Blueprint, jsonify, request
+from app import db
 from app.models.task import Task
 
 tasks_bp = Blueprint("read_all_tasks", __name__, url_prefix=("/tasks"))
 
 # create route (get) to read all tasks
 @tasks_bp.route("", methods=["GET"])
-def read_all_tasks():
+def get_all_tasks():
     tasks_response = []
     tasks = Task.query.all() 
     
@@ -20,3 +19,31 @@ def read_all_tasks():
         })
         
     return jsonify(tasks_response)
+
+
+@tasks_bp.route("", methods=["POST"])
+def create_task():
+    request_body = request.get_json()
+    
+    if "title" not in request_body or "description" not in request_body:
+        return jsonify({"details": "Invalid data"}), 400
+    
+    new_task = Task(
+        title = request_body.get["title"],
+        description = request_body.get["description"],
+        completed_at = request_body.get["completed_at"]
+        )
+    
+    db.session.add(new_task)
+    db.session.commit()
+    
+    return jsonify({
+        "task": {
+            "id": task.task_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.completed_at != None
+        }
+    }), 201
+    
+            
