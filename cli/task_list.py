@@ -5,7 +5,7 @@ url = "http://localhost:5000"
 def parse_response(response):
     if response.status_code >= 400:
         return None
-    
+    print(response.json())
     return response.json()["task"]
 
 def create_task(title, description, completed_at=None):
