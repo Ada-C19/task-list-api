@@ -2,6 +2,7 @@ from app import db
 from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
 from app.models.goal import Goal
+from app.routes.helper_functions import validate_model
 from sqlalchemy import text
 import datetime
 import requests
@@ -42,30 +43,16 @@ def read_all_goals():
 
 @goals_bp.route("/<goal_id>", methods =["GET"])
 def read_one_goal(goal_id):
-    try:
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
-    
-    goals = Goal.query.all()
-    for goal in goals:
-        if goal.id == goal_id:
-            return make_response(jsonify({"goal" : goal.to_dict()}))
+    goal = validate_model(Goal, goal_id)
+
+    return make_response(jsonify({"goal" : goal.to_dict()}))
         
-    abort(make_response({"message":f"goal {goal_id} not found"}, 404))
 
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
     request_body = request.get_json()
-    try: 
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
-       
-    goal = Goal.query.get(goal_id)
-    if not goal:
-        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))  
+    goal = validate_model(Goal, goal_id)
 
     goal.title = request_body["title"]
 
@@ -76,10 +63,7 @@ def update_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))         
+    goal = validate_model(Goal, goal_id)    
 
     db.session.delete(goal)
     db.session.commit()
@@ -92,14 +76,8 @@ def delete_goal(goal_id):
 def add_tasks_to_goal(goal_id):
     request_body = request.get_json()
     task_ids = request_body["task_ids"]
-    try: 
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
-       
-    goal = Goal.query.get(goal_id)
-    if not goal:
-        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))  
+
+    goal = validate_model(Goal, goal_id)
 
     for task_id in task_ids:
         task = Task.query.get(task_id)
@@ -107,7 +85,7 @@ def add_tasks_to_goal(goal_id):
 
     db.session.commit()
 
-    response_message = {"id": goal_id, "task_ids": task_ids}
+    response_message = {"id": int(goal_id), "task_ids": task_ids}
 
     return make_response(jsonify(response_message))
 

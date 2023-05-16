@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
 from app.models.goal import Goal
 import requests
+import os
 
 def validate_model(cls, model_id):
     try:

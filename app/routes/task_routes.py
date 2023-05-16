@@ -2,25 +2,11 @@ from app import db
 from flask import Blueprint, jsonify, request, make_response, abort
 from app.models.task import Task
 from app.models.goal import Goal
+from app.routes.helper_functions import validate_model, post_slack_message
 from sqlalchemy import text
 import datetime
 import requests
 import os
-
-
-def post_slack_message(task_title):
-    slack_url = "https://slack.com/api/chat.postMessage"
-    channel_id = "task-notifications"
-    slack_message = f"Someone just completed the task {task_title}"
-    headers = dict(
-        Authorization = os.environ.get("SLACK_AUTH")
-    )
-    data = dict(
-        channel = channel_id,
-        text = slack_message
-    )
-    response = requests.post(slack_url, headers=headers, data=data)
-    return response
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
@@ -30,7 +16,6 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 def create_task():
     request_body = request.get_json()
     if "title" not in request_body or "description" not in request_body:
-# test will not pass if "completed_at" added to the guard clause. Looking over project directions and test, is this intentional?
         return make_response({ "details": "Invalid data"}, 400)
     
     new_task = Task.from_dict(request_body)
@@ -40,8 +25,8 @@ def create_task():
 
     response = {"task" : new_task.to_dict()}
     
-    # return
     return make_response(jsonify(response), 201)
+
 
 @tasks_bp.route("", methods = ["GET"])
 def read_all_tasks():
@@ -66,35 +51,24 @@ def read_all_tasks():
             }
             )
     return jsonify(tasks_response)
+
     
 @tasks_bp.route("/<task_id>", methods =["GET"])
 def read_one_task(task_id):
-    try:
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
-    
-    tasks = Task.query.all()
-    for task in tasks:
-        if task.id == task_id:
-            task_dict = task.to_dict()
-            if task.goal_id:
-                task_dict["goal_id"] = int(task.goal_id)
-            return make_response(jsonify({"task" : task_dict}))
+    task = validate_model(Task, task_id)
+    task_dict = task.to_dict()
+    if task.goal_id:
+        task_dict["goal_id"] = int(task.goal_id)
+
+    return make_response(jsonify({"task" : task_dict}))
         
-    abort(make_response({"message":f"task {task_id} not found"}, 404))
+
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     request_body = request.get_json()
-    try: 
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
-       
-    task = Task.query.get(task_id)
-    if not task:
-        abort(make_response({"message":f"Task {task_id} not found"}, 404))  
+
+    task = validate_model(Task, task_id)  
 
     task.title = request_body["title"]
     task.description = request_body["description"]
@@ -105,11 +79,8 @@ def update_task(task_id):
 
 
 @tasks_bp.route("/<task_id>", methods=["DELETE"])
-def delete_task(task_id):
-    task = Task.query.get(task_id)
-
-    if not task:
-        abort(make_response({"message":f"Task {task_id} not found"}, 404))         
+def delete_task(task_id): 
+    task = validate_model(Task, task_id)      
 
     db.session.delete(task)
     db.session.commit()
@@ -121,15 +92,7 @@ def delete_task(task_id):
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-
-    try: 
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
-       
-    task = Task.query.get(task_id)
-    if not task:
-        abort(make_response({"message":f"Task {task_id} not found"}, 404)) 
+    task = validate_model(Task, task_id)    
     
     task.completed_at = datetime.datetime.today()
     task_dict = task.to_dict()
@@ -145,16 +108,7 @@ def mark_complete(task_id):
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete_incomplete(task_id): 
     request_body = request.get_json()
-    try: 
-        task_id = int(task_id)
-    except:
-        abort(make_response({"message":f"task {task_id} invalid"}, 400))
-       
-    task = Task.query.get(task_id)
-    if not task:
-        abort(make_response({"message":f"Task {task_id} not found"}, 404)) 
-
-    task = Task.query.get(task_id)
+    task = validate_model(Task, task_id)
 
     task.completed_at = None
 
