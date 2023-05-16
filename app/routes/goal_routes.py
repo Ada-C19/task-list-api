@@ -10,6 +10,7 @@ import os
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
+
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -41,12 +42,12 @@ def read_all_goals():
             )
     return jsonify(goals_response)
 
+
 @goals_bp.route("/<goal_id>", methods =["GET"])
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
 
     return make_response(jsonify({"goal" : goal.to_dict()}))
-        
 
 
 @goals_bp.route("/<goal_id>", methods=["PUT"])
@@ -72,6 +73,7 @@ def delete_goal(goal_id):
 
     return make_response(jsonify({"details": response}))
 
+
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def add_tasks_to_goal(goal_id):
     request_body = request.get_json()
@@ -92,14 +94,7 @@ def add_tasks_to_goal(goal_id):
 
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_all_tasks_one_goal(goal_id):
-    try: 
-        goal_id = int(goal_id)
-    except:
-        abort(make_response({"message":f"goal {goal_id} invalid"}, 400))
-       
-    goal = Goal.query.get(goal_id)
-    if not goal:
-        abort(make_response({"message":f"Goal {goal_id} not found"}, 404))  
+    goal = validate_model(Goal, goal_id)
 
     response_message = goal.to_dict()
     tasks = Task.query.filter_by(goal=goal)

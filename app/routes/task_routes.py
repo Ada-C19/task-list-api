@@ -63,7 +63,6 @@ def read_one_task(task_id):
     return make_response(jsonify({"task" : task_dict}))
         
 
-
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_task(task_id):
     request_body = request.get_json()
