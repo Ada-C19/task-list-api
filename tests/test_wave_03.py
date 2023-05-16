@@ -124,6 +124,7 @@ def test_mark_complete_missing_task(client):
     # Act
     response = client.patch("/tasks/1/mark_complete")
     response_body = response.get_json()
+    # oh... i'm going to need to add fixtures to make these tests work. i think all the previous tests had fixtures pre-installed
 
     # Assert
     assert response.status_code == 404
