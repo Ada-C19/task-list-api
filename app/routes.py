@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
+from datetime import date
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -96,6 +97,31 @@ def delete_task(task_id):
 
     return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
 
+
+
+@tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
+def mark_task_complete(task_id):
+
+    task = validate_model(Task, task_id)
+        
+    task.completed_at = date.today()
+
+    db.session.add(task)
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()}), 200
+
+@tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
+def mark_task_incomplete(task_id):
+
+    task = validate_model(Task, task_id)
+        
+    task.completed_at = None
+
+    db.session.add(task)
+    db.session.commit()
+
+    return jsonify({"task":task.to_dict()}), 200
 
 
 
