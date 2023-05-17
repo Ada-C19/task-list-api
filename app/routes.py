@@ -178,7 +178,7 @@ def mark_incomplete(task_id):
 
 # create function that sends request to slack API
 def send_slack_request(channel, message):
-    path = https://slack.com/api/chat.postMessage
+    path = "https://slack.com/api/chat.postMessage"
     headers = {
         "Type": "application/json",
         "Authorization": "xoxb-4715007748918-5273625376965-Fd54AOr5GENxXWt10KbNsgpE"
