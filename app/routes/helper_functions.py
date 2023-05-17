@@ -39,8 +39,8 @@ def validate_id(cls, id):
 
 def get_model_by_id(cls, id):
     id = validate_id(cls, id)
-    model = db.session.query(cls).get(id)
-    # model = db.session.get(cls, id)
+    # model = db.session.query(cls).get(id)
+    model = db.session.get(cls, id)
 
 
     if not model:
