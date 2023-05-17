@@ -63,7 +63,6 @@ def delete_goal(goal_id):
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def adding_task_ids(goal_id):
     goal = validate_model(Goal, goal_id)
-
     request_body = request.get_json()
 
     task_ids = request_body.get("task_ids")

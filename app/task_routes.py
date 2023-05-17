@@ -4,7 +4,7 @@ from app.models.task import Task
 from flask import Blueprint, jsonify, make_response, request, abort
 from sqlalchemy import text
 from datetime import datetime
-import os, requests
+# import os, requests
 from .routes_helper import validate_model
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix = "/tasks")
