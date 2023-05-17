@@ -1,8 +1,8 @@
-"""empty message
+"""Updating task model
 
-Revision ID: ea67644817cc
+Revision ID: 16588ec20c55
 Revises: 
-Create Date: 2023-05-16 13:37:35.739721
+Create Date: 2023-05-17 15:14:03.704277
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ea67644817cc'
+revision = '16588ec20c55'
 down_revision = None
 branch_labels = None
 depends_on = None
