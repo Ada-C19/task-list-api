@@ -59,7 +59,7 @@ def read_one_task(task_id):
     
     task = validate_model(Task, task_id)
 
-    return task.to_dict(), 200
+    return jsonify({"task":task.to_dict()}), 200
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
@@ -74,7 +74,16 @@ def update_task(task_id):
 
     db.session.commit()
 
-    return task.to_dict(), 200
+    return jsonify({"task":task.to_dict()}), 200
+
+@task_bp.route("/<task_id>", methods=["DELETE"])
+def delete_task(task_id):
+    task = validate_model(Task, task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return make_response({"details": f"Task {task_id} \"{task.title}\" successfully deleted"})
 
 
 
