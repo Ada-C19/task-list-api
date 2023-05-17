@@ -6,6 +6,8 @@ class Task(db.Model):
     title = db.Column(db.String) #when refactoring change to varchar
     description = db.Column(db.String) # when refacoring change to varvhar
     completed_at = db.Column(db.DateTime, default=None, nullable=True) 
+    goal_id = db.Column(db.Integer, db.ForeignKey('goal.goal_id'))
+    goal = db.relationship("Goal", back_populates="tasks")
 
 
     @classmethod
