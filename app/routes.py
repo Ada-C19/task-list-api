@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app import db
 from app.models.task import Task
 from datetime import datetime
+import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix=("/tasks"))
 
@@ -141,6 +142,9 @@ def mark_complete(task_id):
     db.session.add(task)
     db.session.commit()
     
+    message = f"Task {task.title} is complete."
+    send_slack_request("study-sesh", message)
+    
     return jsonify({
         "task": {
             "id": task.task_id,
@@ -170,3 +174,18 @@ def mark_incomplete(task_id):
             "is_complete": False
         }
     })
+    
+
+# create function that sends request to slack API
+def send_slack_request(channel, message):
+    path = https://slack.com/api/chat.postMessage
+    headers = {
+        "Type": "application/json",
+        "Authorization": "xoxb-4715007748918-5273625376965-Fd54AOr5GENxXWt10KbNsgpE"
+    }
+    payload = {
+        "channel": channel,
+        "text": message
+    }
+    response = requests.post(path, headers=headers, json=payload)
+    response.raise_for_status()
