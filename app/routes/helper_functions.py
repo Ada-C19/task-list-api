@@ -21,7 +21,7 @@ def create_response(cls, instance, status_code=HTTPStatus.OK):
     db.session.commit()
     instance = instance.to_json()
     cls_type = cls.__name__.lower()
-    return jsonify({cls_type: instance}), status_code
+    return make_response(jsonify({cls_type: instance}), status_code)
 
 
 def generate_error_message(cls, id):
@@ -39,7 +39,8 @@ def validate_id(cls, id):
 
 def get_model_by_id(cls, id):
     id = validate_id(cls, id)
-    model = db.session.get(cls, id)
+    model = db.session.query(cls).get(id)
+    # model = db.session.get(cls, id)
 
 
     if not model:
@@ -117,11 +118,14 @@ def get_all_instances(cls, id=None):
         elif sort_order == "description_desc":
             instances = instances.order_by(desc(cls.description))
 
-    instances = instances.all()
+    # instances = instances.all()
 
-    task_list = [task.to_json() for task in instances]
+    # instance = [task.to_json() for task in instances]
 
-    return jsonify(task_list), HTTPStatus.OK
+    instance = [instance.to_json() for instance in instances]
+
+    return jsonify(instance), HTTPStatus.OK
+    # return make_response(jsonify(response_body), HTTPStatus.OK)	 
 
 
 
