@@ -21,7 +21,7 @@ def create_response(cls, instance, status_code=HTTPStatus.OK):
     db.session.commit()
     instance = instance.to_json()
     cls_type = cls.__name__.lower()
-    return make_response({cls_type: instance}, status_code)
+    return make_response(jsonify({cls_type: instance}), status_code)
 
 
 def generate_error_message(cls, id):
@@ -121,9 +121,9 @@ def get_all_instances(cls, id=None):
 
     task_list = [task.to_json() for task in instances]
 
-    response_body = task_list
+    # response_body = task_list
 
-    return make_response(jsonify(response_body), HTTPStatus.OK)
+    return jsonify(task_list), HTTPStatus.OK)
 
 
 
