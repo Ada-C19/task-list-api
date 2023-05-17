@@ -121,9 +121,7 @@ def get_all_instances(cls, id=None):
 
     task_list = [task.to_json() for task in instances]
 
-    # response_body = task_list
-
-    return jsonify(task_list), HTTPStatus.OK)
+    return jsonify((task_list), HTTPStatus.OK)
 
 
 
