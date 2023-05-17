@@ -157,7 +157,9 @@ def test_delete_goal_not_found(client, one_goal):
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_create_goal_missing_title(client):
     # Act
-    response = client.post("/goals", json={})
+    response = client.post("/goals", json={
+        "description:": "Test Description"
+    })
     response_body = response.get_json()
 
     # Assert

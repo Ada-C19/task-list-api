@@ -22,7 +22,7 @@ def create_goal():
     request_body = request.get_json()
     
     if "title" not in request_body:
-        abort(make_response({"details": "missing title"}, 400))
+        abort(make_response({"details": "Invalid data"}, 400))
     
     new_goal = Goal(title=request_body["title"])
     
