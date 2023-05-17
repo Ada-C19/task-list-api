@@ -3,8 +3,12 @@ from app.models.task import Task
 from app.models.goal import Goal
 from flask import Blueprint, jsonify, make_response, request, abort
 from datetime import datetime
+import requests
+import json
+from dotenv import load_dotenv
+import os
 
-
+load_dotenv()
 task_list_bp = Blueprint("task_list", __name__, url_prefix="/tasks")
 goals_bp = Blueprint("goals_list", __name__, url_prefix="/goals")
 
@@ -60,6 +64,60 @@ def post_goal():
             "title": new_goal.title} }), 201
 
 
+# create nested post 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+
+def create_task(goal_id):
+    goal = validate_goal(goal_id)
+    request_body = request.get_json()
+    
+    result = {"id": goal.goal_id,
+  "task_ids": request_body["task_ids"]
+}   
+    
+    for task_id in request_body["task_ids"]:
+        task = validate_task(task_id)
+        goal.tasks.append(task)
+    
+    
+    db.session.commit()
+
+    return result
+
+
+# create nested get
+
+@goals_bp.route("<goal_id>/tasks", methods=["GET"])
+def get_tasks_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+    goal_response = []
+    task_response = []
+    tasks = Task.query.all()
+    if "title" not in request_body or "id" not in request_body:
+        return make_response({"details": "Invalid data"}, 400)
+    for task in tasks:
+        if not tasks:
+            return jasonify(task_response)
+
+        if not task.completed_at:
+            task_response.append({"id":task.task_id,
+            "title":task.title,
+            "description": task.description,
+            "is_complete": False
+
+            })
+        else:
+            task_response.append({
+            "id":task.task_id,
+            "title":task.title,
+            "description": task.description,
+            "completed_at":task.completed_at
+        })
+
+        goal_response.append(task_response)
+    return jsonify(task_response)
+
+    
 
 # #read all tasks
 @task_list_bp.route("", methods=["GET"])
@@ -116,7 +174,7 @@ def validate_goal(goal_id):
     try:
         goal_id = int(goal_id)
     except:
-        abort(make_response({"message": f"Task {task_id} invalid"}, 400))
+        abort(make_response({"message": f"Goal {goal_id} invalid"}, 400))
     goal = Goal.query.get(goal_id)
     
     if not goal:
@@ -134,9 +192,9 @@ def read_all_goals():
         if not goals:
             return jsonify(goal_response)
         else:
-            goal_response.append({ "goal": {
+            goal_response.append({
             "id":goal.goal_id,
-            "title":goal.title}})
+            "title":goal.title})
 
     return jsonify(goal_response)
 
@@ -173,8 +231,11 @@ def get_one_task(task_id):
 def get_one_goal(goal_id):
     goal = validate_goal(goal_id)
 
-    return jsonify({"id":goal.goal_id,
-            "title":goal.title}), 200
+
+    return jsonify({"goal":{"id": goal.goal_id,
+        "title":goal.title}})
+
+
 
 
 # #update task
@@ -225,6 +286,20 @@ def update_task_to_complete(task_id):
 
     task.completed_at = datetime.now()
 
+    url = "https://slack.com/api/chat.postMessage"
+
+    payload = json.dumps({
+    "channel": "C0581AUJACV",
+    "text": (f"Someone just completed the task {task.title}")
+    })
+    headers = {
+    'Authorization': os.environ.get("SLACK_API_TOKEN"),
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
     
     db.session.commit()
 
@@ -265,4 +340,4 @@ def delete_goal(goal_id):
     db.session.delete(goal)
     db.session.commit()
 
-    return abort(make_response({"details":f"Task {goal.goal_id} \"{goal.title}\" successfully deleted"}))
+    return abort(make_response({"details":f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"}))
