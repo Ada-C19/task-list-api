@@ -21,7 +21,7 @@ def create_response(cls, instance, status_code=HTTPStatus.OK):
     db.session.commit()
     instance = instance.to_json()
     cls_type = cls.__name__.lower()
-    return make_response(jsonify({cls_type: instance}), status_code)
+    return make_response({cls_type: instance}, status_code)
 
 
 def generate_error_message(cls, id):
@@ -39,8 +39,7 @@ def validate_id(cls, id):
 
 def get_model_by_id(cls, id):
     id = validate_id(cls, id)
-    # model = db.session.query(cls).get(id)
-    model = db.session.get(cls, id)
+    model = db.session.query(cls).get(id)
 
 
     if not model:
@@ -63,35 +62,6 @@ def create_instance(cls):
 
     return create_response(cls, instance, HTTPStatus.CREATED)
 
-
-# def get_all_instances(cls, id=None):
-#     if id is not None:
-#         instance = get_model_by_id(cls, id)
-#         instance = instance.to_json(tasks=True)
-#         return make_response(instance, HTTPStatus.OK)
-
-#     sort_order = request.args.get("sort")
-
-#     instances = cls.query
-
-#     title_query = request.args.get("title")
-#     if title_query:
-#         instances = instances.filter_by(title=title_query)
-
-#     if sort_order == "asc":
-#         instances = instances.order_by(asc(cls.title))
-#     elif sort_order == "desc":
-#         instances = instances.order_by(desc(cls.title))
-
-#     if hasattr(cls, 'description'):
-#         if sort_order == "description_asc":
-#             instances = instances.order_by(asc(cls.description))
-#         elif sort_order == "description_desc":
-#             instances = instances.order_by(desc(cls.description))
-
-#     instance = [instance.to_json() for instance in instances]
-
-#     return make_response(instance, HTTPStatus.OK)
 
 def get_all_instances(cls, id=None):
     if id is not None:
@@ -118,15 +88,9 @@ def get_all_instances(cls, id=None):
         elif sort_order == "description_desc":
             instances = instances.order_by(desc(cls.description))
 
-    # instances = instances.all()
-
-    # instance = [task.to_json() for task in instances]
-
     instance = [instance.to_json() for instance in instances]
 
-    return jsonify(instance), HTTPStatus.OK
-    # return make_response(jsonify(response_body), HTTPStatus.OK)	 
-
+    return jsonify(instance), HTTPStatus.OK	 
 
 
 def get_one_instance(cls, id):
