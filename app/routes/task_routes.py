@@ -4,6 +4,10 @@ from app import db
 from datetime import datetime
 import requests
 from .route_helpers import validate_model
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -81,7 +85,8 @@ def complete_task(id):
     task.is_complete = True
 
     PATH = "https://slack.com/api/chat.postMessage"
-    Authorization = "Bearer xoxb-5242678399683-5266537240624-SzcfKHmF2xZaq407bmmGcsdL"
+    Authorization = os.environ.get(
+        "Authorization")
     text = f"Someone just completed the task {task.title}"
 
     headers = {
