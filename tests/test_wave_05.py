@@ -8,7 +8,7 @@ def test_get_goals_no_saved_goals(client):
     # Act
     response = client.get("/goals")
     response_body = response.get_json()
-
+    print(f'no goal {response_body}')
     # Assert
     assert response.status_code == 200
     assert response_body == []
@@ -19,7 +19,7 @@ def test_get_goals_one_saved_goal(client, one_goal):
     # Act
     response = client.get("/goals")
     response_body = response.get_json()
-
+    print(f'1 goal {response_body}')
     # Assert
     assert response.status_code == 200
     assert len(response_body) == 1

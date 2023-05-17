@@ -6,7 +6,7 @@ def test_get_tasks_sorted_asc(client, three_tasks):
     # Act
     response = client.get("/tasks?sort=asc")
     response_body = response.get_json()
-
+    print(f'sorted tasks {response_body}')
     # Assert
     assert response.status_code == 200
     assert len(response_body) == 3
