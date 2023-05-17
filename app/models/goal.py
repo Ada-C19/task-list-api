@@ -12,3 +12,4 @@ class Goal(db.Model):
         id = self.id,
         title = self.title
         )
+        return goal_dict

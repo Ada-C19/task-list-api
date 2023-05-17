@@ -6,7 +6,7 @@ def validate_model(cls,model_id):
         model_id = int(model_id)
     except:
         abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
-        # abort(make_response({“message”:f”{cls.__name__} {model_id} invalid”}, 400))
+        # abort(make_response({"message":f"{cls.__name__} {model_id} invalid"}, 400))
 
     model = cls.query.get(model_id)
 
