@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.goal import Goal
+from app.models.task import Task
 from app.routes.routes import validate_model
 from datetime import datetime
 from app import db
@@ -18,6 +19,21 @@ def create_goal():
     db.session.commit()
     return make_response(jsonify({"goal": new_goal.to_dict()}), 201)
 
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_tasks_for_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+    # if "tasks_ids" not in request_body:
+    #     abort(make_response({"details": "Invalid data"}, 400))
+    
+    task_ids = request_body["task_ids"]
+    for task_id in task_ids:
+        task = validate_model(Task, task_id)
+        task.goal_id = goal.id
+
+    db.session.commit()
+    return make_response({"id": goal.id, "task_ids": task_ids}, 200)
+
 @goals_bp.route("", methods=["GET"])
 def read_all_goals():
     goals = Goal.query.all()
@@ -31,6 +47,12 @@ def read_all_goals():
 def read_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
     return make_response(jsonify({"goal":goal.to_dict()}), 200)
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def read_tasks_for_one_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    return make_response(goal.to_dict(tasks=True), 200)
 
 
 
