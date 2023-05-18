@@ -1,10 +1,13 @@
 from flask import Blueprint, jsonify, request
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime
 import requests
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix=("/tasks"))
+goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
+
 
 # create route (get) to get all tasks
 @tasks_bp.route("", methods=["GET"])
@@ -190,3 +193,27 @@ def send_slack_request(channel, message):
     response = requests.post(path, headers=headers, json=payload)
     response.raise_for_status()
     
+
+# get a goal
+@goals_bp.route("", methods=["GET"])
+def get_goals():
+    goals = Goal.query.all()
+    goals_dict = [goal.to_dict() for goal in goals]
+    return jsonify(goals_dict)
+
+
+# create a new goal
+@goals_bp.route("", methods=["POST"])
+def create_goal():
+    request_data = request.get_json()
+    if "title" not in request_data:
+        return jsonify({"details": "Invalid data"}), 400
+
+    title = request_data["title"]
+    goal = Goal(title=title)
+    db.session.add(goal)
+    db.session.commit()
+
+    return jsonify({"goal": goal.to_dict()}), 201
+
+

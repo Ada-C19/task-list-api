@@ -1,4 +1,6 @@
 import pytest
+from app.models.goal import Goal
+
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -150,3 +152,4 @@ def test_create_goal_missing_title(client):
     assert response_body == {
         "details": "Invalid data"
     }
+
