@@ -234,3 +234,14 @@ def update_goal(goal_id):
 def get_goal(goal_id):
     goal = Goal.query.get_or_404(goal_id)
     return jsonify({"goal": goal.to_dict()})
+
+# delete a goal
+@goals_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+    db.session.delete(goal)
+    db.session.commit()
+
+    return jsonify({
+        "details": f'Goal {goal.id} "{goal.title}" successfully deleted'
+    }), 200
