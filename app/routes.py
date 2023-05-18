@@ -123,7 +123,7 @@ def mark_task_incomplete(task_id):
 
     return jsonify({"task":task.to_dict()}), 200
 
-#################################GOAL ROUTES #############################################
+#################################  GOAL ROUTES #######################################
 
 @goals_bp.route("", methods=['POST'])
 
@@ -172,7 +172,7 @@ def read_one_goal(goal_id):
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
 
-    task = validate_model(Goal, goal_id)
+    goal = validate_model(Goal, goal_id)
     
     request_body = request.get_json()
     
@@ -193,4 +193,43 @@ def delete_goal(goal_id):
 
     return make_response({"details": f"Goal {goal_id} \"{goal.title}\" successfully deleted"})
 
+##############################  MANY TO MANY RELATIONSHIP #######################
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_list_of_tasks(goal_id):
+    print("PRINT")
+    goal = validate_model(Goal, goal_id)
 
+    request_body = request.get_json()
+   
+    for task_id in request_body["task_ids"]:
+        task = validate_model(Task, task_id)
+        if task not in goal.tasks:
+            goal.tasks.append(task)
+        
+    
+    task_ids=[]
+    for task in goal.tasks:
+        task_ids.append(task.task_id)
+
+    db.session.commit()
+
+    return {
+        "id": int(goal_id),  
+        "task_ids": task_ids }, 200
+
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+
+def read_task_of_one_goal(goal_id):
+
+    goal = validate_model(Goal, goal_id)
+
+    tasks_response = []
+
+    for task in goal.tasks:
+        tasks_response.append(task.to_dict())
+    
+    return {
+        "id": int(goal_id),
+        "title": goal.title,
+        "tasks": tasks_response
+    }, 200

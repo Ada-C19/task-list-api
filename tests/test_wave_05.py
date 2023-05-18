@@ -93,12 +93,12 @@ def test_update_goal(client, one_goal):
     assert response_body == {
         "goal": {
             "id": 1,
-            "title": "Updated Task Title"
+            "title": "Updated Goal Title"
         }
     }
 
     goal = Goal.query.get(1)
-    assert goal.title == "Updated Task Title"
+    assert goal.title == "Updated Goal Title"
 
 
 
