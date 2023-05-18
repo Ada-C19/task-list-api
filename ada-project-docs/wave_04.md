@@ -1,3 +1,53 @@
+- What is the responsibility of this endpoint? send a message to a channel
+- What is the URL and HTTP method for this endpoint? The URL for this endpoint is https://slack.com/api/chat.postMessage and the HTTP method is POST.
+- What are the _two_ _required_ arguments for this endpoint? toke and channel
+- How does this endpoint relate to the Slackbot API key (token) we just created? token 
+
+{
+    "ok": true,
+    "channel": "C0561UUDX4K",
+    "ts": "1683767884.147159",
+    "message": {
+        "bot_id": "B057X96T14G",
+        "type": "message",
+        "text": "Hello world",
+        "user": "U057A363EFN",
+        "ts": "1683767884.147159",
+        "app_id": "A056T21RBC7",
+        "blocks": [
+            {
+                "type": "rich_text",
+                "block_id": "uEBB7",
+                "elements": [
+                    {
+                        "type": "rich_text_section",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "text": "Hello world"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "team": "T04L0DA7XB6",
+        "bot_profile": {
+            "id": "B057X96T14G",
+            "app_id": "A056T21RBC7",
+            "name": "Y's Bot",
+            "icons": {
+                "image_36": "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png",
+                "image_48": "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png",
+                "image_72": "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+            },
+            "deleted": false,
+            "updated": 1683766418,
+            "team_id": "T04L0DA7XB6"
+        }
+    }
+}
+
 # Wave 4: Using an External Web API
 
 ## Goal
@@ -194,3 +244,6 @@ Send `PATCH` requests to `localhost:5000/tasks/<book_id>/mark_complete` (use the
 ![](assets/postman_patch.png)
 
 ![](assets/slack_notification_feature.png)
+
+
+

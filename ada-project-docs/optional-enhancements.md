@@ -1,3 +1,22 @@
+### Edge Cases
+
+Many waves are missing many edge case considerations. Consider different edge cases in each wave, make decisions for what should happen, and then implement it!
+
+As inspiration, here are some beginning edge cases to consider:
+
+What should happen if...
+
+- when creating a task, the value of `completed_at` is a string that is not a datetime?
+- when updating a task, the value of `completed_at` is a string that is not a datetime?
+- when getting all tasks, and using query params, the value of `sort` is not "desc" or "asc"?
+
+For each of these, consider what the HTTP response should be.
+
+How would you write tests for it? How would you implement it?
+
+Your decisions should not break the other tests.
+
+
 # Optional Enhancements
 
 ## Goal
