@@ -189,3 +189,4 @@ def send_slack_request(channel, message):
     }
     response = requests.post(path, headers=headers, json=payload)
     response.raise_for_status()
+    
