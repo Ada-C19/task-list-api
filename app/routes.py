@@ -258,27 +258,26 @@ def delete_goal(goal_id):
     }), 200
     
     
-# get a task for specific goal
-@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def get_tasks_for_specific_goal(goal_id):
-    goal = Goal.query.get_or_404(goal_id)
 
-    tasks = [
-        {
+# get task for specific goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_goal(goal_id):
+    goal = Goal.query.get(goal_id)
+    if not goal:
+        return jsonify({"message": "Goal not found"}), 404
+
+    tasks = []
+    for task in goal.tasks:
+        tasks.append({
             "id": task.id,
-            "goal_id": task.goal_id,
+            "goal_id": goal.id,
             "title": task.title,
             "description": task.description,
             "is_complete": task.is_complete
-        }
-        for task in goal.tasks
-    ]
+        })
 
-    response_body = {
+    return jsonify({
         "id": goal.id,
         "title": goal.title,
         "tasks": tasks
-    }
-
-    return jsonify(response_body), 200
-
+    })
