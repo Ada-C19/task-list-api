@@ -217,3 +217,20 @@ def create_goal():
     return jsonify({"goal": goal.to_dict()}), 201
 
 
+# update existing goal
+@goals_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+    request_data = request.get_json()
+    if "title" in request_data:
+        goal.title = request_data["title"]
+        
+        db.session.commit()
+
+    return jsonify({"goal": goal.to_dict()})
+
+# get specific goal
+@goals_bp.route("/<goal_id>", methods=["GET"])
+def get_goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+    return jsonify({"goal": goal.to_dict()})
