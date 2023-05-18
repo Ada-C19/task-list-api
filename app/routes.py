@@ -257,3 +257,4 @@ def delete_goal(goal_id):
     return jsonify({
         "details": f'Goal {goal.id} "{goal.title}" successfully deleted'
     }), 200
+    
