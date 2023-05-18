@@ -229,10 +229,14 @@ def update_goal(goal_id):
 
     return jsonify({"goal": goal.to_dict()})
 
-# get specific goal
+# get specific goal/ account for 404
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_goal(goal_id):
-    goal = Goal.query.get_or_404(goal_id)
+    goal = Goal.query.get(goal_id)
+
+    if goal is None:
+        return jsonify({"details": f"Goal {goal_id} was not found."}), 404
+
     return jsonify({"goal": goal.to_dict()})
 
 # delete a goal
@@ -245,3 +249,5 @@ def delete_goal(goal_id):
     return jsonify({
         "details": f'Goal {goal.id} "{goal.title}" successfully deleted'
     }), 200
+    
+    # 
