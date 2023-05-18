@@ -8,7 +8,6 @@ import requests
 tasks_bp = Blueprint("tasks", __name__, url_prefix=("/tasks"))
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 
-
 # create route (get) to get all tasks
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -258,3 +257,28 @@ def delete_goal(goal_id):
         "details": f'Goal {goal.id} "{goal.title}" successfully deleted'
     }), 200
     
+    
+# get a task for specific goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_for_specific_goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+
+    tasks = [
+        {
+            "id": task.id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.is_complete
+        }
+        for task in goal.tasks
+    ]
+
+    response_body = {
+        "id": goal.id,
+        "title": goal.title,
+        "tasks": tasks
+    }
+
+    return jsonify(response_body), 200
+
