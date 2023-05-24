@@ -68,7 +68,7 @@ def get_specific_task(task_id):
         "task": {
             "id": task.task_id,
             "title": task.title,
-            "description": task.description,
+            "description": task.desciption,
             "is_complete": task.completed_at != None
         }
     })
@@ -254,30 +254,25 @@ def delete_goal(goal_id):
     db.session.commit()
 
     return jsonify({
-        "details": f'Goal {goal.id} "{goal.title}" successfully deleted'
+        "details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'
     }), 200
     
     
 
 # get task for specific goal
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
-def get_tasks_for_goal(goal_id):
+def get_task_for_goal(goal_id):
     goal = Goal.query.get(goal_id)
     if not goal:
         return jsonify({"message": "Goal not found"}), 404
 
     tasks = []
     for task in goal.tasks:
-        tasks.append({
-            "id": task.id,
-            "goal_id": goal.id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.is_complete
-        })
+        tasks.append(task.to_dict())
 
     return jsonify({
-        "id": goal.id,
+        "id": goal.goal_id,
         "title": goal.title,
         "tasks": tasks
     })
+    
