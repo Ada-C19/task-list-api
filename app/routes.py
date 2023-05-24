@@ -258,21 +258,49 @@ def delete_goal(goal_id):
     }), 200
     
     
+# Add a task to a goal
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def goal_tasks_post(goal_id):
+    goal = Goal.query.get(goal_id)
+
+    if not goal:
+        return {"message": f"Goal {goal_id} not found"}, 404
+
+    request_body = request.get_json()
+
+    answer = {
+        "id": goal.goal_id,
+        "task_ids": request_body["task_ids"],
+    }
+
+    for task_id in request_body["task_ids"]:
+        task = Task.query.get(task_id)
+        if not task:
+            return {
+                "message":
+                    f"Task {task_id} not found"
+            }, 404
+
+        goal.tasks.append(task)
+
+    db.session.commit()
+
+    return answer, 200
 
 # get task for specific goal
 @goals_bp.route("/<goal_id>/tasks", methods=["GET"])
 def get_task_for_goal(goal_id):
     goal = Goal.query.get(goal_id)
     if not goal:
-        return jsonify({"message": "Goal not found"}), 404
+        return {"message": f"Goal not found"}, 404
 
-    tasks = []
-    for task in goal.tasks:
-        tasks.append(task.to_dict())
-
-    return jsonify({
+    answer = {
         "id": goal.goal_id,
         "title": goal.title,
-        "tasks": tasks
-    })
-    
+        "tasks": [],
+    }
+
+    for task in goal.tasks:
+        answer["tasks"].append(task.to_dict())
+
+    return answer, 200
