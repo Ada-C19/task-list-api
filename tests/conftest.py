@@ -39,6 +39,7 @@ def one_task(app):
         title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=None)
     db.session.add(new_task)
     db.session.commit()
+    return new_task
 
 
 # This fixture gets called in every test that
@@ -47,15 +48,18 @@ def one_task(app):
 # them in the database
 @pytest.fixture
 def three_tasks(app):
-    db.session.add_all([
+    tasks = [
         Task(
             title="Water the garden 🌷", description="", completed_at=None),
         Task(
             title="Answer forgotten email 📧", description="", completed_at=None),
         Task(
             title="Pay my outstanding tickets 😭", description="", completed_at=None)
-    ])
+    ]
+    db.session.add_all(tasks)
     db.session.commit()
+    return tasks
+
 
 
 # This fixture gets called in every test that
@@ -68,6 +72,7 @@ def completed_task(app):
         title="Go on my daily walk 🏞", description="Notice something new every day", completed_at=datetime.utcnow())
     db.session.add(new_task)
     db.session.commit()
+    return new_task
 
 
 # This fixture gets called in every test that
@@ -78,6 +83,7 @@ def one_goal(app):
     new_goal = Goal(title="Build a habit of going outside daily")
     db.session.add(new_goal)
     db.session.commit()
+    return new_goal
 
 
 # This fixture gets called in every test that
@@ -91,3 +97,4 @@ def one_task_belongs_to_one_goal(app, one_goal, one_task):
     goal = Goal.query.first()
     goal.tasks.append(task)
     db.session.commit()
+    return task
