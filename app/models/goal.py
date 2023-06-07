@@ -1,18 +1,17 @@
 from app import db
-from flask import Blueprint, jsonify, make_response, abort, request
+from flask import jsonify, make_response, abort
 
-goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
 class Goal(db.Model):
 
-    goal_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
-    tasks = db.relationship("Task", back_populates="goal")
+    # tasks = db.relationship("Task", back_populates="goal")
 
     def to_dict(self):
 
         goal_dict = {
-            "id": self.goal_id,
+            "id": self.id,
             "title": self.title
         }
 
