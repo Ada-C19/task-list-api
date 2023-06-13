@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request, abort
 from app.models.task import Task
 from datetime import datetime 
+from .routes import validate_model
 from app import db
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
@@ -11,13 +12,12 @@ tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 def create_task():
     request_body = request.get_json()
 
-
     new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit() 
 
-    return make_response(jsonify({"task": new_task.to_dict()}), 201) 
+    return make_response(jsonify({"task": new_task.to_dict()}), 201)  
 
 
 #GET ALL TASK ENDPOINTS -- WAVE 2 QUERY PARAM
@@ -28,28 +28,25 @@ def read_all_tasks():
     
     if sort_query_param == "asc":
         tasks = Task.query.order_by(Task.title).all()
-
     elif sort_query_param == "desc":
         tasks = Task.query.order_by(Task.title.desc()).all()
-
     else:
         tasks = Task.query.all()
 
     response_body = []
     
     for task in tasks:
-       response_body.append(task.to_dict())
-
+        response_body.append(task.to_dict())
 
     return jsonify(response_body)
 
 #GET ONE TASK ENDPOINT  
 @tasks_bp.route("/<task_id>", methods=["GET"])
-
 def handle_task(task_id):
-    task = validate_task(task_id)
 
-    return make_response({"task": task.to_dict()}) 
+    task = validate_model(Task, task_id)
+
+    return make_response(jsonify({"task": task.to_dict()}))
                          
 
 
@@ -58,7 +55,7 @@ def handle_task(task_id):
 @tasks_bp.route("/<task_id>", methods = ["PUT"])
 
 def update_task(task_id):
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
     request_body = request.get_json()
 
     task.title = request_body["title"]
@@ -72,7 +69,8 @@ def update_task(task_id):
 @tasks_bp.route("/<task_id>", methods = ["DELETE"])
 
 def delete_task(task_id):
-    task = validate_task(task_id)
+
+    task = validate_model(Task, task_id)
 
     db.session.delete(task)
     db.session.commit()
@@ -81,40 +79,29 @@ def delete_task(task_id):
 
 
 
-#HELPER FUNCTION
-def validate_task(task_id):
-    try: 
-        task_id = int(task_id)
-    except: 
-        abort(make_response({"message": f"Task {task_id} is invalid"}, 400))
-
-    task = Task.query.get(task_id)
-
-    if not task:
-        abort(make_response({"message": f"Task {task_id} was not found."}, 404))
-    
-    return task 
 
 
 #WAVE 3 - PATCH
 
 @tasks_bp.route("<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
-    
-    task = validate_task(task_id)
+
+    task = validate_model(Task, task_id)
+
 
     if task.completed_at is None:
         task.completed_at = datetime.now()
         
-        db.session.patch(task)
+    #    db.session.patch(task)
         db.session.commit()
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
 
+
 @tasks_bp.route("<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_incomplete(task_id):
 
-    task = validate_task(task_id)
+    task = validate_model(Task, task_id)
 
     if task.completed_at is not None:
         task.completed_at = None
@@ -122,6 +109,7 @@ def mark_incomplete(task_id):
         db.session.commit()
 
     return make_response(jsonify({"task": task.to_dict()}), 200)
+
 
 
 

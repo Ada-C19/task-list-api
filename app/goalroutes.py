@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request, abort
 from app.models.goal import Goal
+from app.models.task import Task
+from .routes import validate_model
 from app import db
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -7,6 +9,10 @@ goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_data = request.get_json()
+
+    if "title" not in request_data:
+        abort(make_response(jsonify({"details": "Invalid data"}), 400))
+
     goal = Goal(title=request_data["title"])
 
     db.session.add(goal)
@@ -16,6 +22,28 @@ def create_goal():
 
     return make_response(jsonify(response_body), 201)
 
+
+
+
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
+def create_task(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_data = request.get_json() 
+    task_ids = request_data["task_ids"]
+    tasks = []
+
+    for task_id in task_ids:
+        task = validate_model(Task, task_id) 
+        tasks.append(task)
+
+    goal.tasks += tasks
+
+    db.session.commit() 
+
+    response_body = {"id": goal.id,
+                     "task_ids": [task.id for task in goal.tasks]} 
+
+    return make_response(jsonify(response_body), 200)
 
 
 @goals_bp.route("", methods=["GET"])
@@ -31,10 +59,7 @@ def get_goals():
 
 @goals_bp.route("/<goal_id>", methods=["GET"])
 def get_goal(goal_id):
-    goal = Goal.query.get(goal_id)
-
-    if not goal:
-        abort(make_response(jsonify({"message": f"Goal {goal_id} was not found."}), 404))
+    goal = validate_model(Goal, goal_id)
 
     response_body = {"goal": goal.to_dict()}
 
@@ -42,13 +67,10 @@ def get_goal(goal_id):
 
 
 
+
 @goals_bp.route("/<goal_id>", methods=["PUT"])
 def update_goal(goal_id):
-    goal = Goal.query.get(goal_id)
-
-    if goal is None:
-        abort(make_response(jsonify({"message": f"Goal {goal_id} was not found."}), 404))
-
+    goal = validate_model(Goal, goal_id)
     request_data = request.get_json()
     goal.title = request_data["title"]
 
@@ -62,7 +84,7 @@ def update_goal(goal_id):
 
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_goal(goal_id):
-    goal = Goal.query.get(goal_id)
+    goal = validate_model(Goal, goal_id)
 
     if goal is None:
         abort(make_response(jsonify({"message": f"Goal {goal_id} was not found."}), 404))
@@ -75,5 +97,6 @@ def delete_goal(goal_id):
     }
 
     return make_response(jsonify(response_body), 200)
+
 
 
