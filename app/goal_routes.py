@@ -94,6 +94,7 @@ def create_task(goal_id):
 
     return response_body
 
+# NESTED ROUTES - GET
 @goals_bp.route("<goal_id>/tasks",  methods=["GET"])
 def get_tasks_of_one_goal(goal_id):
     goal = validate_model(Goal, goal_id)
