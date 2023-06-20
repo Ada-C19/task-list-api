@@ -63,16 +63,13 @@ def update_one_goal(goal_id):
 # DELETES ONE GOAL
 @goals_bp.route("/<goal_id>", methods=["DELETE"])
 def delete_one_goal(goal_id):
-
-    try:
-        goal = validate_model(Goal, goal_id)
-    except:
-        return make_response(f"Goal {goal_id} not found"), 404
-    
+    goal = validate_model(Goal, goal_id)
+        
     db.session.delete(goal)
     db.session.commit()
 
-    return {'details': f'Goal {goal_id} "{goal.title}" successfully deleted'}
+    return make_response(jsonify({"details": f"Goal {goal.goal_id} \"{goal.title}\" successfully deleted"}))
+
 
 # NESTED ROUTES - POST
 @goals_bp.route("<goal_id>/tasks", methods=["POST"])
