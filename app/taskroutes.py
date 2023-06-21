@@ -43,10 +43,19 @@ def read_all_tasks():
 #GET ONE TASK ENDPOINT  
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
-
     task = validate_model(Task, task_id)
-
-    return make_response(jsonify({"task": task.to_dict()}))
+    
+    response_body = {
+        "task": {
+            "id": task.id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.completed_at is not None
+        }
+    }
+    
+    return make_response(jsonify(response_body), 200)
                          
 
 

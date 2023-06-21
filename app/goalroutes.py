@@ -100,3 +100,23 @@ def delete_goal(goal_id):
 
 
 
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_goal_tasks(goal_id):
+    goal = validate_model(Goal, goal_id)
+
+    response_body = {
+        "id": goal.id,
+        "title": goal.title,
+        "tasks": []
+    }
+
+    for task in goal.tasks:
+        response_body["tasks"].append({
+            "id": task.id,
+            "goal_id": task.goal_id,
+            "title": task.title,
+            "description": task.description,
+            "is_complete": task.completed_at is not None
+        })
+
+    return make_response(jsonify(response_body), 200)
