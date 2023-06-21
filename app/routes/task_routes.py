@@ -10,9 +10,7 @@ from slack_sdk import WebClient
 
 
 tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
-
- 
-    
+   
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
     
@@ -72,12 +70,23 @@ def create_task():
 
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_task_complete(task_id):
-    task = validate_object(Task, task_id)
-    if task.completed_at is not None:
-        # The task is already complete
-        return {"task": task.to_dict()}, 200
-    task.completed_at = datetime.utcnow()
-    db.session.commit()
+    # task = validate_object(Task, task_id)
+    # if task.completed_at is not None:
+    #     # The task is already complete
+    #     return {"task": task.to_dict()}, 200
+    # task.completed_at = datetime.utcnow()
+    # db.session.commit()
+
+    # url = 'https://slack.com/api/chat.postMessage'
+    # headers = {
+    #     "Authorization": f"Bearer {os.environ['SLACK_TOKEN']}"
+    # }
+    # params = {
+    #     'channel': "task-notifications",
+    #     'text': f"Someone just completed the task {task.title}"
+    # }
+    # message = request.post(url, data=params, headers= headers)
+    # return message.json()
 
     #make a request to slack, post to slack channel task-notifications  
     slack_token= os.environ["SLACK_TOKEN"]
@@ -86,6 +95,8 @@ def mark_task_complete(task_id):
         text=f"Someone just completed the task {task.title}")
 
     return {"task": task.to_dict()}, 200
+
+   
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):

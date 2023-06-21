@@ -71,9 +71,8 @@ def get_one_goals_tasks(goal_id):
 @goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def post_tasks_to_goal(goal_id):
     goal = validate_object(Goal, goal_id)
-    task_ids = request.json.get("task_ids", [])
+    task_ids = request.json.get("task_ids")
  
-
     for task_id in task_ids:
         task = validate_object(Task, task_id)
         task.goal_id = goal_id

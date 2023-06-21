@@ -14,7 +14,7 @@ class Task(db.Model):
         new_dict = {"id": self.task_id,
                 "title": self.title,
                 "description": self.description,
-                "is_complete": (self.completed_at!=None)} 
+                "is_complete": bool(self.completed_at)} 
         if self.goal_id:
             new_dict["goal_id"] = self.goal_id
         return new_dict
