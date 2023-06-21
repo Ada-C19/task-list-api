@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app.models.task import Task
 from app import db
-from datetime import datetime
+import datetime
 from app.routes.helper_routes import validate_object
 import os
 import requests
@@ -86,7 +86,7 @@ def mark_task_complete(task_id):
     requests.post(url="https://slack.com/api/chat.postMessage", data=bot_data)
 
     return {"task": task.to_dict()}, 200
-   
+
 
 @tasks_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
 def mark_task_incomplete(task_id):
