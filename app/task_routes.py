@@ -9,16 +9,19 @@ import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
-
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
 
-    if (not request_body.get("title") or
-            not request_body.get("description")):
+    if (not request_body.get("title")):
         abort(make_response({"details": "Invalid data"}, 400))
 
-    task = Task.from_dict(request_body)
+    task_data = {
+        "title": request_body.get("title"),
+        "description": request_body.get("description")
+    }
+
+    task = Task.from_dict(task_data)
 
     db.session.add(task)
     db.session.commit()
