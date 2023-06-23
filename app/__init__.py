@@ -12,6 +12,7 @@ load_dotenv()
 def create_app(test_config=None):
     app = Flask(__name__)
     CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
     
     if not test_config:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("RENDER_DB_URI")
@@ -20,7 +21,6 @@ def create_app(test_config=None):
     else:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("TEST_DB_URI")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config['CORS_HEADERS'] = 'Content-Type'
     
     # Import models here for Alembic setup
     from app.models.task import Task
