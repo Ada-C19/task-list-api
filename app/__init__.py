@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 
 db = SQLAlchemy()
@@ -35,5 +36,5 @@ def create_app(test_config=None):
 
     from .routes.goal_routes import goal_bp
     app.register_blueprint(goal_bp)
-
+    CORS(app)
     return app
