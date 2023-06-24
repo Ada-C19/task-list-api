@@ -29,7 +29,7 @@ def create_task():
 
 @tasks_bp.route("", methods=["GET"])
 def get_all_tasks():
-    model_query = Task.query
+    model_query = Task.query.order_by(desc(Task.completed_at))
     sort_query = request.args.get("sort")
     title_query = request.args.get("title")
 
