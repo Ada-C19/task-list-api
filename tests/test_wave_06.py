@@ -112,3 +112,14 @@ def test_get_task_includes_goal_id(client, one_task_belongs_to_one_goal):
             "is_complete": False
         }
     }
+    
+def test_get_headers(client):
+    # Act
+    response = client.get("/tasks")
+    print(response.headers)
+    # response_body = response.get_json()
+
+    # Assert
+    assert response.status_code != 200
+    # assert response_body == {'Not found': 'No Goal with id#1 is found'}
+    # assert Goal.query.get(1) is None

@@ -2,21 +2,17 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import os
 
 db = SQLAlchemy()
 migrate = Migrate()
 load_dotenv()
 
-# @cross_origin(origins='http://localhost:3003')
+# origins='http://localhost:3003'
 def create_app(test_config=None):
     app = Flask(__name__)
-    CORS(app)
     CORS(app, resources={r'/*': {"origins": "*"}}, headers='Content-Type')
-    # app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
-    # app.config['CORS_HEADERS'] = 'Content-Type'
-    # Access-Control-Allow-Origin
     if not test_config:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("RENDER_DB_URI")
         # app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DEV_DB_URI")
