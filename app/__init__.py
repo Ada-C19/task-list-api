@@ -12,10 +12,10 @@ load_dotenv()
 # @cross_origin(origins='http://localhost:3003')
 def create_app(test_config=None):
     app = Flask(__name__)
-    CORS(app)
-    # CORS(app, resources={r'/*': {"origins": "*"}}, headers='Content-Type')
-    app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
-    app.config['CORS_HEADERS'] = 'Content-Type'
+    # CORS(app)
+    CORS(app, resources={r'/*': {"origins": "*"}}, headers='Content-Type')
+    # app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
+    # app.config['CORS_HEADERS'] = 'Content-Type'
     # Access-Control-Allow-Origin
     if not test_config:
         app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("RENDER_DB_URI")
