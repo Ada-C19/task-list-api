@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_cors import cross_origin
 from sqlalchemy.sql import func
 from app import db
 from app import valid
@@ -9,6 +10,7 @@ tasks_bp = Blueprint('tasks', __name__, url_prefix='/tasks')
 
 
 @tasks_bp.route('', methods=['POST'])
+@cross_origin()
 def create_task():
     request_body = request.get_json()
     valid_request = valid.validate_entry(Task, request_body)

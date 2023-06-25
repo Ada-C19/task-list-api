@@ -12,7 +12,7 @@ load_dotenv()
 # @cross_origin(origins='http://localhost:3003')
 def create_app(test_config=None):
     app = Flask(__name__)
-    # CORS(app)
+    CORS(app)
     CORS(app, resources={r'/*': {"origins": "*"}}, headers='Content-Type')
     # app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
     # app.config['CORS_HEADERS'] = 'Content-Type'
