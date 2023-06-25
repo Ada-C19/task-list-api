@@ -13,8 +13,8 @@ load_dotenv()
 def create_app(test_config=None):
     app = Flask(__name__)
     CORS(app)
-    CORS(app, resources={r'/*': {"origins": "*"}}, headers='Content-Type')
-    # app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
+    # CORS(app, resources={r'/*': {"origins": "*"}}, headers='Content-Type')
+    app.config['CORS_RESOURCES'] = {r"/api/*": {"origins": "*"}}
     app.config['CORS_HEADERS'] = 'Content-Type'
     # Access-Control-Allow-Origin
     if not test_config:
