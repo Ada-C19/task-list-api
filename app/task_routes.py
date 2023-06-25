@@ -23,6 +23,7 @@ def create_task():
 
 
 @tasks_bp.route('', methods=['GET'])
+@cross_origin()
 def get_tasks():
     title_query = request.args.get('title')
     sort_query = request.args.get('sort')
