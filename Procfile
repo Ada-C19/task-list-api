@@ -1,0 +1,1 @@
+web:gunicore wsgi:app
