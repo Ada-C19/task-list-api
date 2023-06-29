@@ -16,6 +16,8 @@ class Task(db.Model):
                 title = self.title,
                 description = self.description
             )
+        if self.goal is not None: 
+            task_dict["goal_id"] = self.goal_id
 
         if self.completed_at:
             task_dict["is_complete"] = True 

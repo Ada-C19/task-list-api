@@ -55,7 +55,7 @@ def handle_task(task_id):
         }
     }
     
-    return make_response(jsonify(response_body), 200)
+    return make_response(jsonify({"task": task.to_dict()}))
                          
 
 

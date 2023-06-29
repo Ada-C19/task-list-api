@@ -108,15 +108,11 @@ def get_goal_tasks(goal_id):
         "id": goal.id,
         "title": goal.title,
         "tasks": []
-    }
+    } 
 
-    for task in goal.tasks:
-        response_body["tasks"].append({
-            "id": task.id,
-            "goal_id": task.goal_id,
-            "title": task.title,
-            "description": task.description,
-            "is_complete": task.completed_at is not None
-        })
+    for task in goal.tasks: 
+        response_body["tasks"].append(task.to_dict()) 
 
     return make_response(jsonify(response_body), 200)
+
+
