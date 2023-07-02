@@ -22,9 +22,9 @@ class Task(db.Model):
 
         if self.goal_id:
             task_dict["task"]["goal_id"] = self.goal_id
-     
+
         return task_dict
- 
+
     @classmethod
     def from_dict(cls, task_dict):
         try:

@@ -9,6 +9,7 @@ import os
 
 tasks_bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
+
 @tasks_bp.route("", methods=["POST"])
 def create_task():
     request_body = request.get_json()
@@ -39,23 +40,23 @@ def read_all_tasks():
         tasks = Task.query.order_by(Task.title.desc()).all()
     else:
         tasks = Task.query.all()
-   
+
     tasks_response = [task.to_dict()["task"] for task in tasks]
-   
-    return jsonify(tasks_response), 200
+
+    return make_response(jsonify(tasks_response), 200)
 
 
 @tasks_bp.route("/<task_id>", methods=["GET"])
 def get_one_task(task_id):
     task = validate_model(Task, task_id)
 
-    return task.to_dict(), 200
- 
+    return make_response(task.to_dict(), 200)
+
 
 @tasks_bp.route("/<task_id>", methods=["PUT"])
 def update_one_task(task_id):
     task = validate_model(Task, task_id)
- 
+
     request_body = request.get_json()
 
     for attr, val in request_body.items():
@@ -81,7 +82,7 @@ def delete_one_task(task_id):
 @tasks_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
 def mark_complete(task_id):
     task = validate_model(Task, task_id)
-  
+
     url = "https://slack.com/api/chat.postMessage"
     payload = {
         "channel": "api-test-channel",
