@@ -14,9 +14,10 @@ class Task(db.Model):
         task_as_dict["id"] = self.task_id
         task_as_dict["title"] = self.title
         task_as_dict["description"] = self.description
-        # task_as_dict["completed_at"] = self.completed_at
         task_as_dict["is_complete"] = self.is_complete
-        task_as_dict["goal_id"] = self.goal_id
+        
+        if self.goal_id:
+            task_as_dict["goal_id"] = self.goal_id
 
         return task_as_dict
     
