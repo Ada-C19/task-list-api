@@ -3,7 +3,6 @@ from flask import Blueprint
 from app.models.task import Task
 from flask import Blueprint, jsonify, abort, make_response, request
 from datetime import datetime
-# import requests
 import os
 from dotenv import load_dotenv
 from app.slack_api import notify_slack
@@ -46,8 +45,6 @@ def create_task():
             "is_complete": new_task.is_complete
         }
     }, 201
-    
-    # return make_response(jsonify(f"Task {new_task.title} successfully created"), 201)
 
 @tasks_bp.route("", methods=["GET"])
 def get_tasks():
