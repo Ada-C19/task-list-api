@@ -10,6 +10,5 @@ class Goal(db.Model):
         goal_as_dict = {}
         goal_as_dict["id"] = self.goal_id
         goal_as_dict["title"] = self.title
-        goal_as_dict["tasks"] = self.tasks
 
         return goal_as_dict
