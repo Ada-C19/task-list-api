@@ -111,13 +111,19 @@ def delete_goal(goal_id):
     return make_response({"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'})
 
 # Send a list of Task IDs to a goal
-@goals_bp.route("/<goal_id>/tasks", methods=[])
+@goals_bp.route("/<goal_id>/tasks", methods=["POST"])
 def add_tasks_to_goal(goal_id):
     goal = validate_goal(goal_id)
     
     request_body = request.get_json()
     
-    tasks = validate_task_list(request_body("task_ids"))
+    task_ids = request_body["task_ids"]
     
-    for task in tasks:
-        
+    tasks = validate_task_list(task_ids)
+    
+    # for task in tasks:
+    #     goal
+    goal.tasks = tasks
+    db.session.commit()
+    
+    return make_response({"id": goal.goal_id, "task_ids": task_ids})
