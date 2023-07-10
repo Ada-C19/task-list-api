@@ -35,20 +35,6 @@ def validate_task_list(task_ids):
     
     return task_list
 
-# def validate_task(task_id):
-#     try:
-#         task_id = int(task_id)
-#     except:
-#         abort(make_response({"message": f"task {task_id} is invalid"}, 400))
-
-#     task = Task.query.get(task_id)
-    
-#     if not task:
-#         abort(make_response({"details": f"Task {task_id} not found"}, 404))
-    
-#     return task
-    
-
 @goals_bp.route("", methods=["POST"])
 def create_goal():
     request_body = request.get_json()
@@ -122,8 +108,6 @@ def add_tasks_to_goal(goal_id):
     
     tasks = validate_task_list(task_ids)
     
-    # for task in tasks:
-    #     goal
     goal.tasks = tasks
     db.session.commit()
     
@@ -134,19 +118,8 @@ def add_tasks_to_goal(goal_id):
 def get_tasks_of_one_goal(goal_id):
     goal = validate_goal(goal_id)
     
-    # tasks = Task.query.all(goal_id)
-    
     tasks_response = []
     for task in goal.tasks:
-        # task = Task.query.get(task_id)
-        
-        # tasks_response.append({
-        #     "id": task.task_id,
-        #     "goal_id": goal_id,
-        #     "title": task.title,
-        #     "description": task.description,
-        #     "is_complete": task.is_complete
-        # })
         tasks_response.append(task.to_dict())
     
     return make_response({
