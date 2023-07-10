@@ -22,7 +22,7 @@ def validate_task_list(task_ids):
     try:
         task_ids = list(task_ids)
     except:
-        abort(make_response({"message": f"task_ids list {task_ids} is invalid"}. 400))
+        abort(make_response({"message": f"task_ids list {task_ids} is invalid"}, 400))
     
     task_list = []
     
@@ -30,7 +30,7 @@ def validate_task_list(task_ids):
         task = Task.query.get(task_id)
         if not task:
             abort(make_response({"details": f"Task {task_id} not found"}))
-        task_list.append(task_id)
+        task_list.append(task)
     
     return task_list
 
@@ -112,8 +112,12 @@ def delete_goal(goal_id):
 
 # Send a list of Task IDs to a goal
 @goals_bp.route("/<goal_id>/tasks", methods=[])
-def add_tasks_to_goal(goal_id, task_ids):
+def add_tasks_to_goal(goal_id):
     goal = validate_goal(goal_id)
     
-    tasks = validate_task_list(task_ids)
+    request_body = request.get_json()
     
+    tasks = validate_task_list(request_body("task_ids"))
+    
+    for task in tasks:
+        
