@@ -1,5 +1,6 @@
 from app import db
 from app.models.goal import Goal
+from app.models.task import Task
 from flask import Blueprint, abort, make_response, request, jsonify
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
@@ -16,6 +17,36 @@ def validate_goal(goal_id):
         abort(make_response({"details": f"Goal {goal_id} not found"}, 404))
     
     return goal
+
+def validate_task_list(task_ids):
+    try:
+        task_ids = list(task_ids)
+    except:
+        abort(make_response({"message": f"task_ids list {task_ids} is invalid"}. 400))
+    
+    task_list = []
+    
+    for task_id in task_ids:
+        task = Task.query.get(task_id)
+        if not task:
+            abort(make_response({"details": f"Task {task_id} not found"}))
+        task_list.append(task_id)
+    
+    return task_list
+
+# def validate_task(task_id):
+#     try:
+#         task_id = int(task_id)
+#     except:
+#         abort(make_response({"message": f"task {task_id} is invalid"}, 400))
+
+#     task = Task.query.get(task_id)
+    
+#     if not task:
+#         abort(make_response({"details": f"Task {task_id} not found"}, 404))
+    
+#     return task
+    
 
 @goals_bp.route("", methods=["POST"])
 def create_goal():
@@ -79,4 +110,10 @@ def delete_goal(goal_id):
     
     return make_response({"details": f'Goal {goal.goal_id} "{goal.title}" successfully deleted'})
 
-# @goals_bp.route("/<goal_id>/tasks", methods=[])
+# Send a list of Task IDs to a goal
+@goals_bp.route("/<goal_id>/tasks", methods=[])
+def add_tasks_to_goal(goal_id, task_ids):
+    goal = validate_goal(goal_id)
+    
+    tasks = validate_task_list(task_ids)
+    
