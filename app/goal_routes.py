@@ -127,3 +127,22 @@ def add_tasks_to_goal(goal_id):
     db.session.commit()
     
     return make_response({"id": goal.goal_id, "task_ids": task_ids})
+
+# Getting Tasks of One Goal
+@goals_bp.route("/<goal_id>/tasks", methods=["GET"])
+def get_tasks_of_one_goal(goal_id):
+    goal = validate_goal(goal_id)
+    
+    tasks = goal.tasks
+    
+    tasks_response = []
+    for task_id in tasks:
+        task = Task.query.get(task_id)
+        
+        tasks_response.append(task.to_dict())
+    
+    return {
+        "id": goal.goal_id,
+        "title": goal.title,
+        "tasks": tasks_response
+    }
