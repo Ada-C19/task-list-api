@@ -2,6 +2,7 @@ from app import db
 from app.models.goal import Goal
 from app.models.task import Task
 from flask import Blueprint, abort, make_response, request, jsonify
+from sqlalchemy import select
 
 goals_bp = Blueprint("goals_bp", __name__, url_prefix="/goals")
 
@@ -133,16 +134,23 @@ def add_tasks_to_goal(goal_id):
 def get_tasks_of_one_goal(goal_id):
     goal = validate_goal(goal_id)
     
-    tasks = goal.tasks
+    # tasks = Task.query.all(goal_id)
     
     tasks_response = []
-    for task_id in tasks:
-        task = Task.query.get(task_id)
+    for task in goal.tasks:
+        # task = Task.query.get(task_id)
         
+        # tasks_response.append({
+        #     "id": task.task_id,
+        #     "goal_id": goal_id,
+        #     "title": task.title,
+        #     "description": task.description,
+        #     "is_complete": task.is_complete
+        # })
         tasks_response.append(task.to_dict())
     
-    return {
+    return make_response({
         "id": goal.goal_id,
         "title": goal.title,
         "tasks": tasks_response
-    }
+    }, 200)
