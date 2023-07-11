@@ -38,12 +38,7 @@ def create_task():
     db.session.commit()
     
     return {
-        "task": {
-            "id": new_task.task_id,
-            "title": new_task.title,
-            "description": new_task.description,
-            "is_complete": new_task.is_complete
-        }
+        "task": new_task.to_dict()
     }, 201
 
 @tasks_bp.route("", methods=["GET"])
