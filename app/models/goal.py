@@ -9,7 +9,6 @@ class Goal(db.Model):
     def to_dict(self):
         goal = {
         "id": self.goal_id,
-        "title": self.title,
-        "tasks": self.tasks
+        "title": self.title
         }
         return goal
