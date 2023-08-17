@@ -31,10 +31,7 @@ def get_tasks_for_goal(goal_id):
     goal = Goal.query.get_or_404(goal_id)
 
     response = goal.to_dict()
-
-    if not goal.tasks:
-        response["tasks"] = []
-        
+    response["tasks"] = []
     for task in goal.tasks:
         response["tasks"].append(task.to_dict())
 

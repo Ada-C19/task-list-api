@@ -14,10 +14,12 @@ class Task(db.Model):
         "id": self.task_id,
         "title": self.title,
         "description": self.description,
-        "is_complete": False
+        "is_complete": False,
         }
         if self.completed_at is not None:
             task["is_complete"] = True
+        if self.goal_id is not None:
+            task["goal_id"] = self.goal_id
         return task
     
     @classmethod
