@@ -2,6 +2,7 @@ from flask import abort, Blueprint, jsonify, make_response, request
 from sqlalchemy import desc, asc
 from app import db
 from app.models.task import Task
+from app.models.goal import Goal
 from datetime import datetime, timezone
 import requests
 import os
