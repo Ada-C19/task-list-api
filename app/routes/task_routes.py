@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, request
 from sqlalchemy import desc, asc
 from app import db
 from app.models.task import Task
@@ -6,17 +6,8 @@ from datetime import datetime, timezone
 import requests
 import os
 
-SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
+
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
-
-
-def call_slack_API(title):
-    r = requests.post('https://slack.com/api/chat.postMessage', 
-                        data={
-                            'channel': 'C05N61M2JHG',
-                            'text': f'Task {title} was marked complete!'},
-                        headers={'Authorization': SLACK_API_TOKEN})
-    return None
 
 
 @task_bp.route("", methods=["GET"])
@@ -74,7 +65,12 @@ def mark_complete(task_id):
     task = Task.query.get_or_404(task_id)
 
     task.completed_at = str(datetime.now(timezone.utc))
-    call_slack_API(task.title)
+
+    slack_bot = requests.post('https://slack.com/api/chat.postMessage', 
+                        data={
+                            'channel': 'C05N61M2JHG',
+                            'text': f'Task "{task.title}" was marked complete!'},
+                        headers={'Authorization': os.environ.get("SLACK_API_TOKEN")})
     
     db.session.commit()
 

@@ -1,11 +1,7 @@
-from flask import abort, Blueprint, jsonify, make_response, request
-from sqlalchemy import desc, asc
+from flask import Blueprint, jsonify, request
 from app import db
 from app.models.goal import Goal
 from app.models.task import Task
-from datetime import datetime, timezone
-import requests
-import os
 
 
 goal_task_bp = Blueprint("goal_task", __name__, url_prefix="/goals")
