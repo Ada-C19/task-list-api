@@ -20,7 +20,7 @@ def call_slack_API(title):
 
 
 @task_bp.route("", methods=["GET"])
-def get_all_tasks():
+def get_tasks():
     sort_query = request.args.get("sort")
     if sort_query == "asc":
         tasks = Task.query.order_by(asc(Task.title))
@@ -37,19 +37,16 @@ def get_all_tasks():
 
 
 @task_bp.route("/<task_id>", methods=["GET"])
-def get_one_task(task_id):
+def get_task(task_id):
     task = Task.query.get_or_404(task_id)
     return {"task": task.to_dict()}, 200
 
 
 @task_bp.route("", methods=["POST"])
-def create_new_task():
+def create_task():
     request_body = request.get_json()
     try:
-        new_task = Task(
-            title=request_body["title"],
-            description=request_body["description"]
-        )
+        new_task = Task.from_dict(request_body)
     except KeyError:
         return {"details": "Invalid data"}, 400
     
@@ -60,7 +57,7 @@ def create_new_task():
 
 
 @task_bp.route("/<task_id>", methods=["PUT"])
-def update_one_task(task_id):
+def update_task(task_id):
     task = Task.query.get_or_404(task_id)
     request_body = request.get_json()
 
@@ -73,7 +70,7 @@ def update_one_task(task_id):
 
 
 @task_bp.route("/<task_id>/mark_complete", methods=["PATCH"])
-def mark_complete_one_task(task_id):
+def mark_complete(task_id):
     task = Task.query.get_or_404(task_id)
 
     task.completed_at = datetime.now(timezone.utc)
@@ -85,7 +82,7 @@ def mark_complete_one_task(task_id):
 
 
 @task_bp.route("/<task_id>/mark_incomplete", methods=["PATCH"])
-def mark_incomplete_one_task(task_id):
+def mark_incomplete(task_id):
     task = Task.query.get_or_404(task_id)
 
     task.completed_at = None
@@ -96,7 +93,7 @@ def mark_incomplete_one_task(task_id):
 
 
 @task_bp.route("/<task_id>", methods=["DELETE"])
-def delete_one_task(task_id):
+def delete_task(task_id):
     task = Task.query.get_or_404(task_id)
 
     db.session.delete(task)
