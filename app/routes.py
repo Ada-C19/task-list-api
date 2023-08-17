@@ -10,6 +10,7 @@ import os
 SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
 goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
+goal_task_bp = Blueprint("goal_task", __name__, url_prefix="/goals/<goal_id>/tasks")
 
 
 
