@@ -143,3 +143,9 @@ def get_all_goals():
         response.append(goal.to_dict())
 
     return jsonify(response), 200
+
+
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def get_one_task(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+    return {"goal": goal.to_dict()}, 200
