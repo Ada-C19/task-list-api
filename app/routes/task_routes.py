@@ -73,7 +73,7 @@ def update_task(task_id):
 def mark_complete(task_id):
     task = Task.query.get_or_404(task_id)
 
-    task.completed_at = datetime.now(timezone.utc)
+    task.completed_at = str(datetime.now(timezone.utc))
     call_slack_API(task.title)
     
     db.session.commit()
