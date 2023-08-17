@@ -146,13 +146,13 @@ def get_all_goals():
 
 
 @goal_bp.route("/<goal_id>", methods=["GET"])
-def get_one_task(goal_id):
+def get_one_goal(goal_id):
     goal = Goal.query.get_or_404(goal_id)
     return {"goal": goal.to_dict()}, 200
 
 
 @goal_bp.route("/<goal_id>", methods=["PUT"])
-def update_one_task(goal_id):
+def update_one_goal(goal_id):
     goal = Goal.query.get_or_404(goal_id)
     request_body = request.get_json()
 
@@ -161,3 +161,14 @@ def update_one_task(goal_id):
     db.session.commit()
 
     return {"goal": goal.to_dict()}, 200
+
+
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_one_goal(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+
+    db.session.delete(goal)
+    db.session.commit()
+
+    return {"details": (f'Goal {goal.goal_id} "{goal.title}" '
+                        'successfully deleted')}, 200
