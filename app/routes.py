@@ -26,7 +26,6 @@ def call_slack_API(title):
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
-
     sort_query = request.args.get("sort")
     if sort_query == "asc":
         tasks = Task.query.order_by(asc(Task.title))
@@ -127,3 +126,20 @@ def create_new_goal():
     db.session.commit()
 
     return {"goal": new_goal.to_dict()}, 201
+
+
+@goal_bp.route("", methods=["GET"])
+def get_all_goals():
+    sort_query = request.args.get("sort")
+    if sort_query == "asc":
+        goals = Goal.query.order_by(asc(Goal.title))
+    elif sort_query == "desc":
+        goals = Goal.query.order_by(desc(Goal.title))
+    else:
+        goals = Goal.query.all()
+
+    response = []
+    for goal in goals:
+        response.append(goal.to_dict())
+
+    return jsonify(response), 200
