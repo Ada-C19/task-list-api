@@ -13,8 +13,7 @@ class Task(db.Model):
         "title": self.title,
         "description": self.description,
         "is_complete": False
-    }
+        }
         if self.completed_at is not None:
             task["is_complete"] = True
-
         return task

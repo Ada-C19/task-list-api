@@ -8,6 +8,8 @@ import os
 
 SLACK_API_TOKEN = os.environ.get("SLACK_API_TOKEN")
 task_bp = Blueprint("task", __name__, url_prefix="/tasks")
+goal_bp = Blueprint("goal", __name__, url_prefix="/goals")
+
 
 
 def call_slack_API(title):
@@ -18,6 +20,8 @@ def call_slack_API(title):
                         headers={'Authorization': SLACK_API_TOKEN})
     return None
 
+
+''' TASK ROUTES '''
 
 @task_bp.route("", methods=["GET"])
 def get_all_tasks():
@@ -105,3 +109,20 @@ def delete_one_task(task_id):
 
     return {"details": (f'Task {task.task_id} "{task.title}" '
                         'successfully deleted')}, 200
+
+
+''' GOAL ROUTES '''
+@goal_bp.route("", methods=["POST"])
+def create_new_goal():
+    request_body = request.get_json()
+    try:
+        new_goal = Goal(
+            title=request_body["title"],
+        )
+    except KeyError:
+        return {"details": "Invalid data"}, 400
+    
+    db.session.add(new_goal)
+    db.session.commit()
+
+    return {"goal": new_goal.to_dict()}, 201
