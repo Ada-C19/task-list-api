@@ -149,3 +149,15 @@ def get_all_goals():
 def get_one_task(goal_id):
     goal = Goal.query.get_or_404(goal_id)
     return {"goal": goal.to_dict()}, 200
+
+
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_one_task(goal_id):
+    goal = Goal.query.get_or_404(goal_id)
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+
+    return {"goal": goal.to_dict()}, 200
