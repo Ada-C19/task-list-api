@@ -19,6 +19,7 @@ def create_task():
         db.session.commit()
 
         return make_response(jsonify({"task": new_task.to_dict()}), 201)
+        
 
     except KeyError as error:
         abort(make_response(jsonify({"details": "Invalid data"}), 400))
