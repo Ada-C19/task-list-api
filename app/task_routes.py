@@ -61,7 +61,7 @@ def delete_task(id):
     message = {"details": f'Task 1 "{task_to_delete.title}" successfully deleted'}
     return make_response(message, 200)
 
-#PATCH /tasks/1/mark_incomplete" [UPDATE]
+#PATCH /tasks/1/mark_incomplete [UPDATE]
 @tasks_bp.route("/<id>/mark_incomplete", methods = ["PATCH"])
 def mark_incompleted(id):
     task_to_incomplete = validate_task(id)
