@@ -39,7 +39,7 @@ def create_goal():
     db.session.commit()
     return make_response({"goal":new_goal.to_json()}), 201
 
-#UPDATE one goal- PUT /goals/<id>  (UPDATE)
+#UPDATE one goal- PUT /goals/<id>  [UPDATE]
 @goals_bp.route("/<id>",methods=["PUT"])
 def update_goal(id):
     goal = validate_goal(id)
@@ -49,7 +49,7 @@ def update_goal(id):
 
     return jsonify({"goal":goal.to_json()}), 200
 
-#DELETE one goal -DELETE /goals/<id> (DELETE)
+#DELETE one goal -DELETE /goals/<id> [DELETE]
 @goals_bp.route("/<id>", methods=["DELETE"])
 def delete_goal(id):
     goal_to_delete = validate_goal(id)
@@ -60,7 +60,7 @@ def delete_goal(id):
     message = {"details": f'Goal 1 "{goal_to_delete.title}" successfully deleted'}
     return make_response(message, 200)
 
-#POST taks ids to goal  /goals/1/tasks [CREATE]
+#POST tasks ids to goal  /goals/1/tasks [CREATE]
 @goals_bp.route("/<id>/tasks", methods=["POST"])
 def post_task_ids_to_goal(id):
     goal = validate_goal(id)
