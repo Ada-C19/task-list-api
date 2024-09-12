@@ -1,17 +1,12 @@
 # Setup
 
-## Goal
-
-The goal for setup is to cover all of the set up needed at the beginning of this project, which includes:
-
-1. Forking and cloning
-1. Managing dependencies
-1. Setting up development and test databases
-1. Setting up a `.env` file
-1. Running `$ flask db init`
-1. Running `$ flask run` and `$ FLASK_ENV=development flask run`
-
 # Requirements
+
+- Python 
+- Flask
+- pip
+- SQLAlchemy
+
 
 ## Fork and Clone
 
